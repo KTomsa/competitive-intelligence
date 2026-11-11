@@ -1,5 +1,7 @@
 
 import os
+import logging
+from typing import Literal
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -9,6 +11,7 @@ from google.genai import types
 from google.genai.errors import APIError
 
 from evidence_agent import review_evidence
+from judge_agent import judge_claim
 
 
 # --------------------------------------------------
@@ -17,9 +20,11 @@ from evidence_agent import review_evidence
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
+
 app = FastAPI(
     title="Fact or Watt",
-    version="0.2.0",
+    version="0.3.0",
     description="Multi-agent claim checking system for the energy sector."
 )
 
@@ -46,7 +51,12 @@ class ClaimRequest(BaseModel):
 
 
 class ClaimAnalysis(BaseModel):
-    category: str
+    category: Literal[
+        "price",
+        "environment",
+        "customers",
+        "other"
+    ]
     normalized_claim: str
     required_evidence: list[str]
     limitations: str
@@ -57,6 +67,7 @@ class ClaimAnalysis(BaseModel):
 # --------------------------------------------------
 
 def extract_claim(claim: str) -> ClaimAnalysis:
+
     api_key = os.getenv("GEMINI_API_KEY")
 
     if not api_key:
@@ -79,7 +90,7 @@ def extract_claim(claim: str) -> ClaimAnalysis:
             energy suppliers.
 
             Tasks:
-            1. Identify the claim category:
+            1. Identify claim category:
                price, environment,
                customers, or other.
             2. Normalize the claim.
@@ -87,12 +98,10 @@ def extract_claim(claim: str) -> ClaimAnalysis:
             4. Describe limitations.
 
             Rules:
-            - Do not invent facts.
-            - Do not invent sources.
+            - Do not invent facts or sources.
             - Do not judge truthfulness.
             - Do not accuse companies.
-            - The provided claim is
-              unverified user input.
+            - The claim is unverified user input.
             - Respond in Czech.
             """,
             response_mime_type="application/json",
@@ -102,14 +111,12 @@ def extract_claim(claim: str) -> ClaimAnalysis:
 
     if not response.text:
         raise ValueError(
-            "Claim Extractor returned an empty response."
+            "Claim Extractor returned an empty response"
         )
 
-    analysis = ClaimAnalysis.model_validate_json(
+    return ClaimAnalysis.model_validate_json(
         response.text
     )
-
-    return analysis
 
 
 # --------------------------------------------------
@@ -120,53 +127,75 @@ def extract_claim(claim: str) -> ClaimAnalysis:
 def health():
     return {
         "status": "ok",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "agents": [
             "Claim Extractor",
-            "Evidence Agent"
+            "Evidence Agent",
+            "Judge Agent"
         ]
     }
 
 
 @app.post("/analyze")
 def analyze(request: ClaimRequest):
+
     try:
-        # Agent 1: extract and classify the claim
+        executed_agents = []
+
+        supplied_evidence = [
+            item.model_dump()
+            for item in request.evidence
+        ]
+
+        # Agent 1 - Claim Extractor
         claim_analysis = extract_claim(
             request.claim
         )
 
-        # Agent 2: evaluate supplied evidence
-        evidence_analysis = None
+        executed_agents.append(
+            "Claim Extractor"
+        )
 
-        if request.evidence:
+        evidence_analysis = None
+        judge_analysis = None
+
+        if supplied_evidence:
+
+            # Agent 2 - Evidence Agent
             evidence_analysis = review_evidence(
                 claim=request.claim,
                 category=claim_analysis.category,
-                evidence=[
-                    item.model_dump()
-                    for item in request.evidence
-                ]
+                evidence=supplied_evidence
             ).model_dump()
 
-        # Return combined results
+            executed_agents.append(
+                "Evidence Agent"
+            )
+
+            # Agent 3 - Judge Agent
+            judge_analysis = judge_claim(
+                claim=request.claim,
+                claim_analysis=claim_analysis.model_dump(),
+                evidence_analysis=evidence_analysis,
+                evidence=supplied_evidence
+            ).model_dump()
+
+            executed_agents.append(
+                "Judge Agent"
+            )
+
+        # Combined output from all agents
         return {
             "claim": request.claim,
             "claim_analysis": claim_analysis.model_dump(),
             "evidence_analysis": evidence_analysis,
-            "evidence": [
-                item.model_dump()
-                for item in request.evidence
-            ],
+            "judge_analysis": judge_analysis,
+            "evidence": supplied_evidence,
+            "evidence_provenance": (
+                "USER_SUPPLIED_UNVERIFIED"
+            ),
             "verification_status": "NOT_VERIFIED",
-            "agents_executed": [
-                "Claim Extractor",
-                *(
-                    ["Evidence Agent"]
-                    if request.evidence
-                    else []
-                )
-            ]
+            "agents_executed": executed_agents
         }
 
     except APIError as exc:
@@ -193,6 +222,10 @@ def analyze(request: ClaimRequest):
         raise
 
     except Exception as exc:
+        logger.exception(
+            "Unexpected error during claim analysis"
+        )
+
         raise HTTPException(
             status_code=500,
             detail="Claim analysis failed."
