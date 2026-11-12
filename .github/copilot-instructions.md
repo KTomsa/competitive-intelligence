@@ -14,6 +14,7 @@ Fact or Watt je český interní Competitive Intelligence nástroj pro ověřov�
 - Testy: `pytest` + Flask test client, síť a LLM mockovat.
 - **Zákaz:** Next.js, React, Vue, Angular, TypeScript, JS/Node backend, Zod a neřízené multiagentní konverzace.
 - Využívej Ruff pro linting a formátování (`black`).
+- Využívej UV jako package manager a pro lokální vývoj. V repozitáři je `pyproject.toml` s verzemi závislostí; nepoužívej `pip install -U` ani `pip freeze > requirements.txt`.
 
 ## Bezpečnostní zásady
 - Žádné volné LLM promptování, žádný nevalidovaný JSON, žádné volné volání URL, žádný neomezený Python kód. Všechny vstupy validuj Pydantic a kontrolou doslovného citátu.
