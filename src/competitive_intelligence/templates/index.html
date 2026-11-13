@@ -26,6 +26,14 @@
           </label>
           {% endfor %}
         </div>
+        <label class="perspective-pick" for="perspective">Dívám se za firmu
+          <select id="perspective">
+            <option value="">— bez pohledu firmy —</option>
+            {% for s in suppliers %}
+            <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
         <p class="hint">
           Srovnávací profil: {{ profile.commodity }}, sazba {{ profile.tariff }}, distribuční území {{ profile.area }}.
           Stránky dodavatelů, jejich ceníky a data ERÚ a OTE se při běhu stahují znovu.

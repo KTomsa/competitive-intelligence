@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import agents, rules
+from . import agents, insights, rules
 from .connectors import eru, ote, pricelist, web
 from .connectors.http import FetchError
 
@@ -91,6 +91,8 @@ def _comparison(suppliers: list[dict], ctx: dict) -> list[dict]:
             bench = rules.benchmark_offer(offer, ctx)
             price_list = offer.get("price_list") or {}
             groups.setdefault(offer["fixation_months"], []).append({
+                "supplier_id": supplier["id"],
+                "audience": offer.get("audience"),
                 "supplier": supplier["name"],
                 "product": offer["product"],
                 "price_mwh_excl_vat": offer.get("price_mwh_excl_vat"),
@@ -113,7 +115,12 @@ def _comparison(suppliers: list[dict], ctx: dict) -> list[dict]:
     return out
 
 
-def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool | None = None) -> dict:
+def run(
+    supplier_ids: list[str] | None = None,
+    live: bool = True,
+    use_llm: bool | None = None,
+    perspective: str | None = None,
+) -> dict:
     config = load_config()
     suppliers = copy.deepcopy(config["suppliers"])
     known = {s["id"] for s in suppliers}
@@ -207,12 +214,30 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
         use_llm,
     )
 
-    report_suppliers, flat = [], []
+    def evaluate(supplier: dict, claim: dict) -> dict:
+        verdict = rules.evaluate(claim, supplier, ctx)
+        item = {
+            "id": claim["id"],
+            "supplier": supplier["name"],
+            "quote": claim["quote"],
+            "rule_id": claim["rule_id"],
+            "rule_label": rules.RULE_LABELS.get(claim["rule_id"], claim["rule_id"]),
+            "source_url": supplier["source_url"],
+            "captured_at": supplier["captured_at"],
+            "source_status": claim["source_status"],
+            "discovered": claim["discovered"],
+            "verdict_label": agents.VERDICT_LABEL[verdict["verdict"]],
+            **verdict,
+        }
+        if claim["source_status"] == "changed":
+            item["limitation"] += f" Citát už na živé stránce není; byl zachycen {supplier['captured_at']}."
+        return item
+
+    # připravená tvrzení všech dodavatelů (pohled firmy potřebuje i ty, které nejsou vybrané k zobrazení)
+    evaluated: dict[str, list[dict]] = {}
     for supplier in suppliers:
-        if supplier["id"] not in selected:
-            continue
         page = pages[supplier["id"]]
-        claims_in = []
+        items = []
         for claim in supplier["claims"]:
             if page is None:
                 status = "prepared_only"
@@ -222,41 +247,35 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
                 status = "live"
             else:
                 status = "changed"
-            claims_in.append({**claim, "source_status": status, "discovered": False})
+            items.append(evaluate(supplier, {**claim, "source_status": status, "discovered": False}))
+        evaluated[supplier["id"]] = items
+
+    report_suppliers, flat = [], []
+    for supplier in suppliers:
+        if supplier["id"] not in selected:
+            continue
+        page = pages[supplier["id"]]
         new_claims, extractor_info = extracted.get(
             supplier["id"], ([], {"method": "nespuštěno", "note": None})
         )
-        if page is not None:
-            for n, claim in enumerate(new_claims, start=1):
-                claims_in.append({
-                    **claim, "id": f"{supplier['id']}-n{n}",
-                    "source_status": page["source"]["origin"], "discovered": True,
-                })
-        claims_out, candidates = [], []
-        for claim in claims_in:
-            base = {
-                "id": claim["id"],
-                "supplier": supplier["name"],
-                "quote": claim["quote"],
-                "rule_id": claim["rule_id"],
-                "rule_label": rules.RULE_LABELS.get(claim["rule_id"], claim["rule_id"]),
-                "source_url": supplier["source_url"],
-                "captured_at": supplier["captured_at"],
-                "source_status": claim["source_status"],
-                "discovered": claim["discovered"],
+        claims_out, candidates = list(evaluated[supplier["id"]]), []
+        for n, claim in enumerate(new_claims if page is not None else [], start=1):
+            found = {
+                **claim, "id": f"{supplier['id']}-n{n}",
+                "source_status": page["source"]["origin"], "discovered": True,
             }
-            if claim["discovered"] and not extractor_info["method"].startswith("model"):
+            if not extractor_info["method"].startswith("model"):
                 # nález podle klíčových slov nikdo nezkontroloval: jen kandidát, bez verdiktu
-                candidates.append(base)
+                candidates.append({
+                    "id": found["id"], "supplier": supplier["name"], "quote": found["quote"],
+                    "rule_id": found["rule_id"],
+                    "rule_label": rules.RULE_LABELS.get(found["rule_id"], found["rule_id"]),
+                    "source_url": supplier["source_url"], "captured_at": supplier["captured_at"],
+                    "source_status": found["source_status"], "discovered": True,
+                })
                 continue
-            verdict = rules.evaluate(claim, supplier, ctx)
-            item = {**base, "verdict_label": agents.VERDICT_LABEL[verdict["verdict"]], **verdict}
-            if claim["source_status"] == "changed":
-                item["limitation"] += (
-                    f" Citát už na živé stránce není; byl zachycen {supplier['captured_at']}."
-                )
-            claims_out.append(item)
-            flat.append(item)
+            claims_out.append(evaluate(supplier, found))
+        flat.extend(claims_out)
         report_suppliers.append({
             "id": supplier["id"],
             "name": supplier["name"],
@@ -272,6 +291,11 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
             "claims": claims_out,
             "candidates": candidates,
         })
+
+    comparison = _comparison(suppliers, ctx)
+    market = insights.market_overview(suppliers, ctx, comparison)
+    own = next((s for s in suppliers if s["id"] == perspective), None)
+    view = insights.build_perspective(own, ctx, comparison, evaluated, market) if own else None
 
     all_live = (
         eru_data["source"]["origin"] == "live"
@@ -289,7 +313,9 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
         "profile": config["profile"],
         "sources": sources,
         "price_lists": price_list_sources,
-        "comparison": _comparison(suppliers, ctx),
+        "comparison": comparison,
+        "market": market,
+        "perspective": view,
         "suppliers": report_suppliers,
         "briefing": agents.write_briefing(
             flat, use_llm and time.monotonic() - started < LLM_BUDGET_S
@@ -300,9 +326,10 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
 
 
 def main() -> None:
-    """python -m competitive_intelligence.workflow [--save-example] [--snapshot]"""
+    """python -m competitive_intelligence.workflow [--save-example] [--snapshot] [--perspective=id]"""
     sys.stdout.reconfigure(encoding="utf-8")
-    report = run(live="--snapshot" not in sys.argv)
+    perspective = next((a.split("=", 1)[1] for a in sys.argv if a.startswith("--perspective=")), None)
+    report = run(live="--snapshot" not in sys.argv, perspective=perspective)
     if "--save-example" in sys.argv:
         report["is_saved_example"] = True
         EXAMPLE_REPORT.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")

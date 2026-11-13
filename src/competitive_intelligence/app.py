@@ -48,9 +48,12 @@ def create_app() -> Flask:
             or not all(isinstance(i, str) and i in known for i in supplier_ids)
         ):
             return jsonify(error="supplier_ids musí být neprázdný seznam známých identifikátorů."), 400
+        perspective = body.get("perspective") or None
+        if perspective is not None and perspective not in known:
+            return jsonify(error="perspective musí být identifikátor známého dodavatele."), 400
         live = body.get("mode", "live") != "snapshot"
         try:
-            report = workflow.run(supplier_ids, live=live)
+            report = workflow.run(supplier_ids, live=live, perspective=perspective)
         except workflow.AuditError as exc:
             return jsonify(error=str(exc)), 502
         return jsonify(report)

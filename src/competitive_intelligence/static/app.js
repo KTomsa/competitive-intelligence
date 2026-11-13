@@ -61,7 +61,12 @@
       const resp = await fetch("/api/v1/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ supplier_ids: ids, mode: mode, code: codeInput ? codeInput.value : undefined }),
+        body: JSON.stringify({
+          supplier_ids: ids,
+          mode: mode,
+          perspective: document.getElementById("perspective").value || undefined,
+          code: codeInput ? codeInput.value : undefined,
+        }),
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.error || "Audit selhal.");
@@ -177,6 +182,173 @@
     return sec;
   }
 
+  function pctText(v) {
+    return (v > 0 ? "+" : "") + String(v.toFixed(1)).replace(".", ",") + " %";
+  }
+
+  function changeCell(change) {
+    const td = el("td");
+    if (!change) { td.textContent = "–"; return td; }
+    td.append(el("strong", change.abs < 0 ? "neg" : "pos", pctText(change.pct)));
+    td.append(el("span", "sub", " (" + (change.abs > 0 ? "+" : "") + czNumber.format(change.abs) + ")"));
+    return td;
+  }
+
+  function bulletList(items, cls) {
+    const ul = el("ul", cls || "plain");
+    items.forEach((node) => { const li = el("li"); li.append(node); ul.append(li); });
+    return ul;
+  }
+
+  function perspectivePanel(v) {
+    const sec = el("section", "panel perspective");
+    sec.append(el("h2", null, "Pohled pro firmu " + v.supplier));
+
+    sec.append(el("h3", null, "1. Kde stojíme cenou"));
+    if (v.price.length) {
+      const wrap = el("div", "matrix-wrap");
+      const table = el("table", "cmp");
+      const head = el("tr");
+      ["Fixace a náš produkt", "Ročně při " + v.price[0].annual_mwh[0] + " MWh", "Pořadí ve vzorku", "Pásmo ERÚ", "Kdo je levnější"]
+        .forEach((t) => head.append(el("th", null, t)));
+      table.append(head);
+      v.price.forEach((p) => {
+        const tr = el("tr", "plain-row");
+        const first = el("td", "cmp-name");
+        first.append(el("strong", null, p.fixation_months + " měs."), el("span", null, " " + p.product));
+        tr.append(first);
+        tr.append(el("td", null, czNumber.format(p.annual_cost[0]) + " Kč"));
+        tr.append(el("td", null, p.rank + ". z " + p.of));
+        const pos = el("td");
+        pos.append(el("span", "badge pos-" + p.position, POSITION_TEXT[p.position] || p.position));
+        tr.append(pos);
+        const who = el("td", "cmp-name");
+        who.textContent = p.cheaper.length
+          ? p.cheaper.map((c) => c.supplier + " o " + czNumber.format(c.saving[0]) + " Kč").join(", ")
+          : "nikdo ve vzorku";
+        tr.append(who);
+        table.append(tr);
+      });
+      wrap.append(table);
+      sec.append(wrap);
+    } else {
+      sec.append(el("p", "meta", "Pro tuto firmu nemáme ceník fixovaného produktu, cenu proto nelze srovnat."));
+    }
+
+    sec.append(el("h3", null, "2. Kde je naše vlastní reklama napadnutelná"));
+    if (v.risky.length) {
+      sec.append(bulletList(v.risky.map((c) => {
+        const box = el("div");
+        box.append(el("strong", null, "„" + c.quote + "“ "), el("span", "badge", c.verdict_label));
+        box.append(el("div", null, c.finding));
+        return box;
+      })));
+      sec.append(el("p", "meta", "Stejná data může použít konkurent. Zvážit přeformulování, nebo si připravit doložení."));
+    } else {
+      sec.append(el("p", "meta", "Žádné z připravených tvrzení není podle dostupných dat napadnutelné."));
+    }
+    if (v.cautions.length) sec.append(bulletList(v.cautions.map((t) => el("span", null, t)), "plain warn"));
+    if (v.solid.length) {
+      sec.append(el("p", "meta", "Obstojí: " + v.solid.map((c) => "„" + c.quote + "“ (" + c.verdict_label + ")").join("; ")));
+    }
+
+    sec.append(el("h3", null, "3. Co můžeme tvrdit a doložit"));
+    if (v.provable.length) {
+      sec.append(bulletList(v.provable.map((c) => {
+        const box = el("div");
+        box.append(el("div", null, c.text));
+        box.append(el("div", "meta", "Zdroj: " + c.source + ". " + c.caveat));
+        return box;
+      })));
+    } else {
+      sec.append(el("p", "meta", "Z dostupných dat nevychází žádné tvrzení, které by šlo doložit."));
+    }
+
+    sec.append(el("h3", null, "4. Co dělá konkurence a týká se nás"));
+    const KIND = { price: "Cena", claim: "Tvrzení konkurenta", loyalty: "Noví a stávající zákazníci", growth: "Růst" };
+    if (v.watch.length) {
+      sec.append(bulletList(v.watch.map((w) => {
+        const box = el("div");
+        box.append(el("span", "badge auto", KIND[w.kind] || w.kind), " ");
+        if (w.kind === "claim") {
+          box.append(el("strong", null, w.supplier + ": „" + w.quote + "“ "), el("span", "badge", w.verdict_label));
+          box.append(el("div", null, w.text));
+        } else {
+          box.append(el("span", null, w.text));
+        }
+        return box;
+      })));
+    } else {
+      sec.append(el("p", "meta", "V datech není nic, co by se této firmy přímo týkalo."));
+    }
+    sec.append(el("p", "meta", v.note));
+    return sec;
+  }
+
+  function marketPanel(m, ownId) {
+    const sec = el("section", "panel");
+    sec.append(el("h2", null, "Cena a růst: kdo získává odběrná místa"));
+    if (m.observations.length) sec.append(bulletList(m.observations.map((t) => el("strong", null, t)), "plain"));
+    const wrap = el("div", "matrix-wrap");
+    const table = el("table", "cmp");
+    const head = el("tr");
+    ["Dodavatel", "Elektřina: změna OPM", "Plyn: změna OPM",
+      "Nejlevnější nabídka" + (m.fixation_months ? " (" + m.fixation_months + " měs., ročně při " + m.annual_mwh + " MWh)" : ""),
+      "Pásmo ERÚ"].forEach((t) => head.append(el("th", null, t)));
+    table.append(head);
+    m.rows.forEach((row) => {
+      const tr = el("tr", "plain-row" + (row.id === ownId ? " own" : ""));
+      tr.append(el("td", "cmp-name", row.name + (row.id === ownId ? " (my)" : "")));
+      tr.append(changeCell(row.electricity), changeCell(row.gas));
+      tr.append(el("td", null, row.price ? row.price.rank + ". z " + row.price.of + " · " + czNumber.format(row.price.annual_cost) + " Kč" : "bez ceníku"));
+      const pos = el("td");
+      if (row.price) pos.append(el("span", "badge pos-" + row.price.position, POSITION_TEXT[row.price.position] || row.price.position));
+      else pos.textContent = "–";
+      tr.append(pos);
+      table.append(tr);
+    });
+    wrap.append(table);
+    sec.append(wrap);
+    const period = m.period ? "Změna počtu odběrných míst od " + m.period.from + " do " + m.period.to + " podle OTE" : "Změna počtu odběrných míst podle OTE";
+    const total = m.market_electricity_pct == null ? "" : "; trh elektřiny jako celek " + pctText(m.market_electricity_pct);
+    sec.append(el("p", "meta", period + total + ". " + m.caveat));
+
+    if (m.loyalty_gaps && m.loyalty_gaps.length) {
+      sec.append(el("h3", null, "Cena pro nové a pro stávající zákazníky"));
+      const wrap2 = el("div", "matrix-wrap");
+      const t2 = el("table", "cmp");
+      const h2 = el("tr");
+      ["Dodavatel a fixace", "Nový zákazník Kč/MWh", "Stávající Kč/MWh", "Rozdíl", "Ročně navíc", "Ověření"]
+        .forEach((t) => h2.append(el("th", null, t)));
+      t2.append(h2);
+      m.loyalty_gaps.forEach((g) => {
+        const tr = el("tr", "plain-row");
+        const first = el("td", "cmp-name");
+        first.append(el("strong", null, g.supplier), el("span", null, " " + g.fixation_months + " měs."));
+        first.append(el("div", "sub", g.new_product + " → " + g.existing_product));
+        tr.append(first);
+        tr.append(el("td", null, czNumber.format(g.new_price)));
+        tr.append(el("td", null, czNumber.format(g.existing_price)));
+        const diff = el("td");
+        diff.append(el("strong", "neg", "+" + String(g.pct).replace(".", ",") + " %"));
+        tr.append(diff);
+        const annual = g.annual_diff.filter((x) => x != null).map((x) => czNumber.format(x) + " Kč");
+        tr.append(el("td", null, annual.length ? annual.join(" až ") : "–"));
+        const ver = el("td");
+        ver.append(el("span", "badge " + (g.confirmed_live ? "origin-live" : "origin-snapshot"),
+          g.confirmed_live ? "ceníky živě" : "z přípravy"));
+        if (g.inferred) ver.append(" ", el("span", "badge", "odvozeno"));
+        tr.append(ver);
+        t2.append(tr);
+      });
+      wrap2.append(t2);
+      sec.append(wrap2);
+      const notes = Array.from(new Set(m.loyalty_gaps.map((g) => g.source_note).filter(Boolean)));
+      sec.append(el("p", "meta", m.loyalty_caveat + " " + notes.join(" ")));
+    }
+    return sec;
+  }
+
   function claimCard(c) {
     const card = el("article", "claim verdict-" + c.verdict);
     const head = el("div", "claim-head");
@@ -244,6 +416,8 @@
       reportEl.append(warn);
     }
 
+    if (r.perspective) reportEl.append(perspectivePanel(r.perspective));
+
     const brief = el("section", "panel briefing");
     brief.append(el("h2", null, "Briefing pro vedení"), el("p", "headline", r.briefing.headline), el("p", null, r.briefing.summary));
     if (r.briefing.priorities.length) {
@@ -275,6 +449,7 @@
     }
     brief.append(el("p", "meta", "Způsob sestavení: " + r.briefing.method));
     reportEl.append(brief);
+    if (r.market) reportEl.append(marketPanel(r.market, r.perspective ? r.perspective.id : null));
 
     const srcPanel = el("section", "panel");
     srcPanel.append(el("h2", null, "Zdroje použité v tomto běhu"));

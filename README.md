@@ -11,7 +11,9 @@ Rozsah vychází z revize architektury z 13. 11. 2026 (jedna aplikace, žádná 
 3. **Stáhne úřední data**: indikativní cenová pásma ERÚ (CSV) a počty odběrných míst dodavatelů elektřiny i plynu z OTE.
 4. **Vyhodnotí tvrzení pravidly v kódu** (ne jazykovým modelem) a ke každému vrátí kartu: tvrzení, nález, omezení, doporučený krok, podklady s výpočtem.
 5. **Srovná fixované nabídky** podle ročního nákladu (cena komodity a stálý plat) a podle pozice vůči pásmu ERÚ.
-6. **Sestaví briefing** s nejvýše třemi prioritami.
+6. **Ukáže cenu a růst vedle sebe**: kdo získává odběrná místa (OTE) a za jakou cenu, a o kolik víc platí stávající zákazníci než noví u téhož dodavatele.
+7. **Sestaví pohled jedné firmy** (volba „Dívám se za firmu“): kde stojíme cenou, která naše tvrzení jsou napadnutelná, co můžeme tvrdit a doložit a co dělá konkurence.
+8. **Sestaví briefing** s nejvýše třemi prioritami.
 
 Když živé stažení selže, použije se datovaný snapshot a rozhraní to viditelně označí. Snapshot se nikdy nevydává za živá data.
 
@@ -71,6 +73,7 @@ src/
     app.py                      # Flask: stránka + POST /api/v1/analyze + GET /api/v1/example
     workflow.py                 # jeden běh auditu
     rules.py                    # pravidla a verdikty
+    insights.py                 # přehled trhu (cena a růst) a pohled jedné firmy
     agents.py                   # Claim Extractor, Strategist
     connectors/                 # http (allowlist), eru, ote, web, pricelist
     data/suppliers.json         # připravené vstupy: citáty, URL, data zachycení, ceny, odkazy na ceníky
@@ -119,6 +122,8 @@ Verdikty se předem nepřipravují.
 - Ceny jsou z ceníků pro distribuční území PRE a sazbu D02d; jinde se mohou lišit.
 - Ceníky E.ON nejdou stáhnout automaticky (jsou za vícekrokovým průvodcem). Jejich ceny dodal tým z PDF stažených 13. 11. 2026; při běhu se živě ověřuje jen cena jednoho produktu na stránce.
 - LAMA energy nemá ve vzorku ceník, takže její cenové tvrzení zůstává neověřené.
+- Údaj, zda je produkt určen novým nebo i stávajícím zákazníkům, pochází ze stránek dodavatele a neověřuje se živě. U ČEZ ho uvádí sám dodavatel, u E.ON je odvozen z názvů produktů.
+- Souběh ceny a růstu není důkaz příčiny; změna počtu odběrných míst může zahrnovat i převzetí jiného dodavatele.
 - Kontrola ceníku hledá v textu PDF název produktu, cenu a stálý plat; neověřuje, že čísla patří ke stejnému řádku tabulky.
 - Zelená tvrzení lze podložit jen prohlášením dodavatele; záruky původu v evidenci OTE se neověřují.
 - Připravené citáty a ceny zastarávají; když dodavatel změní web nebo ceník, aplikace na to upozorní a údaj je potřeba znovu zachytit.

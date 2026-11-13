@@ -244,6 +244,58 @@ def test_model_cannot_assign_a_rule_the_quote_does_not_support(monkeypatch):
     assert [(c["quote"], c["rule_id"]) for c in claims] == [(lines[0], "other"), (lines[2], "price_rank")]
 
 
+def test_company_perspective_answers_four_questions_from_snapshots():
+    report = workflow.run(live=False, perspective="centropol")
+    view = report["perspective"]
+    assert view["supplier"] == "Centropol"
+    # 1. cena: u každé fixace je vidět, kdo je levnější a o kolik
+    by_months = {p["fixation_months"]: p for p in view["price"]}
+    assert [c["supplier"] for c in by_months[36]["cheaper"]] == ["ČEZ Prodej"]
+    assert round(by_months[36]["cheaper"][0]["saving"][0]) == 317
+    assert [c["supplier"] for c in by_months[24]["cheaper"]] == ["E.ON"]
+    # 2. vlastní napadnutelná tvrzení
+    assert {c["id"] for c in view["risky"]} == {"centropol-1", "centropol-2"}
+    # 3. doložitelná tvrzení mají zdroj a výhradu a neobsahují zanedbatelné rozdíly
+    assert view["provable"] and all(c["source"] and c["caveat"] for c in view["provable"])
+    assert any("Rosteme" in c["text"] for c in view["provable"])
+    assert not any("o 25 Kč" in c["text"] for c in view["provable"])
+    # 4. konkurence: tvrzení, která se nás týkají, a dražší ceny pro stávající zákazníky jinde
+    kinds = {w["kind"] for w in view["watch"]}
+    assert {"price", "claim", "loyalty", "growth"} <= kinds
+    assert any(w["kind"] == "claim" and w["supplier"] == "Dobrá Energie" for w in view["watch"])
+
+
+def test_market_overview_and_loyalty_gap_from_price_lists():
+    report = workflow.run(live=False)
+    assert report["perspective"] is None
+    market = report["market"]
+    rows = {r["id"]: r for r in market["rows"]}
+    assert rows["cez"]["price"]["rank"] == 1 and rows["cez"]["electricity"]["abs"] < 0
+    assert rows["epet"]["electricity"]["pct"] > 0
+    assert len(market["observations"]) == 3
+    gaps = {(g["supplier_id"], g["fixation_months"]): g for g in market["loyalty_gaps"]}
+    cez = gaps[("cez", 36)]
+    assert (cez["new_price"], cez["existing_price"], cez["pct"]) == (3250.0, 3630.0, 11.7)
+    assert cez["annual_diff"] == [760.0, 1520.0] and cez["inferred"] is False
+    assert gaps[("eon", 36)]["inferred"] is True  # u E.ON je rozdělení jen odvozené z názvů
+
+
+def test_own_loyalty_gap_is_a_caution_not_an_opportunity():
+    view = workflow.run(live=False, perspective="cez")["perspective"]
+    assert any("stávající zákazníci platí víc" in c for c in view["cautions"])
+    assert not any(w["kind"] == "loyalty" and "ČEZ Prodej" in w["text"] for w in view["watch"])
+    assert any("Růst u elektřiny tvrdit nelze" in c for c in view["cautions"])
+
+
+def test_api_validates_perspective():
+    client = create_app().test_client()
+    body = {"supplier_ids": ["cez"], "mode": "snapshot"}
+    ok = client.post("/api/v1/analyze", json={**body, "perspective": "centropol"})
+    assert ok.status_code == 200 and ok.get_json()["perspective"]["id"] == "centropol"
+    assert client.post("/api/v1/analyze", json={**body, "perspective": "neznamy"}).status_code == 400
+    assert client.post("/api/v1/analyze", json=body).get_json()["perspective"] is None
+
+
 def test_vercel_entrypoint_imports():
     import importlib
 

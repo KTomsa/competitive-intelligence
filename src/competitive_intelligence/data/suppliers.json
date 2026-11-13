@@ -63,7 +63,8 @@
               "(2 685,95)",
               "163,35"
             ]
-          }
+          },
+          "audience": "new"
         },
         {
           "id": "cez-online12",
@@ -84,7 +85,8 @@
               "(2 760,33)",
               "163,35"
             ]
-          }
+          },
+          "audience": "new"
         },
         {
           "id": "cez-bezstarosti36",
@@ -105,7 +107,8 @@
               "(3 000,00)",
               "163,35"
             ]
-          }
+          },
+          "audience": "existing"
         },
         {
           "id": "cez-bezstarosti24",
@@ -126,10 +129,38 @@
               "(3 223,14)",
               "163,35"
             ]
+          },
+          "audience": "existing"
+        },
+        {
+          "id": "cez-bezstarosti12",
+          "product": "Elektřina Bez starostí na 1 rok",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 12,
+          "price_mwh_excl_vat": 3280.99,
+          "price_mwh_incl_vat": 3970.0,
+          "monthly_fee_incl_vat": 163.35,
+          "audience": "existing",
+          "price_list": {
+            "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
+            "document": "moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
+            "effective_from": "2026-08-25",
+            "markers": [
+              "Elektřina Bez starostí na 1 rok",
+              "3 970,00",
+              "(3 280,99)",
+              "163,35"
+            ]
           }
         }
       ],
-      "green_evidence": []
+      "green_evidence": [],
+      "audience_source": {
+        "url": "https://www.cez.cz/nextcez/cs/ceniky?commodity=ele",
+        "note": "ČEZ na stránce ceníků uvádí: Elektřina Fix na 3 roky a Elektřina Online na 1 rok „pro nové zákazníky“, Elektřina Bez starostí „pro nové i stávající zákazníky“ (zachyceno 13. 11. 2026).",
+        "inferred": false
+      }
     },
     {
       "id": "centropol",
@@ -276,7 +307,8 @@
             "document": "cenik--variant--pro--na--3--roky--10_26-----distribucni--uzemi--pre.pdf",
             "effective_from": "2026-10-10",
             "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
-          }
+          },
+          "audience": "new"
         },
         {
           "id": "eon-variantpro24",
@@ -292,7 +324,8 @@
             "document": "cenik--variant--pro--na--2--roky--10_26-----distribucni--uzemi--pre.pdf",
             "effective_from": "2026-10-01",
             "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
-          }
+          },
+          "audience": "new"
         },
         {
           "id": "eon-variant36",
@@ -308,10 +341,16 @@
             "document": "cenik--variant--na--3--roky--11_26-----distribucni--uzemi--pre.pdf",
             "effective_from": "2026-11-04",
             "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
-          }
+          },
+          "audience": "existing"
         }
       ],
-      "green_evidence": []
+      "green_evidence": [],
+      "audience_source": {
+        "url": "https://www.eon.cz/domacnosti/elektrina/",
+        "note": "E.ON na stránce doporučuje novým zákazníkům tarif s označením PRO a stávajícím tarif bez něj. U řady Variant je rozdělení odvozeno z tohoto pojmenování (zachyceno 13. 11. 2026).",
+        "inferred": true
+      }
     },
     {
       "id": "epet",

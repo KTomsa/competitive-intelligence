@@ -505,6 +505,9 @@ def _ote_position(data: dict | None, supplier: dict):
     return None, None, ranking
 
 
+ote_position = _ote_position  # veřejný název pro pohled firmy
+
+
 def _combined_ranking(ctx: dict) -> list[tuple[str, int]]:
     """Součet OPM elektřiny a plynu podle dodavatele."""
     ele = ctx["ote"]["ranking"]
