@@ -79,6 +79,9 @@ def benchmark_offer(offer: dict, ctx: dict) -> dict:
         "price": None,
         "basis": None,
     }
+    if offer.get("stale"):
+        out["reason"] = "Cena z přípravy už na živé stránce není; nabídku je potřeba znovu zachytit."
+        return out
     if offer.get("fixation_months") is None:
         out["reason"] = "Produkt nemá fixaci; pásma ERÚ existují jen pro fixované produkty."
         return out
@@ -152,7 +155,9 @@ def band_evidence(bm: dict, ctx: dict) -> dict:
 
 
 ERU_LIMIT = (
-    "Pásmo ERÚ je indikativní cena komodity bez stálého měsíčního platu a bez regulovaných složek; "
+    "Pásmo ERÚ odpovídá zhruba 25. až 50. percentilu fixovaných nabídek na trhu (dolní mez = hranice "
+    "nejlevnější čtvrtiny, horní mez = přibližně medián). Je to cena komodity bez stálého měsíčního "
+    "platu a bez regulovaných složek; "
     "neříká nic o celkovém účtu ani o tom, zda je nabídka nejlevnější na trhu."
 )
 
@@ -209,7 +214,8 @@ def price_favorable(claim, supplier, ctx):
 
 def _comparable(offer: dict, ctx: dict) -> bool:
     return (
-        offer.get("tariff") == ctx["profile"]["tariff"]
+        not offer.get("stale")
+        and offer.get("tariff") == ctx["profile"]["tariff"]
         and offer.get("fixation_months") is not None
         and offer.get("price_mwh_excl_vat") is not None
     )
@@ -224,7 +230,9 @@ def _annual_cost(offer: dict, mwh: float) -> float | None:
 
 
 def price_rank(claim, supplier, ctx):
-    kind = claim.get("params", {}).get("kind", "superlative")
+    kind = claim.get("params", {}).get("kind")
+    if kind is None:  # automaticky nalezené tvrzení: „garance nejnižší ceny“ je závazek dorovnání
+        kind = "price_match_guarantee" if "garanc" in claim.get("quote", "").casefold() else "superlative"
     own = [o for o in supplier["offers"] if _comparable(o, ctx)]
     sample = [s["name"] for s in ctx["suppliers"] if s["id"] != supplier["id"]]
     sample_note = (
@@ -381,7 +389,10 @@ def price_guarantee(claim, supplier, ctx):
         found = re.search(r"(\d+)\s*(rok|roky|roků|let|měsíc)", claim.get("quote", ""))
         if found:
             months = int(found.group(1)) * (1 if found.group(2).startswith("měsíc") else 12)
-    matching = [o for o in supplier["offers"] if months and o.get("fixation_months") == months]
+    matching = [
+        o for o in supplier["offers"]
+        if months and o.get("fixation_months") == months and not o.get("stale")
+    ]
     if not matching:
         return result(
             UNVERIFIABLE,

@@ -17,7 +17,7 @@ from .connectors.web import contains, normalize
 from .rules import CONTRADICTED, PARTIAL, RULE_LABELS, SUPPORTED, UNVERIFIABLE
 
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
-LLM_TIMEOUT_MS = 20_000
+LLM_TIMEOUT_MS = 15_000
 MAX_PAGE_CHARS = 60_000
 MAX_NEW_CLAIMS = 5
 
@@ -59,7 +59,7 @@ def _parse(system: str, user: str, schema: type[BaseModel]):
         try:
             response = client.models.generate_content(model=MODEL, contents=user, config=config)
         except APIError as exc:
-            if exc.code not in (403, 429, 500, 503, 504):
+            if exc.code not in (403, 429, 500, 503):
                 raise
             time.sleep(2)  # přetížení bývá krátké: jeden opakovaný pokus
             response = client.models.generate_content(model=MODEL, contents=user, config=config)
@@ -133,9 +133,15 @@ def _keyword_extract(lines: list[str]) -> list[dict]:
     return found
 
 
+def _stems(text: str) -> set[str]:
+    """Hrubé kmeny slov (prvních pět písmen), aby „Garance“ a „Garanci“ byly totéž."""
+    return {w[:5] for w in re.findall(r"\w{4,}", text.casefold())}
+
+
 def _accept(candidates: list[dict], page: dict, known_quotes: list[str]) -> list[dict]:
     """Ponechá jen citáty, které doslova existují ve staženém textu a nejsou duplicitní."""
     claims, seen = [], [normalize(q).casefold() for q in known_quotes]
+    seen_stems = [_stems(q) for q in seen]
     for cand in candidates:
         quote = normalize(cand["quote"])
         key = quote.casefold()
@@ -143,7 +149,11 @@ def _accept(candidates: list[dict], page: dict, known_quotes: list[str]) -> list
             continue
         if any(key in s or s in key for s in seen):
             continue
+        stems = _stems(key)
+        if stems and any(stems <= known or (known and known <= stems) for known in seen_stems):
+            continue  # stejné tvrzení v jiném tvaru nebo jeho zkrácená verze
         seen.append(key)
+        seen_stems.append(stems)
         claims.append({"quote": quote, "rule_id": cand["rule_id"], "params": {}})
         if len(claims) >= MAX_NEW_CLAIMS:
             break

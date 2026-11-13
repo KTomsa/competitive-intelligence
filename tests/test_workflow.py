@@ -112,15 +112,61 @@ def test_api_runs_only_configured_suppliers():
     assert client.get("/").status_code == 200
     ok = client.post("/api/v1/analyze", json={"supplier_ids": ["cez"], "mode": "snapshot"})
     assert ok.status_code == 200 and [s["id"] for s in ok.get_json()["suppliers"]] == ["cez"]
-    assert client.post("/api/v1/analyze", json={"supplier_ids": ["https://evil.example"]}).status_code == 502
-    assert client.post("/api/v1/analyze", json={"supplier_ids": "cez"}).status_code == 400
+    for bad in ({"supplier_ids": ["https://evil.example"]}, {"supplier_ids": "cez"}, {"supplier_ids": []},
+                {"mode": "snapshot"}, {"supplier_ids": [["cez"]]}):
+        assert client.post("/api/v1/analyze", json=bad).status_code == 400, bad
+    assert client.post("/api/v1/analyze", data="{oops", content_type="application/json").status_code == 400
+    assert client.post("/api/v1/analyze").status_code == 400
 
 
 def test_api_requires_demo_code_when_configured(monkeypatch):
     monkeypatch.setenv("DEMO_CODE", "tajne")
     client = create_app().test_client()
-    assert client.post("/api/v1/analyze", json={"mode": "snapshot"}).status_code == 403
-    assert client.post("/api/v1/analyze", json={"mode": "snapshot", "code": "tajne"}).status_code == 200
+    body = {"mode": "snapshot", "supplier_ids": ["cez"]}
+    assert client.post("/api/v1/analyze", json=body).status_code == 403
+    assert client.post("/api/v1/analyze", json={**body, "code": "tajne"}).status_code == 200
+
+
+def test_price_gone_from_live_page_no_longer_decides(monkeypatch):
+    def changed_page(url):
+        name = {"www.cez.cz": "web_cez.html", "www.centropol.cz": "web_centropol.html",
+                "www.eon.cz": "web_eon.html", "www.bezdodavatele.cz": "web_bezdodavatele.html"}
+        host = url.split("/")[2]
+        if host not in name:
+            raise http.FetchError("úřední zdroj v testu nedostupný")
+        content = (http.SNAPSHOT_DIR / name[host]).read_bytes()
+        if host == "www.cez.cz":
+            content = content.replace("3 340".encode(), "3 999".encode())
+        return http.Fetched(content=content, url=url, fetched_at="2026-11-13T12:00:00+00:00", origin="live")
+
+    monkeypatch.setattr(http, "fetch_live", changed_page)
+    report = workflow.run(["cez"], live=True)
+    offers = {o["id"]: o for o in report["suppliers"][0]["offers"]}
+    assert offers["cez-online12"]["stale"] and not offers["cez-online12"]["benchmark"]["eligible"]
+    assert offers["cez-fix36"]["confirmed_live"]
+    assert any("už na živé stránce není" in w for w in report["warnings"])
+
+
+def test_snapshot_mode_never_calls_model(monkeypatch):
+    monkeypatch.setenv("CI_USE_LLM", "1")
+    monkeypatch.setenv("GEMINI_API_KEY", "x")
+
+    def boom(*args):
+        raise AssertionError("model se v režimu snapshot nesmí volat")
+
+    monkeypatch.setattr(agents, "_parse", boom)
+    assert workflow.run(["cez"], live=False)["llm_used"] is False
+
+
+def test_model_duplicates_of_prepared_claims_are_dropped(monkeypatch):
+    page = {"lines": [], "text": "Ke stabilní dodávce energií dáváme Garanci nejnižší ceny. Garance nejnižší ceny"}
+
+    def fake_parse(system, user, schema):
+        return schema(claims=[{"quote": "Garance nejnižší ceny", "rule_id": "price_rank"}])
+
+    monkeypatch.setattr(agents, "_parse", fake_parse)
+    known = ["Ke stabilní dodávce energií dáváme Garanci nejnižší ceny."]
+    assert agents.extract_claims(page, known, use_llm=True)[0] == []
 
 
 def test_vercel_entrypoint_imports():

@@ -34,15 +34,20 @@ def create_app() -> Flask:
 
     @app.post("/api/v1/analyze")
     def analyze():
-        body = request.get_json(silent=True) or {}
+        body = request.get_json(silent=True)
+        if not isinstance(body, dict):
+            return jsonify(error="Tělo požadavku musí být JSON objekt."), 400
         demo_code = os.environ.get("DEMO_CODE")
         if demo_code and not hmac.compare_digest(str(body.get("code", "")), demo_code):
             return jsonify(error="Neplatný přístupový kód."), 403
+        known = {s["id"] for s in workflow.load_config()["suppliers"]}
         supplier_ids = body.get("supplier_ids")
-        if supplier_ids is not None and (
-            not isinstance(supplier_ids, list) or not all(isinstance(i, str) for i in supplier_ids)
+        if (
+            not isinstance(supplier_ids, list)
+            or not supplier_ids
+            or not all(isinstance(i, str) and i in known for i in supplier_ids)
         ):
-            return jsonify(error="supplier_ids musí být seznam identifikátorů."), 400
+            return jsonify(error="supplier_ids musí být neprázdný seznam známých identifikátorů."), 400
         live = body.get("mode", "live") != "snapshot"
         try:
             report = workflow.run(supplier_ids, live=live)

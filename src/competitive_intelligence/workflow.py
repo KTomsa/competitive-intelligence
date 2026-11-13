@@ -4,6 +4,7 @@ from __future__ import annotations
 import copy
 import json
 import sys
+import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,6 +15,7 @@ from .connectors.http import FetchError
 
 DATA = Path(__file__).resolve().parent / "data"
 EXAMPLE_REPORT = DATA / "example_report.json"
+LLM_BUDGET_S = 25  # po této době se briefing složí ze šablony, aby požadavek nepřesáhl limit
 
 
 class AuditError(Exception):
@@ -52,7 +54,9 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
     if not selected:
         raise AuditError("Nebyl vybrán žádný známý dodavatel.")
     if use_llm is None:
-        use_llm = agents.llm_available()
+        # běh z uložených dat je záloha pro případ bez internetu, proto bez modelu
+        use_llm = live and agents.llm_available()
+    started = time.monotonic()
     now = datetime.now(timezone.utc)
     warnings: list[str] = []
 
@@ -74,10 +78,21 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
     for supplier in suppliers:
         page = pages[supplier["id"]]
         for offer in supplier["offers"]:
-            offer["confirmed_live"] = bool(
-                page and page["source"]["origin"] == "live" and web.contains(page["text"], offer["page_marker"])
+            is_live = bool(page and page["source"]["origin"] == "live")
+            on_page = bool(
+                page
+                and web.contains(page["text"], offer["page_marker"])
+                and web.contains(page["text"], offer["product"])
             )
+            offer["confirmed_live"] = is_live and on_page
+            # živá stránka už cenu nebo produkt neobsahuje: záznam je zastaralý a nesmí rozhodovat
+            offer["stale"] = is_live and not on_page
             offer["captured_at"] = supplier["captured_at"]
+            if offer["stale"]:
+                warnings.append(
+                    f"{supplier['name']}: cena nabídky „{offer['product']}“ zachycená {supplier['captured_at']} "
+                    "už na živé stránce není. Nabídka se do verdiktů nepočítá, je potřeba ji znovu zachytit."
+                )
         if page and page["source"]["warning"]:
             warnings.append(f"{page['source']['name']}: {page['source']['warning']}")
 
@@ -177,7 +192,9 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
         "profile": config["profile"],
         "sources": {"eru": eru_data["source"], "ote": ote_data["source"]},
         "suppliers": report_suppliers,
-        "briefing": agents.write_briefing(flat, use_llm),
+        "briefing": agents.write_briefing(
+            flat, use_llm and time.monotonic() - started < LLM_BUDGET_S
+        ),
         "warnings": warnings,
         "llm_used": use_llm,
     }

@@ -176,7 +176,15 @@
     reportEl.replaceChildren();
     reportEl.hidden = false;
 
-    const mode = el("p", "mode mode-" + r.mode, (r.is_saved_example ? "Uložená ukázka z " + fmtTime(r.generated_at) + ". " : "") + MODE_TEXT[r.mode]);
+    const SAVED_TEXT = {
+      live: "Zdroje byly tehdy staženy živě; nejde o aktuální běh.",
+      mixed: "Část zdrojů tehdy pocházela ze snapshotu; nejde o aktuální běh.",
+      snapshot: "Vznikla z uložených dat; nejde o aktuální běh.",
+    };
+    const modeText = r.is_saved_example
+      ? "Uložená ukázka z " + fmtTime(r.generated_at) + ". " + SAVED_TEXT[r.mode]
+      : MODE_TEXT[r.mode];
+    const mode = el("p", "mode mode-" + (r.is_saved_example ? "snapshot" : r.mode), modeText);
     reportEl.append(mode);
     if (r.warnings && r.warnings.length) {
       const warn = el("ul", "warnings");
