@@ -1,127 +1,79 @@
-# Fact or Watt — technická architektura v2 (Flask/Python/HTML/JS)
+# Fact or Watt — architecture v3 (Flask + src + Azure SQL + Vercel)
 
-**Původ požadavků:** dodaný dokument „Fact or Watt: architektura v2“, 12. 11. 2026. **Adaptační rozhodnutí:** technologie Next.js/Vercel/TS/Zod jsou nahrazeny Flask/Python/Pydantic/HTML/JS na výslovnou žádost týmu. Dodatečné bezpečnostní a metodické úpravy jsou popsané v `ARCHITECTURE_VALIDATION.md`.
+**Status:** target architecture, not a statement that every component is implemented. This revision preserves the reviewed v2 multiagent methods while updating persistent storage, repository structure and deployment. See `API_CONTRACTS.md` and `RULE_CATALOG.md` for normative domain semantics.
 
-## 1. KIT a KIQ
+## 1. Goal and KIQs
+
 **KIT:** Kde se marketingová tvrzení konkurenčních dodavatelů elektřiny rozcházejí s ověřitelnými daty a jakou příležitost to dává našemu positioningu?
 
-| KIQ | Manažerská otázka | Agenti |
+| KIQ | Question | Responsible roles |
 |---|---|---|
-| KIQ1 | Jaká tvrzení konkurenti právě teď komunikují na svých webech? | Web Scout + Claim Extractor |
-| KIQ2 | Která cenová tvrzení obstojí proti ceníkům? | Price agent |
-| KIQ3 | Která ekologická tvrzení jsou doložená a která nesou možné regulatorní riziko? | Green agent |
-| KIQ4 | Odpovídají tvrzení o zákaznících a spolehlivosti veřejným datům? | Customer agent (stretch) |
-| KIQ5 | Kde jsou největší mezery a jak je využít? | Judge + Strategist |
+| 1 | Jaká tvrzení konkurenti komunikují na svých webech? | Web Scout, Claim Extractor |
+| 2 | Která cenová tvrzení obstojí proti ceníkům? | Price agent |
+| 3 | Která ekologická tvrzení jsou doložená a mohou nést regulatorní riziko? | Green agent |
+| 4 | Odpovídají tvrzení o zákaznících a spolehlivosti veřejným datům? | Customer agent (stretch) |
+| 5 | Kde jsou největší mezery a jak je využít? | Judge, Strategist |
 
-## 2. Tok systému
+## 2. Components and deployment topology
 
 ```mermaid
 flowchart TB
-    UI[Flask HTML/Jinja2 + JavaScript] -->|POST autorizovaný audit| API[Flask API]
-    UI -->|GET status, výsledky, latest| API
-    API <--> DB[(AZURE: audit, events, claims, evidence)]
-    WORKER[Samostatný Python worker] <--> DB
-    WORKER --> O[Orchestrátor]
-    O --> W[Web Scout: živý fetch + canonical hash]
-    WEB[(Schválené URL dodavatelů)] --> W
-    FALL[(Baseline / snapshot)] -. fallback .-> W
-    W --> C[Claim Extractor - LLM]
-    C --> P[Price agent - LLM + read-only tools]
-    C --> G[Green agent - LLM + read-only tools]
-    C -. stretch .-> A[Customer agent - LLM + read-only tools]
-    REF[(Reference: ceny, mix, OTE, ERÚ)] --> TOOLS[Deterministické nástroje / pravidla]
+    B[Browser: HTML, JS, Bootstrap] --> F[Vercel: Flask web/API]
+    F <-->|jobs, status, sanitized results| DB[(Azure SQL Database)]
+    W[Python worker: Azure Container Apps or Vercel Daemon beta] <-->|lease, stages, audit data| DB
+    W --> O[Orchestrator]
+    O --> S[Web Scout: safe live fetch, hash, fallback]
+    S --> C[Claim Extractor: LLM + literal quotes]
+    C --> P[Price Agent: tool calling]
+    C --> G[Green Agent: tool calling]
+    C -. optional .-> U[Customer Agent: tool calling]
+    P --> R[Deterministic rule engine]
+    G --> R
+    U --> R
+    R --> J[Judge: relevance, downgrade only]
+    J --> T[Strategist: cited briefing]
+    T --> DB
+    REF[(Reference data: tariffs, OTE, ERU, product mix)] --> TOOLS[Approved typed read-only tools]
     TOOLS --> P
     TOOLS --> G
-    TOOLS --> A
-    P --> RULES[Rule engine: výpočty + rule_verdict]
-    G --> RULES
-    A --> RULES
-    RULES --> J[Judge - LLM pouze downgrade]
-    J --> S[Strategist - LLM briefing]
-    S --> DB
-    DB --> PUB[Publikovaný poslední audit]
+    TOOLS --> U
+    ART[(Optional Azure Blob: raw HTML/PDF/XLSX)] <-->|hash/URI| W
 ```
 
-### Role komponent
-| Komponenta | Implementace | Vstup | Výstup |
-|---|---|---|---|
-| API/web | Flask/Jinja2/JS | výběr, autorizace, čtení | job ID, status, dashboard |
-| Orchestrátor | čistý Python | audit job + config | průběh, checkpointy, error routing |
-| Web Scout | Python HTTP/parser | 2–4 schválené URL na firmu | zdrojová data/hash/`origin` |
-| Claim Extractor | LLM | kanonický text | doslovné Claims + katalog rule IDs |
-| Price / Green / Customer | LLM se server-side tools | Claim + registry nástrojů | Evidence + zvolená tool calls |
-| Deterministic rules | čistý Python | evidenční fakta | `rule_verdict`, metriky, omezení |
-| Judge | LLM s omezenými oprávněními | Claim + Evidence + rule_verdict | `final_verdict`, případný downgrade |
-| Strategist | LLM | pouze hotové audity | briefing s claim IDs |
+**Vercel** serves the Flask UI and short request/response APIs. **Azure SQL Database** (MSSQL assumed until resource type confirmation) persists audits, jobs, claims, evidence, verdicts, source metadata and publication pointers. The **worker** is a separate process that continues independently of web requests; recommended host is Azure Container Apps. Vercel Daemons are a newer beta alternative, not included in the minimal deployment configuration. Use Azure Blob Storage for potentially large immutable raw artifacts; do not rely on local files in a Vercel Function.
 
-## 3. Režim živého sběru a provenience
-`mode=fixture` je offline a neslibuje živá data. `mode=live` při **každém běhu** zkusí bezpečně stáhnout schválené stránky dodavatelů (MVP 2–4 stránky na každou ze 3 firem). Referenční zdroje se nemusejí stahovat při každém auditu — mají kurátorované/verzované podklady a data platnosti.
+## 3. Source intake and agent boundaries
 
-### Tři větve
-1. **Fetch úspěšný, canonical hash odpovídá baseline** a sedí URL/verze parseru/extractoru: použij schválená uložená tvrzení; `origin=baseline`, `fetch_was_live=true`, nevolat znovu LLM Extractor.
-2. **Fetch úspěšný, hash se změnil**: `origin=live`; spusť Claim Extractor z nového kanonického textu, `human_reviewed=false`, zobraz změnu a uchovej doslovné citace.
-3. **Fetch selhal, byl odepřen nebo bez použitelného textu**: pokud existuje platný snapshot, `origin=snapshot`, `fetch_was_live=false`, `fallback_reason` a čas snapshotu. Jinak zapiš source error; tvrzení nejsou ověřena a nesmí být potichu převzata z jiného dodavatele.
+- **Web Scout** is deterministic Python, not an LLM. For each live audit fetch approved 2–4 URLs/supplier, canonicalize and hash source text. On successful fetch with an approved identical baseline, reuse checked claims. On changed content, call Claim Extractor. If fetch fails and a compatible snapshot exists, use it with `origin=snapshot`, its real timestamp, and a warning. Never claim that backup is live content.
+- **Claim Extractor** returns exact quotes that exist in stored source content, `source_ref` and one rule ID from the closed catalog.
+- **Price/Green/Customer agents** are bounded LLMs with tool calling; tools use curated, dated reference data and deterministic functions. Agent output is typed Evidence, not unverified free-form numbers.
+- **Rule engine** produces a deterministic initial verdict. **Judge** can only downgrade it to `unverifiable` on mismatch and records an explanation. **Strategist** summarizes saved evidence with `claim_id` references.
+- No agent can write SQL, execute arbitrary code, request arbitrary websites, modify evidence or upgrade a rule verdict.
 
-Kanonizace stránky musí být **verzovaná** (vyčistit menu/cookie bannery/jednorázové tokeny, zachovat obsah tvrzení). U baseline nikdy nepřipisuj starším tvrzením čas posledního živého zjištění bez pole `baseline_approved_at`. Snapshoty jsou immutable, hash a source metadata se ukládají odděleně. Nelze-li bezpečně načíst web kvůli robots.txt/ToS, neobcházej ochranu; přiznej fallback.
+## 4. Source provenance and methodological invariants
 
-## 4. Rozhodovací a agentní model
-**LLM** extrahuje citát, přiřadí katalogové pravidlo a parametry, volí přístupné evidenční nástroje, kontroluje sémantický soulad a píše briefing. **Kód** parsuje referenční data, počítá matematiku a přiřazuje verdict; žádná LLM odpověď jej nesmí libovolně zlepšit.
+Each source/evidence record should carry `source_url`, `source_ref`, `source_content_hash`, `captured_at`, `checked_at`/`valid_as_of` as appropriate, `origin` (`live | baseline | snapshot`), limitation and parser/rule versions. `human_reviewed` belongs to extracted claim review, separate from origin. Live/snapshot/fixture must be differentiated in public UI.
 
-Specializované LLM evidence agenty mají vlastní instrukce, vstupní schéma a seznam nástrojů; například `PriceAgent` smí `get_price_offers` a `calculate_annual_cost`, nikoli `get_eru_decisions` bez důvodu. Orchestrátor udělí jednotný tool budget (max calls, timeout, max tokens) a zaznamená názvy nástrojů, bezpečné argumenty a zdrojové IDs. Real tool-calling lze vyhodnotit v golden setu.
+Four verdicts: `supported`, `partially_supported`, `contradicted`, `unverifiable`. Incomplete evidence is not contradiction. Superlative `nejlevnější v ČR` cannot be supported by 3–5 firms; a valid comparable cheaper offer can contradict it. OTE OPM does not equal unique customers; country-wide residual energy mix is not supplier product proof. Regulatory risk is a separate non-legal flag. No global supplier dishonesty score.
 
-`Judge`: kontrola doslovného tvrzení a relevance firmy, produktu, období, scope. Finální verdikt je shodný s `rule_verdict`, nebo pouze `unverifiable`; rozdíl se označí `judge_changed=true`, `judge_reason`. Při chybě Judge u citlivého tvrzení neponechávej nezávisle nevysvětlený kladný závěr.
+## 5. Persistence and durable worker
 
-## 5. Datové zdroje
-- **Live reklamní obsah:** weby dodavatelů (HTML, produkty, marketingové landing pages), volitelně aktuální přímé PDF odkazy.
-- **Referenční data:** ceníky/obchodní podmínky, ERÚ srovnávač či veřejné exporty jen pokud skutečně dostupné, OTE počty OPM a energetické statistiky, produktový mix/záruky původu, ERÚ rozhodnutí/sankce.
-- **Záloha:** kurátorovaná baseline schválených tvrzení + archiv textových snapshotů. Vše s datem platnosti a lokátorem.
-- Podrobná hranice mezi kódem (API/scraping/parsing) a agenty je v `DATA_SOURCES.md`.
+Use SQLAlchemy 2.1+ and Alembic. No SQLite as production persistence or implicit test substitute. Define SQLAlchemy `Supplier`, `AuditRun`, `AuditJob`, `AuditEvent`, `Source`, `SourceSnapshot`, `Claim`, `Evidence`, `Verdict`, `Publication` models as needed; enforce relational constraints and provenance. Make HTTP request handlers short: authorized `POST /api/v1/audits` inserts job and returns `202`; `GET /api/v1/audits/{id}` reads durable status/events; results and latest publication endpoints are read-only.
 
-## 6. Stav auditů, rozhraní a UI
-- `POST /api/v1/audits` pouze pro oprávněné uživatele, odpoví `202`, worker běží odděleně. 
-- UI polluje `GET /api/v1/audits/<id>` a načte `.../results`; `/api/v1/audits/latest` je veřejně čitelný publikovaný poslední audit.
-- Stage: `queued → collecting → extracting → verifying → judging → reporting → completed`, možné `failed`/`partial` (v dalších verzích). Eventy obsahují `stage`, `timestamp`, `origin` a lidsky čitelný popis. Jednotlivé nerozhodnutelné claims mohou mít `unverifiable` i při celkově `completed`.
-- UI: výběr dodavatelů a odběrového profilu; live průběh; tabulka tvrzení s důkazy, stářím dat, čtyřmi verdikty a briefing. **Žádné globální „skóre pravdivosti“**.
+Worker uses atomic job claim, leases, heartbeat, retries, idempotent operations and explicit publish-on-success transaction. Persist stage events so page reloads and transient web instance restarts do not lose audit progress. Store raw PDF/HTML bytes in Blob or bounded external storage when appropriate.
 
-## 7. Doporučená struktura repozitáře
-```text
-.github/
-  copilot-instructions.md
-  instructions/{flask-backend,evidence-pipeline,frontend,tests}.instructions.md
-src/competitive_intelligence/
-  __init__.py                  # create_app
-  config.py
-  web/{pages,api}.py
-  schemas/{claim,evidence,verdict,audit}.py
-  models/
-  services/{orchestrator,web_scout,snapshots,baseline,publication}.py
-  connectors/{supplier_web,ote,eru}.py
-  parsers/{html,prices,pdf,xlsx}.py
-  agents/{extractor,price,green,customer,judge,strategist}.py
-  tools/{registry,price_tools,green_tools,customer_tools}.py
-  rules/{catalog,price,green,customer,verdicts}.py
-  llm/{provider,tool_adapter,prompts}.py
-  worker.py
-  templates/{index,audit}.html
-  static/{js,css}/
-config/{suppliers.yaml,profiles.yaml}
-eval/golden.json
-tests/                 # anonymizované golden fixtures a unit/integration testy
-docs/{ARCHITECTURE,ARCHITECTURE_VALIDATION,API_CONTRACTS,RULE_CATALOG,DATA_SOURCES,IMPLEMENTATION_PLAN,CHANGELOG_V2}.md
-.env.example
-pyproject.toml
-README.md
-```
-Názvy adresářů jsou plánované. Nedoplňuj prázdné moduly bez implementační potřeby. `data/raw`, pracovní snapshoty, `.env` nepatří do Gitu; schválené neosobní baseline/fixtures do Gitu patřit mohou.
+Azure SQL TLS, firewall and allowed Vercel outbound connections must be explicitly configured. Vercel Static IPs are plan-dependent; do not assume a hostname/password alone grants access. For exact database setup, see `DATABASE_AZURE.md`.
 
-## 9. Reprodukovatelnost, testování a demo
-- `fixture` end-to-end včetně interních agentních stubů; `live` musí mít skutečné tool calling pro Price/Green v MVP.
-- Golden set 20–30 ručně označených tvrzení: extrakce, klasifikace pravidel a přesnost verdiktu se měří zvlášť. Nevydávej empirická čísla bez naměřených hodnot.
-- MVP **musí**: 3 dodavatelé, cena + green, live se zálohou, publikovaný poslední audit, golden set. **Mělo by**: 5 dodavatelů, Customer. **Může**: změnový report a export.
-- Při prezentaci živě spustit jednoho dodavatele, další ukázat z publikovaného auditu; `fixture` či `snapshot` vždy jasně označit.
+## 6. Repository structure
 
-## Zdroje k provozním tvrzením
-- GitHub Copilot: https://docs.github.com/en/copilot/how-tos/copilot-in-your-ide/customize-copilot/configure-custom-instructions/add-repository-instructions-in-your-ide
-- Flask / Gunicorn: https://flask.palletsprojects.com/en/stable/deploying/gunicorn/
-- Vercel Flask: https://vercel.com/kb/guide/ship-a-flask-app-on-vercel
-- Vercel functions/filesystem: https://vercel.com/docs/functions/runtimes
+Canonical application logic lives under `src/competitive_intelligence/`: Flask factory `app.py`, blueprints `web/`, schemas `schemas/`, models `models/`, repositories/services `services/`, connectors and parsers, `agents/`, read-only `tools/`, deterministic `rules/`, LLM adapters, templates and static assets. `src/index.py` is solely the Vercel WSGI adapter. Tests are under `tests/`, docs under `docs/`, configuration under `config/` as it is implemented. No Next.js, TypeScript or duplicate root Flask app.
+
+## 7. UI, API and release
+
+HTML/Jinja2/vanilla JS (Bootstrap optional): supplier/profile selection, audit stage and event polling, results with dated evidence/provenance, CI manager briefing and verdict matrix. Public `latest` is a separately approved/sanitized audit; launching an audit requires server-side authorization and rate limits.
+
+Deploy Flask on Vercel with `src/index.py`, Python 3.14 and `uv`/`pyproject.toml`; place env secrets in Vercel Settings. **Deployment is not verified until preview deploy, Azure connection test, worker lifecycle test and public endpoint smoke test succeed.** See `DEPLOYMENT_VERCEL.md`.
+
+## 8. MVP and evaluation
+
+MVP: 3 suppliers, price and green evidence agents, safe live source intake + explicit baseline/snapshot fallback, durable jobs, visible last published audit, 20–30 human-annotated golden claims. Stretch: 5 suppliers, Customer agent, changed-claim report, exports. Evaluate quote extraction precision/recall, rule classification accuracy and verdict accuracy separately; report sample size and uncertainties.

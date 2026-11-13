@@ -1,13 +1,14 @@
 ---
-applyTo: "src/competitive_intelligence/**/*.py"
+applyTo: "src/competitive_intelligence/**/*.py,src/index.py"
 ---
-# Backend Python/Flask — architektura v2
-- Implementuj `create_app(config=None)`, Blueprints, Pydantic v2 schémata, oddělený worker a transakční persistenci; nikdy nesvazuj live audit se životností HTTP requestu.
-- Web Scout i agentní pipeline musí být injektovatelné/mokovatelné, aby režim fixture nevyžadoval síť ani klíč.
-- Pro live audity validuj serverovou autorizaci; publikovaný `GET latest` pouze čte poslední výsledek.
-- Na každý audit ulož per-source `origin`, `captured_at`, `valid_as_of`, URL, `canonical_hash`, `baseline_hash`, `fallback_reason`, human_reviewed a event timeline.
-- Evidence agenti volají pouze schválené read-only Python nástroje s validovanými parametry; výpočet pravidla mimo LLM.
-- Při chybě zdroje pokračuj s transparentním snapshotem, pokud existuje; při absenci snapshotu vypiš chybu, nevyráběj pozitivní verdict.
-- SQLite v lokálním MVP; ve funkčním serverless nasazení nepovažuj lokální DB nebo `/tmp` za trvalou frontu.
-- Obchodní výpočty používají `Decimal`, měny/DPH/období explicitně. Všechny časové značky UTC timezone-aware.
-- Error handler vrací `code`, `message`, bez tracebacků. API endpointy krátké a idempotentní tam, kde to dává smysl.
+# Python Flask backend, Azure persistence, Vercel entrypoint
+
+- Keep an application factory `create_app(config=None)` in `src/competitive_intelligence/app.py`; `src/index.py` exports only `app = create_app()`. Do not place business logic in the entrypoint or add a second Flask app.
+- Use Blueprints, Pydantic validation, service and repository abstractions. Every request has a short-lived SQLAlchemy session, transaction boundaries and explicit rollback/close.
+- Production persistence is Azure SQL Database **if the provisioned Azure resource is MSSQL**, using `mssql+mssqlpython`/SQLAlchemy 2.1+. If the Azure resource is PostgreSQL, configure the matching dialect instead. No SQLite as live or test database.
+- Read `DATABASE_URL` from environment and redact it from logs. Do not create tables automatically at import/startup. All schema changes via Alembic; migrations run as an explicit deployment step with proper access controls.
+- Write audit statuses, events, claims, evidence, provenance, published results and job leases to persistent Azure storage. Large snapshots belong in object storage or an explicitly bounded database storage strategy; never rely on Vercel local files.
+- `POST /api/v1/audits` authenticates, creates the job transactionally, returns 202. A separate worker consumes jobs and heartbeats leases. No background thread spawned from request handlers.
+- Keep database code injectible; offline fixture tests use in-memory fake repositories; integration tests use a separate disposable Azure database.
+- Use `Decimal` for money and timezone-aware UTC timestamps; never mix OPM counts with customer counts. No LLM-generated SQL, arbitrary network fetch or shell execution.
+- Verify Azure firewall, TLS, credential scope and connection-pool size against Vercel concurrency; avoid opening a new engine for every request.
