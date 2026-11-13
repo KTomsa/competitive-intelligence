@@ -251,15 +251,51 @@ def test_customer_claim_above_every_month_of_the_year_is_flagged_but_not_contrad
     assert "v každém měsíci roku" in out["finding"] and "klesá" in out["finding"]
 
 
-def test_undefined_qualifier_is_never_a_verdict_but_reports_who_is_bigger():
-    ctx = gas_ctx()
-    claim = {"params": {"scope": "qualified", "qualifier": "alternativní",
-                        "merged_with": ["maly"], "exclude": ["velky", "plynar"]}}
-    out = rules.market_size(claim, supplier("maly", []), ctx)  # maly 10 + maly 10? jen jednou → 10
+def test_size_claim_with_qualifier_is_judged_by_team_definitions():
+    ctx = gas_ctx()  # součty: plynar 2000, velky 1300, stredni 600, maly 10
+    ctx["definitions"] = {"traditional_suppliers": {"names": ["velky", "plynar"], "note": "Definice týmu."}}
+    claim = {"params": {"scope": "qualified", "qualifier": "alternativní"}}
+    # stredni je největší mimo tradiční, ale ne mezi všemi → platí jen při užším výkladu
+    partial = rules.market_size(claim, supplier("stredni", []), ctx)
+    assert partial["verdict"] == rules.PARTIAL
+    assert [sub["status"].split(" ")[0] for sub in partial["subclaims"]] == ["neplatí", "platí"]
+    # maly není největší ani mimo tradiční → neplatí při žádném výkladu
+    wrong = rules.market_size(claim, supplier("maly", []), ctx)
+    assert wrong["verdict"] == rules.CONTRADICTED and "stredni" in wrong["finding"]
+    # největší ze všech → platí při obou výkladech
+    top = gas_ctx()
+    top["definitions"] = ctx["definitions"]
+    top["ote_gas"]["ranking"] = [("velky", 900), ("stredni", 100)]
+    assert rules.market_size(claim, supplier("velky", []), top)["verdict"] == rules.SUPPORTED
+    # sloučené firmy se sčítají
+    merged = {"params": {"scope": "qualified", "qualifier": "alternativní", "merged_with": ["maly"]}}
+    assert "610" in rules.market_size(merged, supplier("stredni", []), ctx)["finding"]
+
+
+def test_size_claim_without_any_definition_gets_no_verdict():
+    out = rules.market_size({"params": {"scope": "czech_owned"}}, supplier("maly", []), gas_ctx())
     assert out["verdict"] == rules.UNVERIFIABLE
-    assert "stredni" in out["finding"] and out["opportunity"]
-    solo = rules.market_size({"params": {"scope": "czech_owned"}}, supplier("maly", []), ctx)
-    assert solo["verdict"] == rules.UNVERIFIABLE
+
+
+def test_trust_slogan_gets_regulator_context_but_no_verdict():
+    s = supplier("a", [])
+    practice = {"date": "01.04.2026", "title": "A - rozhodnutí k užití nekalé obchodní praktiky",
+                "url": "https://eru.gov.cz/x", "kind": "practice"}
+    other = {"date": "01.01.2025", "title": "A - rozhodnutí k porušení povinností držitele licence",
+             "url": "https://eru.gov.cz/y", "kind": "offence"}
+    stopped = {"date": "01.01.2024", "title": "A - usnesení o zastavení řízení",
+               "url": "https://eru.gov.cz/z", "kind": "discontinued"}
+    ctx = make_ctx([])
+    ctx["decisions"] = {"a": {"decisions": [practice, other, stopped]}}
+    out = rules.soft_trust({"params": {}}, s, ctx)
+    assert out["verdict"] == rules.UNVERIFIABLE and out["opportunity"]
+    assert "2 pravomocná rozhodnutí" in out["finding"] and "01.04.2026" in out["finding"]
+    assert len(out["evidence"]) == 2 and out["evidence"][0]["url"]  # zastavené řízení se nepočítá
+    ctx["decisions"] = {"a": {"decisions": [other]}}
+    assert not rules.soft_trust({"params": {}}, s, ctx)["opportunity"]
+    ctx["decisions"] = {"a": {"decisions": []}}
+    assert "neeviduje" in rules.soft_trust({"params": {}}, s, ctx)["finding"]
+    assert rules.soft_trust({"params": {}}, s, make_ctx([]))["evidence"] == []  # zdroj není k dispozici
 
 
 def test_stepped_products_and_other_areas_are_not_compared():

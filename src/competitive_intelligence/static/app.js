@@ -265,7 +265,7 @@
     }
 
     sec.append(el("h3", null, "4. Co dělá konkurence a týká se nás"));
-    const KIND = { price: "Cena", claim: "Tvrzení konkurenta", loyalty: "Noví a stávající zákazníci", growth: "Růst" };
+    const KIND = { price: "Cena", claim: "Tvrzení konkurenta", loyalty: "Noví a stávající zákazníci", growth: "Růst", regulator: "Regulátor" };
     if (v.watch.length) {
       sec.append(bulletList(v.watch.map((w) => {
         const box = el("div");
@@ -294,7 +294,7 @@
     const head = el("tr");
     ["Dodavatel", "Elektřina: změna OPM", "Plyn: změna OPM",
       "Nejlevnější nabídka" + (m.annual_mwh ? " (ročně při " + m.annual_mwh + " MWh)" : ""),
-      "Pásmo ERÚ"].forEach((t) => head.append(el("th", null, t)));
+      "Pásmo ERÚ", "Přestupky podle ERÚ"].forEach((t) => head.append(el("th", null, t)));
     table.append(head);
     m.rows.forEach((row) => {
       const tr = el("tr", "plain-row" + (row.id === ownId ? " own" : ""));
@@ -307,6 +307,14 @@
       if (row.price) pos.append(el("span", "badge pos-" + row.price.position, POSITION_TEXT[row.price.position] || row.price.position));
       else pos.textContent = "–";
       tr.append(pos);
+      const dec = el("td");
+      if (!row.decisions) dec.textContent = "–";
+      else if (!row.decisions.offences) dec.textContent = "0";
+      else {
+        dec.append(el("strong", null, String(row.decisions.offences)));
+        if (row.decisions.practices) dec.append(el("span", "sub neg", " · " + row.decisions.practices + " o praktikách"));
+      }
+      tr.append(dec);
       table.append(tr);
     });
     wrap.append(table);
@@ -389,7 +397,9 @@
       details.append(el("summary", null, "Podklady a výpočet (" + c.evidence.length + ")"));
       c.evidence.forEach((e) => {
         const row = el("div", "evidence");
-        row.append(el("div", "evidence-label", e.label), el("div", "evidence-value", e.value));
+        const label = el("div", "evidence-label");
+        if (e.url) label.append(link(e.url, e.label)); else label.textContent = e.label;
+        row.append(label, el("div", "evidence-value", e.value));
         if (e.chart) row.append(bandChart(e.chart));
         details.append(row);
       });
@@ -458,6 +468,7 @@
     const ul = el("ul", "sources");
     ul.append(sourceRow(r.sources.eru), sourceRow(r.sources.ote));
     if (r.sources.ote_gas) ul.append(sourceRow(r.sources.ote_gas));
+    if (r.sources.eru_decisions) ul.append(sourceRow(r.sources.eru_decisions));
     r.suppliers.forEach((s) => { if (s.page) ul.append(sourceRow(s.page)); });
     srcPanel.append(ul);
     if (r.price_lists && r.price_lists.length) {
@@ -481,6 +492,22 @@
       const sec = el("section", "panel supplier");
       sec.append(el("h2", null, s.name));
       s.claims.forEach((c) => sec.append(claimCard(c)));
+      if (s.decisions && s.decisions.length) {
+        const DKIND = { practice: "obchodní praktiky", offence: "jiný přestupek", dispute: "spor", discontinued: "řízení zastaveno", other: "jiné" };
+        const det = el("details", "candidates");
+        const practices = s.decisions.filter((d) => d.kind === "practice").length;
+        det.append(el("summary", null, "Pravomocná rozhodnutí ERÚ (" + s.decisions.length +
+          (practices ? ", z toho " + practices + " o obchodních praktikách" : "") + ")"));
+        const list = el("ul");
+        s.decisions.forEach((d) => {
+          const li = el("li");
+          li.append(d.date + " · ", link(d.url, d.title), " ", el("span", "badge" + (d.kind === "practice" ? " risk" : ""), DKIND[d.kind] || d.kind));
+          list.append(li);
+        });
+        det.append(list);
+        det.append(el("p", "meta", "Zdroj: seznam pravomocných rozhodnutí ERÚ, datum je datum zveřejnění. Obsah rozhodnutí aplikace nečte."));
+        sec.append(det);
+      }
       if (s.candidates && s.candidates.length) {
         const det = el("details", "candidates");
         det.append(el("summary", null, "Další tvrzení nalezená na stránce (" + s.candidates.length + ", bez verdiktu)"));

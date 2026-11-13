@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import agents, insights, rules
-from .connectors import eru, ote, pricelist, web
+from .connectors import eru, eru_decisions, ote, pricelist, web
 from .connectors.http import FetchError
 
 DATA = Path(__file__).resolve().parent / "data"
@@ -141,6 +141,7 @@ def run(
         gas_future = pool.submit(_load_official, ote.load_gas, ote.OteFormatError, live, warnings)
         page_futures = {s["id"]: pool.submit(web.load, s, live) for s in suppliers}
         list_futures = {o["id"]: pool.submit(pricelist.load, o, live) for _, o in offers}
+        decision_futures = {s["id"]: pool.submit(eru_decisions.load, s, live) for s in suppliers}
         eru_data, ote_data = eru_future.result(), ote_future.result()
         try:
             gas_data = gas_future.result()
@@ -162,6 +163,18 @@ def run(
             except FetchError as exc:
                 price_lists[offer["id"]] = None
                 warnings.append(f"{supplier['name']}: ceník „{offer['product']}“ se nepodařilo načíst: {exc}")
+
+        decisions = {}
+        for supplier in suppliers:
+            try:
+                decisions[supplier["id"]] = decision_futures[supplier["id"]].result()
+                decisions[supplier["id"]].pop("_fetched", None)
+            except FetchError as exc:
+                decisions[supplier["id"]] = None
+                warnings.append(f"{supplier['name']}: rozhodnutí ERÚ se nepodařilo načíst: {exc}")
+    decision_sources = [d["source"] for d in decisions.values() if d]
+    if any(src["origin"] != "live" for src in decision_sources) and live:
+        warnings.append("ERÚ – pravomocná rozhodnutí: část seznamů pochází z uloženého snapshotu.")
 
     # nabídky: potvrzuje je živý ceník nebo živá stránka?
     price_list_sources = []
@@ -204,6 +217,8 @@ def run(
         "eru": eru_data,
         "ote": ote_data,
         "ote_gas": gas_data,
+        "decisions": decisions,
+        "definitions": config.get("definitions") or {},
         "offer_month": offer_month,
     }
 
@@ -290,6 +305,10 @@ def run(
             ],
             "claims": claims_out,
             "candidates": candidates,
+            "decisions": [
+                {k: d[k] for k in ("date", "title", "url", "kind")}
+                for d in (decisions[supplier["id"]] or {"decisions": []})["decisions"]
+            ],
         })
 
     comparison = _comparison(suppliers, ctx)
@@ -303,14 +322,26 @@ def run(
         and gas_data is not None and gas_data["source"]["origin"] == "live"
         and all(s["page"] and s["page"]["origin"] == "live" for s in report_suppliers)
         and all(src["origin"] == "live" for src in price_list_sources)
+        and bool(decision_sources) and all(src["origin"] == "live" for src in decision_sources)
     )
     sources = {"eru": eru_data["source"], "ote": ote_data["source"]}
     if gas_data is not None:
         sources["ote_gas"] = gas_data["source"]
+    if decision_sources:
+        sources["eru_decisions"] = {
+            "name": "ERÚ – pravomocná rozhodnutí (podle účastníka řízení)",
+            "page_url": eru_decisions.LIST_URL,
+            "source_url": eru_decisions.LIST_URL,
+            "origin": "live" if all(src["origin"] == "live" for src in decision_sources) else "snapshot",
+            "fetched_at": max(src["fetched_at"] for src in decision_sources),
+            "warning": None,
+            "unit": "název, datum zveřejnění a štítky rozhodnutí; obsah rozhodnutí se nečte",
+        }
     return {
         "generated_at": now.isoformat(timespec="seconds"),
         "mode": "live" if all_live else ("snapshot" if not live else "mixed"),
         "profile": config["profile"],
+        "definitions": config.get("definitions") or {},
         "sources": sources,
         "price_lists": price_list_sources,
         "comparison": comparison,

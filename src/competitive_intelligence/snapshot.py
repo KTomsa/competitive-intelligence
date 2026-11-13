@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .connectors import eru, ote, pricelist, web
+from .connectors import eru, eru_decisions, ote, pricelist, web
 from .connectors.http import FetchError, save_snapshot
 
 DATA = Path(__file__).resolve().parent / "data"
@@ -48,6 +48,20 @@ def main() -> None:
             ok = pricelist.contains_all(result["text"], (offer.get("price_list") or {}).get("markers") or [])
             pricelist.save(offer, result)
             print(f"ulozeno cenik {offer['id']} ({len(result['text'])} znaku) cena a plat v ceniku: {ok}")
+
+    for supplier in suppliers:
+        try:
+            result = eru_decisions.load(supplier)
+        except FetchError as exc:
+            print(f"CHYBA rozhodnuti {supplier['id']}: {exc}")
+            continue
+        if result["_fetched"].origin != "live":
+            print(f"PRESKOCENO rozhodnuti {supplier['id']}: zive stazeni selhalo")
+            continue
+        eru_decisions.save(supplier, result)
+        kinds = [d["kind"] for d in result["decisions"]]
+        print(f"ulozeno rozhodnuti {supplier['id']}: {len(kinds)} celkem, "
+              f"{kinds.count('practice')} o obchodnich praktikach")
 
 
 if __name__ == "__main__":

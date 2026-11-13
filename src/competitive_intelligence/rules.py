@@ -43,6 +43,21 @@ def num(value: float) -> str:
     return f"{value:,.0f}".replace(",", " ")
 
 
+DECISION_KIND = {
+    "practice": "přestupek: obchodní praktiky nebo nepravdivé informace",
+    "offence": "přestupek: jiné porušení povinností",
+    "dispute": "rozhodnutí ve sporu",
+    "discontinued": "zastavené řízení",
+    "other": "jiné rozhodnutí",
+}
+
+
+def decisions_phrase(count: int) -> str:
+    if count == 1:
+        return "1 pravomocné rozhodnutí"
+    return f"{count} pravomocná rozhodnutí" if count < 5 else f"{count} pravomocných rozhodnutí"
+
+
 GREEN_RISK_REASON = (
     "Environmentální tvrzení bez doložení může spadat pod směrnici (EU) 2024/825; nutná právní kontrola."
 )
@@ -556,8 +571,9 @@ def market_size(claim, supplier, ctx):
     if params.get("scope") in ("czech_owned", "qualified"):
         qualifier = params.get("qualifier", "český")
         merged = [supplier["ote_name"]] + list(params.get("merged_with", []))
-        excluded = list(params.get("exclude", []))
-        if len(merged) == 1 and not excluded:
+        definition = (ctx.get("definitions") or {}).get("traditional_suppliers") or {}
+        traditional = list(params.get("exclude") or definition.get("names") or [])
+        if not traditional:
             return result(
                 UNVERIFIABLE,
                 f"Podle OTE je dodavatel {position}. podle počtu odběrných míst elektřiny ({num(count)} OPM, "
@@ -571,40 +587,58 @@ def market_size(claim, supplier, ctx):
         def among(name, names):
             return any(ote_connector.same_supplier(name, n) for n in names)
 
+        def names_of(items):
+            return ", ".join(f"{n} ({num(c)})" for n, c in items[:3])
+
         combined = _combined_ranking(ctx)
         own_total = sum(c for name, c in combined if among(name, merged))
-        bigger = [(name, c) for name, c in combined if c > own_total and not among(name, excluded + merged)]
         who = " + ".join(merged)
+        bigger_all = [(n, c) for n, c in combined if c > own_total and not among(n, merged)]
+        bigger_alt = [(n, c) for n, c in bigger_all if not among(n, traditional)]
+        readings = [
+            ("všichni dodavatelé", bigger_all),
+            ("dodavatelé mimo tradiční skupiny", bigger_alt),
+        ]
+        subclaims = [
+            {"text": f"Výklad „{label}“",
+             "status": "platí" if not items else f"neplatí – víc odběrných míst má {names_of(items)}"}
+            for label, items in readings
+        ]
         evidence.append({
-            "label": f"Součet OPM elektřiny a plynu – {who}: {num(own_total)}",
-            "value": (
-                "větší mimo tradiční dodavatele: " + "; ".join(f"{n} ({num(c)})" for n, c in bigger[:5])
-                if bigger else "mimo tradiční dodavatele není nikdo větší"
-            ),
+            "label": f"Součet odběrných míst elektřiny a plynu – {who}: {num(own_total)}",
+            "value": ("větší: " + names_of(bigger_all)) if bigger_all else "nikdo není větší",
             "source": "ote",
         })
-        reading = (
-            f"Za „{qualifier}“ zde bereme dodavatele mimo tradiční: {', '.join(excluded)}." if excluded else ""
+        limitation = (
+            OTE_LIMIT + f" Pojem „{qualifier} dodavatel“ tvrzení nedefinuje, proto se posuzuje podle výkladů "
+            "stanovených týmem. " + (definition.get("note") or "") + f" Za tradiční se berou: "
+            f"{', '.join(traditional)}. Velikost se měří součtem odběrných míst "
+            "elektřiny a plynu; objem dodané energie ani vlastnictví firem v datech nejsou."
         )
-        if bigger:
-            names = ", ".join(f"{n} ({num(c)} OPM)" for n, c in bigger[:3])
+        base = f"Podle OTE má {who} dohromady {num(own_total)} odběrných míst elektřiny a plynu."
+        if not bigger_all:
             return result(
-                UNVERIFIABLE,
-                f"Podle OTE má {who} dohromady {num(own_total)} odběrných míst elektřiny a plynu. Víc jich mají "
-                f"{names}. Pojem „{qualifier} dodavatel“ ani metrika (odběrná místa, objem dodávky) nejsou "
-                "v tvrzení definovány.",
-                OTE_LIMIT + " " + reading + " Dodavatel může myslet objem dodané energie, který OTE nezveřejňuje.",
-                f"Příležitost: podle počtu odběrných míst tvrzení neplatí a „{qualifier}“ není definováno. "
-                "Lze ho zpochybnit čísly OTE s výhradou, že může jít o objem dodávky.",
-                evidence, opportunity=2,
+                SUPPORTED, base + " Nikdo nemá víc, tvrzení platí při obou výkladech.",
+                limitation, "Tvrzení o velikosti nenapadat.", evidence, subclaims,
+            )
+        if bigger_alt:
+            return result(
+                CONTRADICTED,
+                base + f" Víc jich mají i dodavatelé mimo tradiční skupiny: {names_of(bigger_alt)}. "
+                "Tvrzení neplatí při žádném z výkladů.",
+                limitation,
+                "Příležitost: tvrzení o prvenství lze zpochybnit čísly OTE, s výhradou, že dodavatel může "
+                "myslet objem dodané energie.",
+                evidence, subclaims, opportunity=3,
             )
         return result(
-            UNVERIFIABLE,
-            f"Podle OTE má {who} dohromady {num(own_total)} odběrných míst elektřiny a plynu a mimo tradiční "
-            f"dodavatele není nikdo větší. Pojem „{qualifier} dodavatel“ ale není v tvrzení definován.",
-            OTE_LIMIT + " " + reading,
-            "Bez akce; při tomto výkladu tvrzení podle počtu odběrných míst obstojí.",
-            evidence,
+            PARTIAL,
+            base + f" Mezi všemi dodavateli jsou větší {names_of(bigger_all)}; mimo tradiční dodavatele je ale "
+            "největší.",
+            limitation,
+            "Příležitost: tvrzení platí jen při užším výkladu. Formulace s konkrétním číslem a zdrojem by "
+            "obstála lépe.",
+            evidence, subclaims, opportunity=2,
         )
     commodities = list(params.get("commodities", ["elektřina"]))
     if "plyn" in claim.get("quote", "").casefold() and "plyn" not in commodities:
@@ -947,12 +981,59 @@ def green_generic(claim, supplier, ctx):
     )
 
 
+def decision_stats(supplier: dict, ctx: dict) -> dict | None:
+    """Souhrn pravomocných rozhodnutí ERÚ o dodavateli; None, když zdroj není k dispozici."""
+    data = (ctx.get("decisions") or {}).get(supplier["id"])
+    if not data:
+        return None
+    items = data["decisions"]
+    practices = [d for d in items if d["kind"] == "practice"]
+    offences = [d for d in items if d["kind"] in ("practice", "offence")]
+    return {"offences": offences, "practices": practices, "all": items,
+            "latest_practice": practices[0]["date"] if practices else None}
+
+
 def soft_trust(claim, supplier, ctx):
+    finding = "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty."
+    limitation = "Neuvádí zdroj ani metodiku (průzkum, období, vzorek)."
+    stats = decision_stats(supplier, ctx)
+    if stats is None:
+        return result(
+            UNVERIFIABLE, finding, limitation,
+            "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
+        )
+    offences, practices = stats["offences"], stats["practices"]
+    evidence = [
+        {"label": f"{d['date']} – {d['title']}", "value": DECISION_KIND[d["kind"]],
+         "source": "eru_decisions", "url": d["url"]}
+        for d in offences[:6]
+    ]
+    limitation += (
+        " Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen "
+        "název a datum zveřejnění, ne skutek ani sankci."
+    )
+    if practices:
+        return result(
+            UNVERIFIABLE,
+            finding + f" ERÚ přitom eviduje {decisions_phrase(len(offences))} o přestupcích tohoto "
+            f"dodavatele, z toho se obchodních praktik nebo nepravdivých informací týká {len(practices)} "
+            f"(poslední zveřejněno {stats['latest_practice']}).",
+            limitation,
+            "Příležitost: slogan o důvěryhodnosti stojí vedle pravomocného rozhodnutí regulátora. Před "
+            "použitím si rozhodnutí přečíst (skutek, období, sankce).",
+            evidence, opportunity=2,
+        )
+    if offences:
+        return result(
+            UNVERIFIABLE,
+            finding + f" ERÚ eviduje {decisions_phrase(len(offences))} o přestupcích tohoto dodavatele, "
+            "žádné se netýká obchodních praktik ani nepravdivých informací.",
+            limitation, "Bez akce.", evidence,
+        )
     return result(
         UNVERIFIABLE,
-        "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-        "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
-        "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
+        finding + " ERÚ u tohoto dodavatele neeviduje žádné pravomocné rozhodnutí o přestupku.",
+        limitation, "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
     )
 
 

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-13T14:07:48+00:00",
+ "generated_at": "2026-11-13T14:37:57+00:00",
  "mode": "live",
  "profile": {
   "commodity": "elektřina",
@@ -11,10 +11,25 @@
   ],
   "vat_rate": 0.21
  },
+ "definitions": {
+  "traditional_suppliers": {
+   "label": "tradiční dodavatelé",
+   "names": [
+    "ČEZ Prodej, a.s.",
+    "ČEZ ESCO, a.s.",
+    "E.ON Energie, a.s.",
+    "Pražská energetika, a.s.",
+    "innogy Energie, s.r.o.",
+    "Pražská plynárenská, a.s."
+   ],
+   "note": "Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json."
+  },
+  "size_metric": "součet odběrných míst elektřiny a plynu podle OTE"
+ },
  "sources": {
   "eru": {
    "source_url": "https://eru.gov.cz/sites/default/files/obsah/prilohy/elektrina_6.csv",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "cd2dfc19a2353f86",
@@ -26,7 +41,7 @@
   },
   "ote": {
    "source_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote",
-   "fetched_at": "2026-11-13T14:07:48+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "2a410f57cd912210",
@@ -37,7 +52,7 @@
   },
   "ote_gas": {
    "source_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu",
-   "fetched_at": "2026-11-13T14:07:48+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "e39455130be486a2",
@@ -45,12 +60,21 @@
    "page_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu",
    "data_period": "2026-09",
    "unit": "počet odběrných a předacích míst (OPM), ne zákazníků"
+  },
+  "eru_decisions": {
+   "name": "ERÚ – pravomocná rozhodnutí (podle účastníka řízení)",
+   "page_url": "https://eru.gov.cz/pravomocna-rozhodnuti",
+   "source_url": "https://eru.gov.cz/pravomocna-rozhodnuti",
+   "origin": "live",
+   "fetched_at": "2026-11-13T14:38:00+00:00",
+   "warning": null,
+   "unit": "název, datum zveřejnění a štítky rozhodnutí; obsah rozhodnutí se nečte"
   }
  },
  "price_lists": [
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "e541c3be5e9a5c26",
@@ -61,7 +85,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "6961b7f5bd95cb63",
@@ -72,7 +96,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "f21625b5ac1e7503",
@@ -83,7 +107,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "1987f52ba59a1d94",
@@ -94,7 +118,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:58+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "d309c4a76dd37b27",
@@ -105,7 +129,7 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:59+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "bc3a8475a19746e9",
@@ -116,7 +140,7 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:59+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "5e8316fd523fb36c",
@@ -127,7 +151,7 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T14:07:49+00:00",
+   "fetched_at": "2026-11-13T14:37:59+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "09ddd13da37cb785",
@@ -138,7 +162,7 @@
   },
   {
    "source_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-14-59/EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
-   "fetched_at": "2026-11-13T14:07:52+00:00",
+   "fetched_at": "2026-11-13T14:38:01+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "8d6a5d6a4770cae4",
@@ -149,7 +173,7 @@
   },
   {
    "source_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-11-06/EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
-   "fetched_at": "2026-11-13T14:07:52+00:00",
+   "fetched_at": "2026-11-13T14:38:02+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "5b0865214b8e599b",
@@ -160,7 +184,7 @@
   },
   {
    "source_url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
-   "fetched_at": "2026-11-13T14:07:50+00:00",
+   "fetched_at": "2026-11-13T14:38:00+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "dfe0a9d0631e2522",
@@ -171,7 +195,7 @@
   },
   {
    "source_url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
-   "fetched_at": "2026-11-13T14:07:50+00:00",
+   "fetched_at": "2026-11-13T14:38:00+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "a9bcc2a99df30f84",
@@ -586,7 +610,12 @@
      "from": "2026-01",
      "to": "2026-09"
     },
-    "price": null
+    "price": null,
+    "decisions": {
+     "offences": 1,
+     "practices": 1,
+     "latest_practice": "16.11.2023"
+    }
    },
    {
     "id": "epet",
@@ -614,6 +643,11 @@
      "product": "FIX 36 GARANT",
      "annual_cost": 9871.18,
      "position": "within"
+    },
+    "decisions": {
+     "offences": 0,
+     "practices": 0,
+     "latest_practice": null
     }
    },
    {
@@ -642,6 +676,11 @@
      "product": "Fixně online pro začátek na 3 roky",
      "annual_cost": 8777.34,
      "position": "below"
+    },
+    "decisions": {
+     "offences": 2,
+     "practices": 1,
+     "latest_practice": "17.06.2025"
     }
    },
    {
@@ -663,7 +702,12 @@
      "from": "2026-01",
      "to": "2026-09"
     },
-    "price": null
+    "price": null,
+    "decisions": {
+     "offences": 4,
+     "practices": 1,
+     "latest_practice": "12.11.2025"
+    }
    },
    {
     "id": "pre",
@@ -684,7 +728,12 @@
      "from": "2026-01",
      "to": "2026-09"
     },
-    "price": null
+    "price": null,
+    "decisions": {
+     "offences": 3,
+     "practices": 1,
+     "latest_practice": "15.07.2025"
+    }
    },
    {
     "id": "mnd",
@@ -705,7 +754,12 @@
      "from": "2026-01",
      "to": "2026-09"
     },
-    "price": null
+    "price": null,
+    "decisions": {
+     "offences": 1,
+     "practices": 1,
+     "latest_practice": "21.04.2023"
+    }
    },
    {
     "id": "eon",
@@ -733,6 +787,11 @@
      "product": "Variant PRO na 3 roky",
      "annual_cost": 8792.28,
      "position": "below"
+    },
+    "decisions": {
+     "offences": 2,
+     "practices": 0,
+     "latest_practice": null
     }
    },
    {
@@ -761,6 +820,11 @@
      "product": "Elektřina Fix na 3 roky",
      "annual_cost": 8460.2,
      "position": "below"
+    },
+    "decisions": {
+     "offences": 1,
+     "practices": 1,
+     "latest_practice": "01.04.2026"
     }
    },
    {
@@ -789,6 +853,11 @@
      "product": "OPTIMAL 606 FIX",
      "annual_cost": 8658.76,
      "position": "below"
+    },
+    "decisions": {
+     "offences": 3,
+     "practices": 3,
+     "latest_practice": "01.04.2026"
     }
    },
    {
@@ -810,7 +879,12 @@
      "from": "2026-01",
      "to": "2026-09"
     },
-    "price": null
+    "price": null,
+    "decisions": {
+     "offences": 0,
+     "practices": 0,
+     "latest_practice": null
+    }
    },
    {
     "id": "bezdodavatele",
@@ -831,7 +905,12 @@
      "from": "2026-01",
      "to": "2026-09"
     },
-    "price": null
+    "price": null,
+    "decisions": {
+     "offences": 0,
+     "practices": 0,
+     "latest_practice": null
+    }
    }
   ],
   "caveat": "Odběrná místa nejsou zákazníci; změna může zahrnovat i převzetí jiného dodavatele. Jde o souběh dvou údajů, ne o důkaz příčiny. Ceny jsou nabídky pro nové zákazníky v jedné sazbě a jednom distribučním území."
@@ -944,10 +1023,10 @@
    {
     "id": "centropol-2",
     "quote": "Největší český dodavatel energií",
-    "verdict": "unverifiable",
-    "verdict_label": "nelze ověřit",
-    "finding": "Podle OTE je dodavatel 5. podle počtu odběrných míst elektřiny (225 805 OPM, 2026-09). Tvrzení se ale omezuje na „český“ dodavatele a OTE takové členění neeviduje.",
-    "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Bez definice pojmu „český dodavatel“ nelze pořadí sestavit."
+    "verdict": "partially_supported",
+    "verdict_label": "částečně podloženo",
+    "finding": "Podle OTE má CENTROPOL ENERGY, a.s. dohromady 292 503 odběrných míst elektřiny a plynu. Mezi všemi dodavateli jsou větší ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779); mimo tradiční dodavatele je ale největší.",
+    "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Pojem „český dodavatel“ tvrzení nedefinuje, proto se posuzuje podle výkladů stanovených týmem. Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json. Za tradiční se berou: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.. Velikost se měří součtem odběrných míst elektřiny a plynu; objem dodané energie ani vlastnictví firem v datech nejsou."
    }
   ],
   "solid": [
@@ -992,7 +1071,9 @@
     "caveat": "Obchodní část ceny (komodita a stálý plat) pro srovnávací sazbu a území; před použitím znovu ověřit platnost obou ceníků."
    }
   ],
-  "cautions": [],
+  "cautions": [
+   "ERÚ eviduje 2 pravomocná rozhodnutí o našich přestupcích, z toho se obchodních praktik nebo nepravdivých informací týká 1 (poslední zveřejněno 17.06.2025). Tvrzení o férovosti a důvěryhodnosti tím může konkurent zpochybnit."
+  ],
   "watch": [
    {
     "kind": "price",
@@ -1017,8 +1098,12 @@
     "kind": "claim",
     "supplier": "Dobrá Energie",
     "quote": "Po sloučení s epet jsme největší alternativní dodavatel energií v ČR",
-    "verdict_label": "nelze ověřit",
-    "text": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají CENTROPOL ENERGY, a.s. (292 503 OPM), MND Energie a.s. (273 578 OPM). Pojem „alternativní dodavatel“ ani metrika (odběrná místa, objem dodávky) nejsou v tvrzení definovány."
+    "verdict_label": "v rozporu s daty",
+    "text": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají i dodavatelé mimo tradiční skupiny: CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578). Tvrzení neplatí při žádném z výkladů."
+   },
+   {
+    "kind": "regulator",
+    "text": "Pravomocná rozhodnutí ERÚ o nekalých či agresivních obchodních praktikách nebo nepravdivých informacích: ARMEX ENERGY 3 (poslední 01.04.2026), SPP CZ 1 (poslední 16.11.2023), Dobrá Energie 1 (poslední 12.11.2025), PRE 1 (poslední 15.07.2025), MND 1 (poslední 21.04.2023), ČEZ Prodej 1 (poslední 01.04.2026)."
    },
    {
     "kind": "loyalty",
@@ -1046,10 +1131,10 @@
    "source_url": "https://www.cez.cz/cs/prejdeteknam",
    "page": {
     "source_url": "https://www.cez.cz/cs/prejdeteknam",
-    "fetched_at": "2026-11-13T14:07:48+00:00",
+    "fetched_at": "2026-11-13T14:37:58+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "3cfc968b660da12f",
+    "sha256": "bfb295c3381baf7d",
     "name": "Web dodavatele ČEZ Prodej",
     "text_sha256": "14f088b56aae53ee"
    },
@@ -1363,13 +1448,20 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
-     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
-     "evidence": [],
+     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ přitom eviduje 1 pravomocné rozhodnutí o přestupcích tohoto dodavatele, z toho se obchodních praktik nebo nepravdivých informací týká 1 (poslední zveřejněno 01.04.2026).",
+     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek). Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen název a datum zveřejnění, ne skutek ani sankci.",
+     "action": "Příležitost: slogan o důvěryhodnosti stojí vedle pravomocného rozhodnutí regulátora. Před použitím si rozhodnutí přečíst (skutek, období, sankce).",
+     "evidence": [
+      {
+       "label": "01.04.2026 – ČEZ Prodej, a.s. - rozhodnutí k užití nekalé obchodní praktiky, uvedení nepravdivých informací a porušení povinností držitele licence",
+       "value": "přestupek: obchodní praktiky nebo nepravdivé informace",
+       "source": "eru_decisions",
+       "url": "https://eru.gov.cz/cez-prodej-rozhodnuti-k-uziti-nekale-obchodni-praktiky-uvedeni-nepravdivych-informaci-poruseni"
+      }
+     ],
      "subclaims": [],
      "possible_regulatory_risk": false,
-     "opportunity": false
+     "opportunity": 2
     },
     {
      "id": "cez-n1",
@@ -1431,31 +1523,35 @@
      ],
      "possible_regulatory_risk": false,
      "opportunity": 2
-    },
-    {
-     "id": "cez-n2",
-     "supplier": "ČEZ Prodej",
-     "quote": "Zajistíte si tak stabilně nízkou cenu",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
-     "source_url": "https://www.cez.cz/cs/prejdeteknam",
-     "captured_at": "2026-11-13",
-     "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "01.04.2026",
+     "title": "ČEZ Prodej, a.s. - rozhodnutí k užití nekalé obchodní praktiky, uvedení nepravdivých informací a porušení povinností držitele licence",
+     "url": "https://eru.gov.cz/cez-prodej-rozhodnuti-k-uziti-nekale-obchodni-praktiky-uvedeni-nepravdivych-informaci-poruseni",
+     "kind": "practice"
+    },
+    {
+     "date": "24.11.2022",
+     "title": "Rozhodnutí ve sporu mezi VT-SUN, s.r.o., a ČEZ Prodej, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-sporu-mezi-vt-sun-sro-cez-prodej",
+     "kind": "dispute"
+    },
+    {
+     "date": "24.11.2022",
+     "title": "Rozhodnutí ve sporu mezi FVE Mozolov s.r.o. v likvidaci a ČEZ Prodej, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-sporu-mezi-fve-mozolov-sro-v-likvidaci-cez-prodej",
+     "kind": "dispute"
+    },
+    {
+     "date": "23.11.2022",
+     "title": "Rozhodnutí ve sporu mezi ČEZ Prodej, a.s, a Saša-Sun s.r.o.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-sporu-mezi-cez-prodej-sasa-sun-sro",
+     "kind": "dispute"
+    }
+   ]
   },
   {
    "id": "centropol",
@@ -1463,12 +1559,12 @@
    "source_url": "https://www.centropol.cz/domacnost/elektrina/",
    "page": {
     "source_url": "https://www.centropol.cz/domacnost/elektrina/",
-    "fetched_at": "2026-11-13T14:07:50+00:00",
+    "fetched_at": "2026-11-13T14:37:59+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "bc5e34d7512e2bc1",
+    "sha256": "2201741e9f1b749c",
     "name": "Web dodavatele Centropol",
-    "text_sha256": "89f49dd582268958"
+    "text_sha256": "235e0631bbe75710"
    },
    "extractor": {
     "method": "model gemini-3.5-flash-lite",
@@ -1657,13 +1753,13 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "nelze ověřit",
+     "verdict_label": "částečně podloženo",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Podle OTE je dodavatel 5. podle počtu odběrných míst elektřiny (225 805 OPM, 2026-09). Tvrzení se ale omezuje na „český“ dodavatele a OTE takové členění neeviduje.",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Bez definice pojmu „český dodavatel“ nelze pořadí sestavit.",
-     "action": "Příležitost: superlativ „největší český“ stojí na nedefinovaném pojmu. Pokud komunikujeme velikost, uvádět konkrétní číslo a zdroj (OTE).",
+     "verdict": "partially_supported",
+     "finding": "Podle OTE má CENTROPOL ENERGY, a.s. dohromady 292 503 odběrných míst elektřiny a plynu. Mezi všemi dodavateli jsou větší ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779); mimo tradiční dodavatele je ale největší.",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Pojem „český dodavatel“ tvrzení nedefinuje, proto se posuzuje podle výkladů stanovených týmem. Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json. Za tradiční se berou: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.. Velikost se měří součtem odběrných míst elektřiny a plynu; objem dodané energie ani vlastnictví firem v datech nejsou.",
+     "action": "Příležitost: tvrzení platí jen při užším výkladu. Formulace s konkrétním číslem a zdrojem by obstála lépe.",
      "evidence": [
       {
        "label": "Elektřina – CENTROPOL ENERGY, a.s.: 225 805 OPM (2026-09)",
@@ -1674,11 +1770,25 @@
        "label": "Pět největších v elektřině podle OPM",
        "value": "1. ČEZ Prodej, a.s. (2 694 690); 2. E.ON Energie, a.s. (1 256 867); 3. Pražská energetika, a.s. (796 293); 4. innogy Energie, s.r.o. (664 428); 5. CENTROPOL ENERGY, a.s. (225 805)",
        "source": "ote"
+      },
+      {
+       "label": "Součet odběrných míst elektřiny a plynu – CENTROPOL ENERGY, a.s.: 292 503",
+       "value": "větší: ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)",
+       "source": "ote"
       }
      ],
-     "subclaims": [],
+     "subclaims": [
+      {
+       "text": "Výklad „všichni dodavatelé“",
+       "status": "neplatí – víc odběrných míst má ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)"
+      },
+      {
+       "text": "Výklad „dodavatelé mimo tradiční skupiny“",
+       "status": "platí"
+      }
+     ],
      "possible_regulatory_risk": false,
-     "opportunity": true
+     "opportunity": 2
     },
     {
      "id": "centropol-3",
@@ -1768,7 +1878,45 @@
      "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "17.06.2025",
+     "title": "CENTROPOL ENERGY, a.s. - rozhodnutí k porušení povinností držitele licence a k užití nekalé a agresivní obchodní praktiky",
+     "url": "https://eru.gov.cz/centropol-energy-rozhodnuti-k-poruseni-povinnosti-drzitele-licence-k-uziti-nekale-agresivni",
+     "kind": "practice"
+    },
+    {
+     "date": "20.10.2023",
+     "title": "CENTROPOL ENERGY, a.s. - rozhodnutí k porušení povinností držitele licence",
+     "url": "https://eru.gov.cz/centropol-energy-rozhodnuti-k-poruseni-povinnosti-drzitele-licence",
+     "kind": "offence"
+    },
+    {
+     "date": "20.10.2023",
+     "title": "CENTROPOL ENERGY, a.s. - usnesení o zastavení řízení",
+     "url": "https://eru.gov.cz/centropol-energy-usneseni-o-zastaveni-rizeni-0",
+     "kind": "discontinued"
+    },
+    {
+     "date": "28.11.2022",
+     "title": "Rozhodnutí ve spotřebitelském sporu s CENTROPOL ENERGY, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-centropol-energy-0",
+     "kind": "dispute"
+    },
+    {
+     "date": "28.11.2022",
+     "title": "Rozhodnutí ve spotřebitelském sporu s CENTROPOL ENERGY, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-centropol-energy",
+     "kind": "dispute"
+    },
+    {
+     "date": "20.06.2022",
+     "title": "CENTROPOL ENERGY, a.s. - usnesení o zastavení řízení",
+     "url": "https://eru.gov.cz/centropol-energy-usneseni-o-zastaveni-rizeni",
+     "kind": "discontinued"
+    }
+   ]
   },
   {
    "id": "eon",
@@ -1776,10 +1924,10 @@
    "source_url": "https://www.eon.cz/domacnosti/elektrina/",
    "page": {
     "source_url": "https://www.eon.cz/domacnosti/elektrina/",
-    "fetched_at": "2026-11-13T14:07:49+00:00",
+    "fetched_at": "2026-11-13T14:37:59+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "2ff9d300df2abec9",
+    "sha256": "72a588bf40773f05",
     "name": "Web dodavatele E.ON",
     "text_sha256": "9f0a50a2837d4be5"
    },
@@ -1998,10 +2146,23 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
-     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
-     "evidence": [],
+     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ eviduje 2 pravomocná rozhodnutí o přestupcích tohoto dodavatele, žádné se netýká obchodních praktik ani nepravdivých informací.",
+     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek). Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen název a datum zveřejnění, ne skutek ani sankci.",
+     "action": "Bez akce.",
+     "evidence": [
+      {
+       "label": "06.10.2026 – E.ON Energie, a.s. - rozhodnutí k porušení povinnosti držitele licence",
+       "value": "přestupek: jiné porušení povinností",
+       "source": "eru_decisions",
+       "url": "https://eru.gov.cz/eon-energie-rozhodnuti-k-poruseni-povinnosti-drzitele-licence-0"
+      },
+      {
+       "label": "16.12.2024 – E.ON Energie, a.s. - rozhodnutí k porušení povinností držitele licence",
+       "value": "přestupek: jiné porušení povinností",
+       "source": "eru_decisions",
+       "url": "https://eru.gov.cz/eon-energie-rozhodnuti-k-poruseni-povinnosti-drzitele-licence"
+      }
+     ],
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
@@ -2027,31 +2188,35 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
-    },
-    {
-     "id": "eon-n2",
-     "supplier": "E.ON",
-     "quote": "Platit za elektřinu méně a méně? S námi ano",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
-     "source_url": "https://www.eon.cz/domacnosti/elektrina/",
-     "captured_at": "2026-11-13",
-     "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "06.10.2026",
+     "title": "E.ON Energie, a.s. - rozhodnutí k porušení povinnosti držitele licence",
+     "url": "https://eru.gov.cz/eon-energie-rozhodnuti-k-poruseni-povinnosti-drzitele-licence-0",
+     "kind": "offence"
+    },
+    {
+     "date": "16.12.2024",
+     "title": "E.ON Energie, a.s. - rozhodnutí k porušení povinností držitele licence",
+     "url": "https://eru.gov.cz/eon-energie-rozhodnuti-k-poruseni-povinnosti-drzitele-licence",
+     "kind": "offence"
+    },
+    {
+     "date": "28.11.2022",
+     "title": "Rozhodnutí ve spotřebitelském sporu s E.ON Energie, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-eon-energie",
+     "kind": "dispute"
+    },
+    {
+     "date": "24.11.2022",
+     "title": "Rozhodnutí ve sporu mezi OTE, a.s., a E.ON Energie, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-sporu-mezi-ote-eon-energie",
+     "kind": "dispute"
+    }
+   ]
   },
   {
    "id": "epet",
@@ -2059,12 +2224,12 @@
    "source_url": "https://epet.cz/elektrina-1",
    "page": {
     "source_url": "https://epet.cz/elektrina-1",
-    "fetched_at": "2026-11-13T14:07:48+00:00",
+    "fetched_at": "2026-11-13T14:37:58+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "b83de48c2becb3cb",
+    "sha256": "3646d4f2ef48f424",
     "name": "Web dodavatele epet",
-    "text_sha256": "b021e8b73871cac7"
+    "text_sha256": "16bf41e2c673b366"
    },
    "extractor": {
     "method": "model gemini-3.5-flash-lite",
@@ -2213,8 +2378,8 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
+     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ u tohoto dodavatele neeviduje žádné pravomocné rozhodnutí o přestupku.",
+     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek). Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen název a datum zveřejnění, ne skutek ani sankci.",
      "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
      "evidence": [],
      "subclaims": [],
@@ -2279,8 +2444,8 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
+     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ u tohoto dodavatele neeviduje žádné pravomocné rozhodnutí o přestupku.",
+     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek). Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen název a datum zveřejnění, ne skutek ani sankci.",
      "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
      "evidence": [],
      "subclaims": [],
@@ -2288,7 +2453,8 @@
      "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": []
   },
   {
    "id": "pre",
@@ -2296,10 +2462,10 @@
    "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
    "page": {
     "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
-    "fetched_at": "2026-11-13T14:07:49+00:00",
+    "fetched_at": "2026-11-13T14:37:58+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "0e85c27ef48e8615",
+    "sha256": "f813e2a0e7485b45",
     "name": "Web dodavatele PRE",
     "text_sha256": "5cfbba540193fbdf"
    },
@@ -2351,13 +2517,32 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
-     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
-     "evidence": [],
+     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ přitom eviduje 3 pravomocná rozhodnutí o přestupcích tohoto dodavatele, z toho se obchodních praktik nebo nepravdivých informací týká 1 (poslední zveřejněno 15.07.2025).",
+     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek). Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen název a datum zveřejnění, ne skutek ani sankci.",
+     "action": "Příležitost: slogan o důvěryhodnosti stojí vedle pravomocného rozhodnutí regulátora. Před použitím si rozhodnutí přečíst (skutek, období, sankce).",
+     "evidence": [
+      {
+       "label": "15.07.2025 – Pražská energetika, a.s. - rozhodnutí k užití nekalé obchodní praktiky a k porušení povinnosti držitele licence",
+       "value": "přestupek: obchodní praktiky nebo nepravdivé informace",
+       "source": "eru_decisions",
+       "url": "https://eru.gov.cz/prazska-energetika-rozhodnuti-k-uziti-nekale-obchodni-praktiky-k-poruseni-povinnosti-drzitele"
+      },
+      {
+       "label": "15.02.2024 – Pražská energetika, a.s. - rozhodnutí k porušení povinnosti držitele licence",
+       "value": "přestupek: jiné porušení povinností",
+       "source": "eru_decisions",
+       "url": "https://eru.gov.cz/prazska-energetika-rozhodnuti-k-poruseni-povinnosti-drzitele-licence"
+      },
+      {
+       "label": "20.06.2022 – Pražská energetika, a.s. - rozhodnutí o vyúčtování dodávky elektřiny",
+       "value": "přestupek: jiné porušení povinností",
+       "source": "eru_decisions",
+       "url": "https://eru.gov.cz/prazska-energetika-rozhodnuti-o-vyuctovani-dodavky-elektriny"
+      }
+     ],
      "subclaims": [],
      "possible_regulatory_risk": false,
-     "opportunity": false
+     "opportunity": 2
     },
     {
      "id": "pre-n1",
@@ -2382,7 +2567,39 @@
      "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "15.07.2025",
+     "title": "Pražská energetika, a.s. - rozhodnutí k užití nekalé obchodní praktiky a k porušení povinnosti držitele licence",
+     "url": "https://eru.gov.cz/prazska-energetika-rozhodnuti-k-uziti-nekale-obchodni-praktiky-k-poruseni-povinnosti-drzitele",
+     "kind": "practice"
+    },
+    {
+     "date": "15.02.2024",
+     "title": "Pražská energetika, a.s. - rozhodnutí k porušení povinnosti držitele licence",
+     "url": "https://eru.gov.cz/prazska-energetika-rozhodnuti-k-poruseni-povinnosti-drzitele-licence",
+     "kind": "offence"
+    },
+    {
+     "date": "06.01.2023",
+     "title": "Pražská energetika, a.s. - usnesení o zastavení řízení",
+     "url": "https://eru.gov.cz/prazska-energetika-usneseni-o-zastaveni-rizeni",
+     "kind": "discontinued"
+    },
+    {
+     "date": "28.11.2022",
+     "title": "Rozhodnutí ve spotřebitelském sporu s Pražská energetika, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-prazska-energetika",
+     "kind": "dispute"
+    },
+    {
+     "date": "20.06.2022",
+     "title": "Pražská energetika, a.s. - rozhodnutí o vyúčtování dodávky elektřiny",
+     "url": "https://eru.gov.cz/prazska-energetika-rozhodnuti-o-vyuctovani-dodavky-elektriny",
+     "kind": "offence"
+    }
+   ]
   },
   {
    "id": "mnd",
@@ -2390,10 +2607,10 @@
    "source_url": "https://www.mnd.cz/elektrina",
    "page": {
     "source_url": "https://www.mnd.cz/elektrina",
-    "fetched_at": "2026-11-13T14:07:48+00:00",
+    "fetched_at": "2026-11-13T14:37:58+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "1faee5dd10183d08",
+    "sha256": "54805f3f0c18f2fa",
     "name": "Web dodavatele MND",
     "text_sha256": "deb68768e29c55cd"
    },
@@ -2451,7 +2668,15 @@
      "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "21.04.2023",
+     "title": "MND Energie a.s. - rozhodnutí k užití nekalé obchodní praktiky",
+     "url": "https://eru.gov.cz/mnd-energie-rozhodnuti-k-uziti-nekale-obchodni-praktiky",
+     "kind": "practice"
+    }
+   ]
   },
   {
    "id": "dobra",
@@ -2459,12 +2684,12 @@
    "source_url": "https://dobra-energie.eu/",
    "page": {
     "source_url": "https://dobra-energie.eu/",
-    "fetched_at": "2026-11-13T14:07:48+00:00",
+    "fetched_at": "2026-11-13T14:37:57+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "931d4773374210e1",
+    "sha256": "6142a70755662385",
     "name": "Web dodavatele Dobrá Energie",
-    "text_sha256": "c4f475a7a1390657"
+    "text_sha256": "75c7fefcdbb42083"
    },
    "extractor": {
     "method": "model gemini-3.5-flash-lite",
@@ -2482,13 +2707,13 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "nelze ověřit",
+     "verdict_label": "v rozporu s daty",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají CENTROPOL ENERGY, a.s. (292 503 OPM), MND Energie a.s. (273 578 OPM). Pojem „alternativní dodavatel“ ani metrika (odběrná místa, objem dodávky) nejsou v tvrzení definovány.",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Za „alternativní“ zde bereme dodavatele mimo tradiční: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.. Dodavatel může myslet objem dodané energie, který OTE nezveřejňuje.",
-     "action": "Příležitost: podle počtu odběrných míst tvrzení neplatí a „alternativní“ není definováno. Lze ho zpochybnit čísly OTE s výhradou, že může jít o objem dodávky.",
+     "verdict": "contradicted",
+     "finding": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají i dodavatelé mimo tradiční skupiny: CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578). Tvrzení neplatí při žádném z výkladů.",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Pojem „alternativní dodavatel“ tvrzení nedefinuje, proto se posuzuje podle výkladů stanovených týmem. Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json. Za tradiční se berou: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.. Velikost se měří součtem odběrných míst elektřiny a plynu; objem dodané energie ani vlastnictví firem v datech nejsou.",
+     "action": "Příležitost: tvrzení o prvenství lze zpochybnit čísly OTE, s výhradou, že dodavatel může myslet objem dodané energie.",
      "evidence": [
       {
        "label": "Elektřina – Dobrá Energie s.r.o.: 44 154 OPM (2026-09)",
@@ -2501,14 +2726,23 @@
        "source": "ote"
       },
       {
-       "label": "Součet OPM elektřiny a plynu – Dobrá Energie s.r.o. + epet energie, a.s.: 187 462",
-       "value": "větší mimo tradiční dodavatele: CENTROPOL ENERGY, a.s. (292 503); MND Energie a.s. (273 578)",
+       "label": "Součet odběrných míst elektřiny a plynu – Dobrá Energie s.r.o. + epet energie, a.s.: 187 462",
+       "value": "větší: ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)",
        "source": "ote"
       }
      ],
-     "subclaims": [],
+     "subclaims": [
+      {
+       "text": "Výklad „všichni dodavatelé“",
+       "status": "neplatí – víc odběrných míst má ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)"
+      },
+      {
+       "text": "Výklad „dodavatelé mimo tradiční skupiny“",
+       "status": "neplatí – víc odběrných míst má CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578)"
+      }
+     ],
      "possible_regulatory_risk": false,
-     "opportunity": 2
+     "opportunity": 3
     },
     {
      "id": "dobra-2",
@@ -2537,31 +2771,35 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
-    },
-    {
-     "id": "dobra-n1",
-     "supplier": "Dobrá Energie",
-     "quote": "90% Klientů by nás doporučilo dál",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
-     "source_url": "https://dobra-energie.eu/",
-     "captured_at": "2026-11-13",
-     "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "12.03.2026",
+     "title": "Dobrá Energie s.r.o. - rozhodnutí k porušení povinnosti držitele licence",
+     "url": "https://eru.gov.cz/dobra-energie-sro-rozhodnuti-k-poruseni-povinnosti-drzitele-licence",
+     "kind": "offence"
+    },
+    {
+     "date": "12.11.2025",
+     "title": "Dobrá Energie s.r.o. - rozhodnutí k porušení povinnosti držitele licence a uvedení nepravdivých informací",
+     "url": "https://eru.gov.cz/dobra-energie-sro-rozhodnuti-k-poruseni-povinnosti-drzitele-licence-uvedeni-nepravdivych-informaci",
+     "kind": "practice"
+    },
+    {
+     "date": "15.10.2024",
+     "title": "Dobrá Energie s.r.o. - rozhodnutí k neposkytnutí informací",
+     "url": "https://eru.gov.cz/dobra-energie-sro-rozhodnuti-k-neposkytnuti-informaci-0",
+     "kind": "offence"
+    },
+    {
+     "date": "19.07.2024",
+     "title": "Dobrá Energie s.r.o. - rozhodnutí k neposkytnutí informací",
+     "url": "https://eru.gov.cz/dobra-energie-sro-rozhodnuti-k-neposkytnuti-informaci",
+     "kind": "offence"
+    }
+   ]
   },
   {
    "id": "spp",
@@ -2569,10 +2807,10 @@
    "source_url": "https://www.spp.cz/",
    "page": {
     "source_url": "https://www.spp.cz/",
-    "fetched_at": "2026-11-13T14:07:48+00:00",
+    "fetched_at": "2026-11-13T14:37:57+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "3c0586b1263c0206",
+    "sha256": "5b9cbe69d4a1081f",
     "name": "Web dodavatele SPP CZ",
     "text_sha256": "0c763bfebf9af081"
    },
@@ -2623,7 +2861,7 @@
     {
      "id": "spp-n1",
      "supplier": "SPP CZ",
-     "quote": "Garantujeme výhodnou cenu a hrajeme fér. Žádné chytáky ve smlouvě ani skryté poplatky u nás nenajde.",
+     "quote": "Garantujeme výhodnou cenu a hrajeme fér.",
      "rule_id": "other",
      "rule_label": "Ostatní",
      "source_url": "https://www.spp.cz/",
@@ -2643,7 +2881,21 @@
      "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "16.11.2023",
+     "title": "SPP CZ, a.s. - rozhodnutí k užití agresivní obchodní praktiky",
+     "url": "https://eru.gov.cz/spp-cz-rozhodnuti-k-uziti-agresivni-obchodni-praktiky",
+     "kind": "practice"
+    },
+    {
+     "date": "25.11.2022",
+     "title": "Rozhodnutí ve spotřebitelském sporu s SPP CZ, a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-spp-cz",
+     "kind": "dispute"
+    }
+   ]
   },
   {
    "id": "lama",
@@ -2651,10 +2903,10 @@
    "source_url": "https://www.lamaenergy.cz/",
    "page": {
     "source_url": "https://www.lamaenergy.cz/",
-    "fetched_at": "2026-11-13T14:07:49+00:00",
+    "fetched_at": "2026-11-13T14:37:58+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "cad63f848690145d",
+    "sha256": "e8ee73d95216a6c4",
     "name": "Web dodavatele LAMA energy",
     "text_sha256": "61c5aaefbf34b23f"
    },
@@ -2707,53 +2959,35 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
-    },
-    {
-     "id": "lama-n2",
-     "supplier": "LAMA energy",
-     "quote": "Desítky tisíc spokojených klientů",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
-     "source_url": "https://www.lamaenergy.cz/",
-     "captured_at": "2026-11-13",
-     "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
-    },
-    {
-     "id": "lama-n3",
-     "supplier": "LAMA energy",
-     "quote": "Férové jednání",
-     "rule_id": "soft_trust",
-     "rule_label": "Důvěra a férovost",
-     "source_url": "https://www.lamaenergy.cz/",
-     "captured_at": "2026-11-13",
-     "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
-     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "22.05.2024",
+     "title": "LAMA energy a.s. - usnesení o zastavení řízení",
+     "url": "https://eru.gov.cz/lama-energy-usneseni-o-zastaveni-rizeni",
+     "kind": "discontinued"
+    },
+    {
+     "date": "18.05.2023",
+     "title": "LAMA energy a.s. - usnesení o zastavení řízení",
+     "url": "https://eru.gov.cz/lama-energy-rozhodnuti-k-neposkytnuti-informaci",
+     "kind": "discontinued"
+    },
+    {
+     "date": "24.11.2022",
+     "title": "Rozhodnutí ve spotřebitelském sporu s LAMA energy a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-lama-energy-0",
+     "kind": "dispute"
+    },
+    {
+     "date": "24.11.2022",
+     "title": "Rozhodnutí ve spotřebitelském sporu s LAMA energy a.s.",
+     "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-lama-energy",
+     "kind": "dispute"
+    }
+   ]
   },
   {
    "id": "armex",
@@ -2761,7 +2995,7 @@
    "source_url": "https://www.armexenergy.cz/",
    "page": {
     "source_url": "https://www.armexenergy.cz/",
-    "fetched_at": "2026-11-13T14:07:49+00:00",
+    "fetched_at": "2026-11-13T14:37:58+00:00",
     "origin": "live",
     "warning": null,
     "sha256": "af61d8abc2cd171e",
@@ -2915,31 +3149,29 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
-    },
-    {
-     "id": "armex-n1",
-     "supplier": "ARMEX ENERGY",
-     "quote": "Stálá cena energií po celou dobu úvazku.",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
-     "source_url": "https://www.armexenergy.cz/",
-     "captured_at": "2026-11-13",
-     "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "01.04.2026",
+     "title": "ARMEX ENERGY a.s. - rozhodnutí k užití agresivní obchodní praktiky, uvedení nepravdivých informací a porušení povinností držitele licence",
+     "url": "https://eru.gov.cz/armex-energy-rozhodnuti-k-uziti-agresivni-obchodni-praktiky-uvedeni-nepravdivych-informaci-poruseni",
+     "kind": "practice"
+    },
+    {
+     "date": "17.10.2025",
+     "title": "ARMEX ENERGY a.s. - rozhodnutí k užití nekalé obchodní praktiky a porušení povinností držitele licence",
+     "url": "https://eru.gov.cz/armex-energy-rozhodnuti-k-uziti-nekale-obchodni-praktiky-poruseni-povinnosti-drzitele-licence",
+     "kind": "practice"
+    },
+    {
+     "date": "16.01.2024",
+     "title": "ARMEX ENERGY a.s. - rozhodnutí k porušení povinností držitele licence a k užití nekalé obchodní praktiky",
+     "url": "https://eru.gov.cz/armex-energy-rozhodnuti-k-poruseni-povinnosti-drzitele-licence-k-uziti-nekale-obchodni-praktiky",
+     "kind": "practice"
+    }
+   ]
   },
   {
    "id": "bezdodavatele",
@@ -2947,10 +3179,10 @@
    "source_url": "https://www.bezdodavatele.cz/",
    "page": {
     "source_url": "https://www.bezdodavatele.cz/",
-    "fetched_at": "2026-11-13T14:07:49+00:00",
+    "fetched_at": "2026-11-13T14:37:59+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "686cbd32c4a739e4",
+    "sha256": "efb52587d8e235f7",
     "name": "Web dodavatele bezDodavatele",
     "text_sha256": "430cceba96d5f324"
    },
@@ -3027,17 +3259,25 @@
      "opportunity": true
     }
    ],
-   "candidates": []
+   "candidates": [],
+   "decisions": [
+    {
+     "date": "20.06.2022",
+     "title": "bezDodavatele a.s. - usnesení o zastavení řízení",
+     "url": "https://eru.gov.cz/bezdodavatele-usneseni-o-zastaveni-rizeni",
+     "kind": "discontinued"
+    }
+   ]
   }
  ],
  "briefing": {
-  "headline": "Konkurence často využívá neověřitelná tvrzení a nepřesné definice velikosti.",
-  "summary": "Analýza trhu ukazuje, že někteří dodavatelé operují s neověřitelnými reklamními slogany ohledně nejnižších cen nebo zeleného původu energií. Objevují se také nepřesnosti v počtech zákazníků a odběrných míst ve srovnání s daty OTE. Tyto nedostatky v marketingových sděleních představují příležitost pro naši vlastní transparentní komunikaci.",
+  "headline": "Konkurenční tvrzení na trhu s elektřinou vykazují řadu nepřesností, které lze obchodně využít.",
+  "summary": "Někteří dodavatelé používají marketingová tvrzení o nejnižších cenách či prvenství, jež veřejná data a ceníky nepotvrzují. U tvrzení o zeleném původu energií a uhlíkové neutralitě chybí na trhu doložitelné záruky a certifikáty. Řada konkurenčních sloganů navíc operuje s nejasně definovanou metrikou zákazníků namísto skutečných odběrných míst.",
   "matrix": {
    "Velikost na trhu": {
-    "contradicted": 0,
-    "partially_supported": 2,
-    "unverifiable": 2,
+    "contradicted": 1,
+    "partially_supported": 3,
+    "unverifiable": 0,
     "supported": 0
    },
    "Výhodná cena": {
@@ -3049,19 +3289,19 @@
    "Důvěra a férovost": {
     "contradicted": 0,
     "partially_supported": 0,
-    "unverifiable": 6,
-    "supported": 0
-   },
-   "Ostatní": {
-    "contradicted": 0,
-    "partially_supported": 0,
-    "unverifiable": 10,
+    "unverifiable": 5,
     "supported": 0
    },
    "Nejnižší cena / cenové prvenství": {
     "contradicted": 1,
     "partially_supported": 0,
     "unverifiable": 3,
+    "supported": 0
+   },
+   "Ostatní": {
+    "contradicted": 0,
+    "partially_supported": 0,
+    "unverifiable": 5,
     "supported": 0
    },
    "Garance (fixace) ceny": {
@@ -3101,15 +3341,15 @@
     "claim_id": "dobra-1",
     "supplier": "Dobrá Energie",
     "quote": "Po sloučení s epet jsme největší alternativní dodavatel energií v ČR",
-    "why": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají CENTROPOL ENERGY, a.s. (292 503 OPM), MND Energie a.s. (273 578 OPM). Pojem „alternativní dodavatel“ ani metrika (odběrná místa, objem dodávky) nejsou v tvrzení definovány.",
-    "next_step": "Příležitost: podle počtu odběrných míst tvrzení neplatí a „alternativní“ není definováno. Lze ho zpochybnit čísly OTE s výhradou, že může jít o objem dodávky."
+    "why": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají i dodavatelé mimo tradiční skupiny: CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578). Tvrzení neplatí při žádném z výkladů.",
+    "next_step": "Příležitost: tvrzení o prvenství lze zpochybnit čísly OTE, s výhradou, že dodavatel může myslet objem dodané energie."
    },
    {
-    "claim_id": "spp-1",
-    "supplier": "SPP CZ",
-    "quote": "Jsme dodavatel energie pro téměř 1,5 milionu zákazníků v Česku a na Slovensku.",
-    "why": "Tvrzení sčítá zákazníky ve více zemích (Česko a Slovensko). V Česku eviduje OTE 6 584 odběrných míst elektřiny a 9 177 plynu, dohromady 15 761, tedy nejvýše 1,1 % tvrzeného počtu.",
-    "next_step": "Příležitost: číslo působí na českého zákazníka mnohem větší, než jaká je česká část. Pokud komunikujeme velikost, uvádět český údaj a zdroj."
+    "claim_id": "cez-3",
+    "supplier": "ČEZ Prodej",
+    "quote": "Jsme nejdůvěryhodnější dodavatel energií",
+    "why": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ přitom eviduje 1 pravomocné rozhodnutí o přestupcích tohoto dodavatele, z toho se obchodních praktik nebo nepravdivých informací týká 1 (poslední zveřejněno 01.04.2026).",
+    "next_step": "Příležitost: slogan o důvěryhodnosti stojí vedle pravomocného rozhodnutí regulátora. Před použitím si rozhodnutí přečíst (skutek, období, sankce)."
    }
   ],
   "method": "model gemini-3.5-flash-lite vybral priority a napsal shrnutí; nálezy, čísla a verdikty jsou z pravidel v kódu"

@@ -3,7 +3,7 @@ import pytest
 
 from competitive_intelligence import agents, workflow
 from competitive_intelligence.app import create_app
-from competitive_intelligence.connectors import eru, http, ote, pricelist, web
+from competitive_intelligence.connectors import eru, eru_decisions, http, ote, pricelist, web
 
 
 @pytest.fixture(autouse=True)
@@ -183,9 +183,14 @@ def test_real_data_verdicts_from_snapshots():
     # počty zákazníků řádově odpovídají součtu odběrných míst elektřiny a plynu
     assert claims["eon-2"]["verdict"] == "partially_supported"
     assert claims["mnd-1"]["verdict"] == "partially_supported"
-    # menší dodavatelé: nález s konkrétními čísly, verdikt zůstává opatrný
+    # tvrzení přes dvě země: nález s českým podílem, verdikt zůstává opatrný
     assert claims["spp-1"]["verdict"] == "unverifiable" and "Slovensko" in claims["spp-1"]["finding"]
-    assert claims["dobra-1"]["verdict"] == "unverifiable" and "CENTROPOL" in claims["dobra-1"]["finding"]
+    # „největší alternativní“ a „největší český“ se posuzují podle definic týmu
+    assert claims["dobra-1"]["verdict"] == "contradicted" and "CENTROPOL" in claims["dobra-1"]["finding"]
+    assert claims["centropol-2"]["verdict"] == "partially_supported"
+    # slogan o důvěře: verdikt se nevydává, ale nález uvádí pravomocné rozhodnutí ERÚ
+    assert claims["cez-3"]["verdict"] == "unverifiable" and "pravomocné rozhodnutí" in claims["cez-3"]["finding"]
+    assert "neeviduje" in claims["epet-2"]["finding"]
     # garance dorovnání ceny není tvrzení o prvenství
     assert claims["centropol-1"]["verdict"] == "unverifiable"
 
@@ -297,6 +302,31 @@ def test_api_validates_perspective():
     assert ok.status_code == 200 and ok.get_json()["perspective"]["id"] == "centropol"
     assert client.post("/api/v1/analyze", json={**body, "perspective": "neznamy"}).status_code == 400
     assert client.post("/api/v1/analyze", json=body).get_json()["perspective"] is None
+
+
+def test_eru_decisions_from_snapshot_are_classified():
+    config = {s["id"]: s for s in workflow.load_config()["suppliers"]}
+    armex = eru_decisions.load(config["armex"], live=False)
+    assert armex["source"]["origin"] == "snapshot"
+    assert [d["kind"] for d in armex["decisions"]] == ["practice", "practice", "practice"]
+    assert all(d["url"].startswith("https://eru.gov.cz/") and d["date"] for d in armex["decisions"])
+    pre = eru_decisions.load(config["pre"], live=False)
+    assert any(d["kind"] == "discontinued" for d in pre["decisions"])  # zastavené řízení není přestupek
+    assert eru_decisions.load(config["epet"], live=False)["decisions"] == []
+    assert eru_decisions.classify("X - rozhodnutí ve sporu", []) == "dispute"
+
+
+def test_report_lists_decisions_and_counts_them_in_market_overview():
+    report = workflow.run(live=False, perspective="centropol")
+    rows = {r["id"]: r for r in report["market"]["rows"]}
+    assert rows["armex"]["decisions"] == {"offences": 3, "practices": 3, "latest_practice": "01.04.2026"}
+    assert rows["epet"]["decisions"]["offences"] == 0
+    assert report["sources"]["eru_decisions"]["origin"] == "snapshot"
+    armex = next(s for s in report["suppliers"] if s["id"] == "armex")
+    assert len(armex["decisions"]) == 3
+    view = report["perspective"]
+    assert any(w["kind"] == "regulator" and "ARMEX ENERGY 3" in w["text"] for w in view["watch"])
+    assert any("o našich přestupcích" in c for c in view["cautions"])
 
 
 def test_vercel_entrypoint_imports():

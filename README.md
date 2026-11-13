@@ -8,7 +8,7 @@ Rozsah vychází z revize architektury z 13. 11. 2026 (jedna aplikace, žádná 
 
 1. **Stáhne stránky dodavatelů** a zkontroluje, že připravené citáty na nich stále jsou. Ve vzorku je jedenáct dodavatelů: ČEZ Prodej, Centropol, E.ON, epet, PRE, MND, Dobrá Energie, SPP CZ, LAMA energy, ARMEX ENERGY a bezDodavatele.
 2. **Stáhne jejich ceníky (PDF)** a ověří, že obsahují cenu i stálý měsíční plat z přípravy.
-3. **Stáhne úřední data**: indikativní cenová pásma ERÚ (CSV) a počty odběrných míst dodavatelů elektřiny i plynu z OTE.
+3. **Stáhne úřední data**: indikativní cenová pásma ERÚ (CSV), počty odběrných míst dodavatelů elektřiny i plynu z OTE a seznam pravomocných rozhodnutí ERÚ, ve kterých je dodavatel účastníkem řízení.
 4. **Vyhodnotí tvrzení pravidly v kódu** (ne jazykovým modelem) a ke každému vrátí kartu: tvrzení, nález, omezení, doporučený krok, podklady s výpočtem.
 5. **Srovná fixované nabídky** podle ročního nákladu (cena komodity a stálý plat) a podle pozice vůči pásmu ERÚ.
 6. **Ukáže cenu a růst vedle sebe**: kdo získává odběrná místa (OTE) a za jakou cenu, a o kolik víc platí stávající zákazníci než noví u téhož dodavatele.
@@ -75,7 +75,7 @@ src/
     rules.py                    # pravidla a verdikty
     insights.py                 # přehled trhu (cena a růst) a pohled jedné firmy
     agents.py                   # Claim Extractor, Strategist
-    connectors/                 # http (allowlist), eru, ote, web, pricelist
+    connectors/                 # http (allowlist), eru, eru_decisions, ote, web, pricelist
     data/suppliers.json         # připravené vstupy: citáty, URL, data zachycení, ceny, odkazy na ceníky
     data/snapshots/             # datované zálohy zdrojů
     data/example_report.json    # uložená ukázka
@@ -110,7 +110,8 @@ Verdikty se předem nepřipravují.
 - Srovnávají se jen nabídky se stejnou sazbou, distribučním územím a délkou fixace a s jednou pevnou cenou.
 - Nejnižší cena ve vzorku neprokazuje nejnižší cenu na trhu; levnější srovnatelná nabídka ale tvrzení o prvenství vyvrátit může.
 - OPM jsou odběrná místa, ne zákazníci.
-- Nedefinovaný pojem („český“, „alternativní“ dodavatel) verdikt zastaví; nález přesto uvede čísla.
+- Nedefinovaný pojem („český“, „alternativní“ dodavatel) se posuzuje podle výkladů, které tým zapsal do `suppliers.json` (část `definitions`); karta uvede výsledek pro každý výklad zvlášť.
+- Pravomocné rozhodnutí ERÚ je kontext k tvrzením o důvěře a férovosti, ne verdikt: minulý přestupek nedokazuje, že slogan je dnes nepravdivý. Zastavená řízení se mezi přestupky nepočítají.
 - Výsledek není právní posouzení.
 
 ## Nasazení
@@ -128,3 +129,5 @@ Verdikty se předem nepřipravují.
 - Zelená tvrzení lze podložit jen prohlášením dodavatele; záruky původu v evidenci OTE se neověřují.
 - Připravené citáty a ceny zastarávají; když dodavatel změní web nebo ceník, aplikace na to upozorní a údaj je potřeba znovu zachytit.
 - Odkaz na směrnici (EU) 2024/825 u zelených tvrzení nebyl právně ověřen.
+- Z rozhodnutí ERÚ se čte jen název, datum zveřejnění a štítky; skutek ani výši sankce aplikace nezná. Hledá se podle názvu účastníka řízení.
+- Velikost dodavatele se měří jen počtem odběrných míst; objem dodané energie, tržby ani vlastnictví firem v datech nejsou.

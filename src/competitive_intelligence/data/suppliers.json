@@ -10,6 +10,21 @@
     ],
     "vat_rate": 0.21
   },
+  "definitions": {
+    "traditional_suppliers": {
+      "label": "tradiční dodavatelé",
+      "names": [
+        "ČEZ Prodej, a.s.",
+        "ČEZ ESCO, a.s.",
+        "E.ON Energie, a.s.",
+        "Pražská energetika, a.s.",
+        "innogy Energie, s.r.o.",
+        "Pražská plynárenská, a.s."
+      ],
+      "note": "Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json."
+    },
+    "size_metric": "součet odběrných míst elektřiny a plynu podle OTE"
+  },
   "suppliers": [
     {
       "id": "cez",
@@ -160,7 +175,8 @@
         "url": "https://www.cez.cz/nextcez/cs/ceniky?commodity=ele",
         "note": "ČEZ na stránce ceníků uvádí: Elektřina Fix na 3 roky a Elektřina Online na 1 rok „pro nové zákazníky“, Elektřina Bez starostí „pro nové i stávající zákazníky“ (zachyceno 13. 11. 2026).",
         "inferred": false
-      }
+      },
+      "eru_name": "ČEZ Prodej"
     },
     {
       "id": "centropol",
@@ -182,7 +198,8 @@
           "quote": "Největší český dodavatel energií",
           "rule_id": "market_size",
           "params": {
-            "scope": "czech_owned"
+            "scope": "qualified",
+            "qualifier": "český"
           }
         },
         {
@@ -259,7 +276,8 @@
           }
         }
       ],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "CENTROPOL ENERGY"
     },
     {
       "id": "eon",
@@ -350,7 +368,8 @@
         "url": "https://www.eon.cz/domacnosti/elektrina/",
         "note": "E.ON na stránce doporučuje novým zákazníkům tarif s označením PRO a stávajícím tarif bez něj. U řady Variant je rozdělení odvozeno z tohoto pojmenování (zachyceno 13. 11. 2026).",
         "inferred": true
-      }
+      },
+      "eru_name": "E.ON Energie"
     },
     {
       "id": "epet",
@@ -428,7 +447,8 @@
           }
         }
       ],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "epet energie"
     },
     {
       "id": "pre",
@@ -459,7 +479,8 @@
           "value": "U produktu PRE PROUD EKO zákazník nezískává fyzicky elektřinu z obnovitelných zdrojů, jeho spotřeba je kryta odpovídajícím množstvím záruk původu.",
           "page_marker": "jeho spotřeba je kryta odpovídajícím množstvím záruk původu"
         }
-      ]
+      ],
+      "eru_name": "Pražská energetika"
     },
     {
       "id": "mnd",
@@ -478,7 +499,8 @@
         }
       ],
       "offers": [],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "MND Energie"
     },
     {
       "id": "dobra",
@@ -496,14 +518,6 @@
             "qualifier": "alternativní",
             "merged_with": [
               "epet energie, a.s."
-            ],
-            "exclude": [
-              "ČEZ Prodej, a.s.",
-              "ČEZ ESCO, a.s.",
-              "E.ON Energie, a.s.",
-              "Pražská energetika, a.s.",
-              "innogy Energie, s.r.o.",
-              "Pražská plynárenská, a.s."
             ]
           }
         },
@@ -521,7 +535,8 @@
         }
       ],
       "offers": [],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "Dobrá Energie"
     },
     {
       "id": "spp",
@@ -541,7 +556,8 @@
         }
       ],
       "offers": [],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "SPP CZ"
     },
     {
       "id": "lama",
@@ -560,7 +576,8 @@
         }
       ],
       "offers": [],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "LAMA energy"
     },
     {
       "id": "armex",
@@ -630,7 +647,8 @@
           }
         }
       ],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "ARMEX ENERGY"
     },
     {
       "id": "bezdodavatele",
@@ -665,7 +683,8 @@
         }
       ],
       "offers": [],
-      "green_evidence": []
+      "green_evidence": [],
+      "eru_name": "bezDodavatele"
     }
   ]
 }

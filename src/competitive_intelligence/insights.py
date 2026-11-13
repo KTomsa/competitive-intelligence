@@ -63,6 +63,14 @@ def _best_by_supplier(group: dict) -> list[dict]:
     return list(best.values())
 
 
+def _decision_counts(supplier: dict, ctx: dict) -> dict | None:
+    stats = rules.decision_stats(supplier, ctx)
+    if stats is None:
+        return None
+    return {"offences": len(stats["offences"]), "practices": len(stats["practices"]),
+            "latest_practice": stats["latest_practice"]}
+
+
 def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) -> dict:
     """Cena a růst vedle sebe: kdo získává odběrná místa a za jakou cenu."""
     longest = comparison[0] if comparison else None
@@ -82,6 +90,7 @@ def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) ->
             "electricity": _series(ctx["ote"], supplier["ote_name"]),
             "gas": _series(ctx.get("ote_gas"), supplier["ote_name"]),
             "price": price,
+            "decisions": _decision_counts(supplier, ctx),
         })
     rows.sort(key=lambda r: (r["electricity"] is None, -(r["electricity"] or {"pct": 0})["pct"]))
     period = next((r["electricity"] for r in rows if r["electricity"]), None)
@@ -320,6 +329,27 @@ def build_perspective(own: dict, ctx: dict, comparison: list[dict], evaluated: d
                     "kind": "claim", "supplier": claim["supplier"], "quote": claim["quote"],
                     "verdict_label": claim["verdict_label"], "text": claim["finding"],
                 })
+    regulator = []
+    for row in market["rows"]:
+        counts = row.get("decisions")
+        if not counts or not counts["practices"]:
+            continue
+        if row["id"] == own["id"]:
+            cautions.append(
+                f"ERÚ eviduje {rules.decisions_phrase(counts['offences'])} o našich přestupcích, z toho se "
+                f"obchodních praktik nebo nepravdivých informací týká {counts['practices']} (poslední zveřejněno "
+                f"{counts['latest_practice']}). Tvrzení o férovosti a důvěryhodnosti tím může konkurent zpochybnit."
+            )
+        else:
+            regulator.append((counts["practices"], f"{row['name']} {counts['practices']} "
+                                                   f"(poslední {counts['latest_practice']})"))
+    if regulator:
+        regulator.sort(key=lambda item: -item[0])
+        watch.append({
+            "kind": "regulator",
+            "text": "Pravomocná rozhodnutí ERÚ o nekalých či agresivních obchodních praktikách nebo "
+                    "nepravdivých informacích: " + ", ".join(text for _, text in regulator) + ".",
+        })
     for gap in market.get("loyalty_gaps", []):
         note = " Rozdělení na nové a stávající zákazníky je odvozené z názvů produktů." if gap["inferred"] else ""
         if gap["supplier_id"] == own["id"]:
