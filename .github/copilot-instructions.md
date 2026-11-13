@@ -8,7 +8,7 @@ Fact or Watt je český interní Competitive Intelligence nástroj pro ověřov�
 ## Technologický stack — NEMĚNIT
 - Backend: **Python 3.12+, Flask** (application factory, Blueprints, Jinja2); typové validace **Pydantic v2**; `Decimal` pro peníze.
 - Frontend: **HTML, vanilla JavaScript/ES modules, CSS**, volitelně **Bootstrap 5**. Bez sestavovacího kroku na frontend.
-- Persistence MVP: **SQLite** pro joby/metadata, adresář `data/raw/` pro immutable snapshoty a `data/reference/`, `data/baseline/`, `data/fixtures/` jako kurátorované podklady. U nasazení ověř trvalý disk.
+- Je vytvořena databázová instance na Azure. Přístup přes SQL alchemy. Žádné SQL z LLM, žádné přímé volání databáze z frontendu. Vše přes backend API. Přihlašovací údaje .env, necommitovat.
 - HTTP/import: `httpx` nebo `requests`, BeautifulSoup, ověřené CSV/XLSX/PDF parsery; oficiální API/export má přednost před scrapingem.
 - LLM: Python provider adapter, strukturované výsledky a **tool calling** omezený na schválené read-only nástroje. Klíč jen na backendu; `fixture` režim běží bez klíče.
 - Testy: `pytest` + Flask test client, síť a LLM mockovat.
@@ -54,8 +54,7 @@ Fact or Watt je český interní Competitive Intelligence nástroj pro ověřov�
 - `POST /api/v1/audits` jen po autorizaci uloží job a vrátí **202**; worker provádí live sběr a LLM mimo HTTP request. `GET /api/v1/audits/{id}` vrací stage, events, origin, warnings. `GET .../results` výsledky. `GET /api/v1/audits/latest` vrací publikovaný poslední úspěšný audit bez citlivostí.
 - Autorizace živého auditu: server-side heslo/token v env, constant-time porovnání, rate limiting, nevypisovat do URL/logů; veřejný přehled výsledků je read-only. Při session/cookie scénáři použij CSRF ochranu.
 - MVP frontend Flask/Jinja2 + vanilla JS používá **polling** (1–2 s); stavy výběr → průběh → výsledky; zobrazuje čas, odkaz, původ (`live/baseline/snapshot`), varování a nutnost revize. Audit je dohledatelný i po obnově stránky.
-- Upřednostni Python host se spolehlivým persistentním diskem a samostatným workerem. Flask na Vercelu je možný, ale **lokální SQLite, snapshots a worker nemohou v serverless funkci sloužit jako trvalé úložiště/fronta**; pro Vercel je třeba externí storage/queue + oddělený job backend.
-- `.env` a `data/raw` necommitovat; veřejně sdílený poslední audit musí být jen sanitizovaný/publikovaný. Ve frontendu žádné neescapované `innerHTML` z LLM nebo webů.
+- `.env` necommitovat; veřejně sdílený poslední audit musí být jen sanitizovaný/publikovaný. Ve frontendu žádné neescapované `innerHTML` z LLM nebo webů.
 
 ## Priority implementace
 - Fáze 1: celý offline fixture průchod a veřejný uložený audit, schémata, pravidla, testy, Flask UI.
