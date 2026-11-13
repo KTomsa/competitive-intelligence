@@ -19,7 +19,7 @@ from ..parsers import PARSER_VERSION, canonicalize, sha256_bytes, sha256_text
 from ..registry import RegisteredPage
 from ..schemas import Origin, Source
 from .repository import utc_now
-from .stores import BaselineStore, Snapshot, SnapshotStore
+from .stores import BaselineStore, Snapshot, SnapshotStore, SourceStorage
 
 # Below this a "successful" response is a consent wall or an empty JavaScript
 # shell, not a page we can read claims from.
@@ -49,11 +49,19 @@ class WebScout:
         snapshots: SnapshotStore,
         baselines: BaselineStore,
         now: Callable[[], datetime] = utc_now,
+        *,
+        record_source: Callable[[Source], None] | None = None,
     ) -> None:
         self._client = client
         self._snapshots = snapshots
         self._baselines = baselines
         self._now = now
+        self._record_source = record_source
+
+    def with_storage(self, storage: SourceStorage) -> "WebScout":
+        """Retain the approved client/clock while substituting durable storage."""
+        return WebScout(self._client, storage.snapshots, storage.baselines, self._now,
+                        record_source=storage.record)
 
     def collect(self, supplier_id: str, page: RegisteredPage) -> ScoutedSource | ScoutError:
         checked_at = self._now()
@@ -62,9 +70,15 @@ class WebScout:
         if result.ok and result.content is not None:
             text = canonicalize(result.content)
             if len(text) >= MIN_USABLE_CHARS:
-                return self._from_live(supplier_id, page, result.content, text, checked_at)
+                outcome = self._from_live(supplier_id, page, result.content, text, checked_at)
+                if self._record_source is not None:
+                    self._record_source(outcome.source)
+                return outcome
             failure = "stránka nevrátila čitelný obsah (JavaScript nebo souhlas s cookies)"
-        return self._from_snapshot(supplier_id, page, failure or "neznámá chyba", checked_at)
+        outcome = self._from_snapshot(supplier_id, page, failure or "neznámá chyba", checked_at)
+        if isinstance(outcome, ScoutedSource) and self._record_source is not None:
+            self._record_source(outcome.source)
+        return outcome
 
     def _from_live(
         self, supplier_id: str, page: RegisteredPage, content: bytes, text: str, checked_at: datetime

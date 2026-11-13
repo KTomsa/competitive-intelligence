@@ -8,9 +8,11 @@ from pydantic import ValidationError
 from sqlalchemy import and_, func, or_, select
 
 from ..models import AuditEventRow, AuditJob, AuditRun, BriefingRow, Publication
+from ..registry import SupplierRegistry
 from ..schemas import AuditCreateRequest, AuditError, AuditEvent, AuditMode, AuditResult, AuditStatus, AuditStatusView
 from .publication import public_result
 from .repository import AuditNotFound, LeaseLost, PROGRESS, StoredAuditError
+from .stores import SourceStorage
 
 
 def decode_result(payload, *, envelope=False):
@@ -40,12 +42,20 @@ def locked(statement, model, *, skip_locked=False):
 class SqlAuditRepository:
     durable = True
 
-    def __init__(self, sessions, *, lease_seconds=60, max_attempts=3, retry_seconds=10):
+    def __init__(self, sessions, *, lease_seconds=60, max_attempts=3, retry_seconds=10,
+                 source_capture_success_status="ok"):
+        if source_capture_success_status != "ok":
+            raise ValueError("SOURCE_CAPTURE_SUCCESS_STATUS must be 'ok'")
         self.sessions = sessions
         self.lease_seconds = lease_seconds
         self.max_attempts = max_attempts
         self.retry_seconds = retry_seconds
         self._leases: dict[str, str] = {}
+        self.source_capture_success_status = source_capture_success_status
+
+    def source_storage(self, audit_id: str, registry: SupplierRegistry) -> SourceStorage:
+        from .sql_sources import SqlSourceStorage
+        return SqlSourceStorage(self, audit_id, registry, success_status=self.source_capture_success_status)
 
     @staticmethod
     def _now(session):

@@ -1,13 +1,13 @@
 """Mappings verified against the manually provisioned ci schema in Azure SQL.
 
-Only Phase 2 operational tables are mapped here. Do not call metadata.create_all.
+Operational and source-intake mappings only. Do not call metadata.create_all.
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from uuid import UUID
 
-from sqlalchemy import BigInteger, ForeignKey, Integer, Unicode
-from sqlalchemy.dialects.mssql import DATETIME2, NVARCHAR, SMALLINT, TINYINT, UNIQUEIDENTIFIER
+from sqlalchemy import BigInteger, ForeignKey, ForeignKeyConstraint, Integer, Unicode
+from sqlalchemy.dialects.mssql import CHAR, DATE, DATETIME2, NVARCHAR, SMALLINT, TINYINT, UNIQUEIDENTIFIER
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.types import TypeDecorator
 
@@ -104,3 +104,106 @@ class Publication(Base):
     approved_by: Mapped[str] = mapped_column(Unicode(150))
     published_at: Mapped[datetime] = mapped_column(UTCDateTime())
     is_current: Mapped[bool]
+
+
+class SupplierRow(Base):
+    __tablename__ = "suppliers"
+    __table_args__ = {"schema": "ci"}
+
+    supplier_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER, primary_key=True)
+    supplier_code: Mapped[str] = mapped_column(Unicode(80))
+    display_name: Mapped[str] = mapped_column(Unicode(200))
+    is_active: Mapped[bool]
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime())
+
+
+class SourceRow(Base):
+    __tablename__ = "sources"
+    __table_args__ = {"schema": "ci"}
+
+    source_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER, primary_key=True)
+    supplier_id: Mapped[UUID | None] = mapped_column(ForeignKey("ci.suppliers.supplier_id"))
+    source_type: Mapped[str] = mapped_column(Unicode(30))
+    source_url: Mapped[str] = mapped_column(Unicode(2048))
+    source_title: Mapped[str | None] = mapped_column(Unicode(300))
+    publisher_name: Mapped[str | None] = mapped_column(Unicode(200))
+    is_active: Mapped[bool]
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime())
+
+
+class SourceCaptureRow(Base):
+    __tablename__ = "source_captures"
+    __table_args__ = {"schema": "ci"}
+
+    capture_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER, primary_key=True)
+    source_id: Mapped[UUID] = mapped_column(ForeignKey("ci.sources.source_id"))
+    captured_at: Mapped[datetime] = mapped_column(UTCDateTime())
+    valid_as_of: Mapped[date | None] = mapped_column(DATE)
+    valid_from: Mapped[date | None] = mapped_column(DATE)
+    valid_to: Mapped[date | None] = mapped_column(DATE)
+    fetch_status: Mapped[str] = mapped_column(Unicode(20))
+    http_status: Mapped[int | None] = mapped_column(SMALLINT)
+    content_sha256: Mapped[str | None] = mapped_column(CHAR(64))
+    canonical_sha256: Mapped[str | None] = mapped_column(CHAR(64))
+    parser_version: Mapped[str | None] = mapped_column(Unicode(80))
+    extractor_version: Mapped[str | None] = mapped_column(Unicode(80))
+    canonical_text: Mapped[str | None] = mapped_column(NVARCHAR(None))
+    blob_key: Mapped[str | None] = mapped_column(Unicode(1024))
+    failure_reason: Mapped[str | None] = mapped_column(Unicode(500))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime())
+
+
+class BaselineRow(Base):
+    __tablename__ = "baselines"
+    __table_args__ = (
+        ForeignKeyConstraint(["capture_id", "source_id"],
+                             ["ci.source_captures.capture_id", "ci.source_captures.source_id"]),
+        {"schema": "ci"},
+    )
+
+    baseline_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER, primary_key=True)
+    source_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER)
+    capture_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER)
+    canonical_sha256: Mapped[str] = mapped_column(CHAR(64))
+    parser_version: Mapped[str] = mapped_column(Unicode(80))
+    extractor_version: Mapped[str] = mapped_column(Unicode(80))
+    approved_at: Mapped[datetime] = mapped_column(UTCDateTime())
+    approved_by: Mapped[str] = mapped_column(Unicode(150))
+    is_active: Mapped[bool]
+
+
+class BaselineClaimRow(Base):
+    __tablename__ = "baseline_claims"
+    __table_args__ = {"schema": "ci"}
+
+    baseline_claim_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER, primary_key=True)
+    baseline_id: Mapped[UUID] = mapped_column(ForeignKey("ci.baselines.baseline_id"))
+    # Product reference data is administered separately; no product writes here.
+    product_id: Mapped[UUID | None] = mapped_column(UNIQUEIDENTIFIER)
+    quote: Mapped[str] = mapped_column(NVARCHAR(None))
+    source_ref: Mapped[str] = mapped_column(Unicode(500))
+    claim_type: Mapped[str] = mapped_column(Unicode(20))
+    rule_id: Mapped[str] = mapped_column(Unicode(40))
+    rule_params_json: Mapped[str] = mapped_column(NVARCHAR(None))
+    human_reviewed: Mapped[bool]
+
+
+class AuditSourceRow(Base):
+    __tablename__ = "audit_sources"
+    __table_args__ = (
+        ForeignKeyConstraint(["capture_id", "source_id"],
+                             ["ci.source_captures.capture_id", "ci.source_captures.source_id"]),
+        ForeignKeyConstraint(["baseline_id", "source_id"],
+                             ["ci.baselines.baseline_id", "ci.baselines.source_id"]),
+        {"schema": "ci"},
+    )
+
+    audit_source_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER, primary_key=True)
+    audit_id: Mapped[UUID] = mapped_column(ForeignKey("ci.audit_runs.audit_id"))
+    source_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER)
+    capture_id: Mapped[UUID] = mapped_column(UNIQUEIDENTIFIER)
+    baseline_id: Mapped[UUID | None] = mapped_column(UNIQUEIDENTIFIER)
+    origin: Mapped[str] = mapped_column(Unicode(12))
+    fetch_was_live: Mapped[bool]
+    checked_at: Mapped[datetime] = mapped_column(UTCDateTime())
+    fallback_reason: Mapped[str | None] = mapped_column(Unicode(500))

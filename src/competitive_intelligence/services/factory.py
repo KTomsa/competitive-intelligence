@@ -14,4 +14,5 @@ def build_repository(settings: Settings):
         lease_seconds=settings.worker_lease_seconds,
         max_attempts=settings.worker_max_attempts,
         retry_seconds=settings.worker_retry_seconds,
+        source_capture_success_status=settings.source_capture_success_status,
     )

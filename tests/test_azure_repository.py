@@ -112,3 +112,38 @@ def test_azure_retry_and_expired_final_delivery_become_terminal(sessions):
         job.lease_expires_at = repo._now(session) - timedelta(seconds=1)
     assert SqlAuditRepository(sessions).claim_next_job() is None
     assert repo.get_status(audit_id).error.code == "RETRIES_EXHAUSTED"
+
+
+def test_azure_source_capture_reused_by_recreated_worker(sessions):
+    from competitive_intelligence.config import Settings
+    from competitive_intelligence.models import AuditSourceRow, SourceCaptureRow
+    from competitive_intelligence.schemas import Origin
+    from competitive_intelligence.worker import process_next
+
+    from .conftest import FakeWeb, make_context, page_html
+
+    success_status = Settings.from_env().source_capture_success_status
+    ctx, _ = make_context(FakeWeb())
+    page = ctx.registry.get("cez").pages[0]
+    live_ctx, _ = make_context(FakeWeb({page.url: page_html("Test capture")}))
+    repo = SqlAuditRepository(sessions, source_capture_success_status=success_status)
+    live_request = AuditCreateRequest(supplier_ids=["cez"], profile_ids=["d02d_2mwh"], mode="live")
+    first_id = repo.create_audit(live_request)
+    assert process_next(repo, live_ctx) == first_id
+    first = repo.get_result(first_id)
+    source = next(source for source in first.sources if source.source_id == page.source_id)
+    assert source.origin is Origin.LIVE
+    with sessions() as session:
+        association = session.scalar(select(AuditSourceRow).where(AuditSourceRow.audit_id == audit_uuid(first_id)))
+        assert association is not None
+        capture = session.get(SourceCaptureRow, association.capture_id)
+        assert capture.canonical_text and capture.content_sha256 == source.content_sha256
+
+    restarted = SqlAuditRepository(sessions, source_capture_success_status=success_status)
+    second_id = restarted.create_audit(live_request)
+    assert process_next(restarted, ctx) == second_id
+    second = restarted.get_result(second_id)
+    fallback = next(source for source in second.sources if source.source_id == page.source_id)
+    assert fallback.origin is Origin.SNAPSHOT and not fallback.fetch_was_live
+    assert fallback.captured_at == source.captured_at
+    assert fallback.canonical_hash == source.canonical_hash

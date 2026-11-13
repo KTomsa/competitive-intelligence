@@ -65,7 +65,7 @@ No DDL, migrations, seed data or production write integration tests are included
 
 The incoming source-intake implementation is now connected to the same leased worker. Both `mode=fixture` and `mode=live` enqueue without processing in database-backed HTTP requests. Live mode collects the registered ČEZ, E.ON and innogy pages and preserves source metadata in the versioned result snapshot. The independent worker retains lease fencing, heartbeats, bounded retries and explicit publication for either mode.
 
-Live claims currently come only from a matching approved baseline; changed/new pages produce an explicit extraction warning. Live reference data and LLM extraction remain unfinished. Raw page text, newly saved fallback snapshots and baseline approval files still use the incoming file-store adapters, so shared SQL/Blob source storage remains acceptance work. These files are not cross-worker durable storage on Vercel. See [merge validation](MERGE_VALIDATION.md) for executed checks and remaining limits.
+Live claims currently come only from a matching approved baseline; changed/new pages produce an explicit extraction warning. Live reference data and LLM extraction remain unfinished. At merge time, raw page text, fallback snapshots and approvals used file-store adapters. The subsequent [Phase 3 implementation](PHASE_3.md) adds shared Azure canonical-text archives, audit-source links and approved baseline reads. Raw HTML/PDF Blob storage and isolated Azure write acceptance remain unfinished. See [merge validation](MERGE_VALIDATION.md) for the earlier executed checks and limits.
 
 ## Changed files
 

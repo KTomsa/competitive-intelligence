@@ -21,6 +21,8 @@ from ..schemas import (
     AuditStatusView,
     Origin,
 )
+from ..registry import SupplierRegistry
+from .stores import SourceStorage
 
 PROGRESS = {
     AuditStatus.QUEUED: 0,
@@ -59,6 +61,8 @@ class AuditRepository(Protocol):
     def claim_next_job(self) -> str | None: ...
 
     def heartbeat(self, audit_id: str) -> None: ...
+
+    def source_storage(self, audit_id: str, registry: SupplierRegistry) -> SourceStorage | None: ...
 
     def retry(self, audit_id: str, code: str, message: str) -> None: ...
 
@@ -103,6 +107,9 @@ class InMemoryAuditRepository:
     """Process-local store. State is lost on restart and is not shared between processes."""
 
     durable = False
+
+    def source_storage(self, audit_id: str, registry: SupplierRegistry) -> SourceStorage | None:
+        return None  # Keep the supplied mock/file adapters for the demonstration.
 
     def __init__(self) -> None:
         self._lock = threading.Lock()

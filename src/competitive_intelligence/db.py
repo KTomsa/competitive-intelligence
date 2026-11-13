@@ -36,7 +36,7 @@ def session_factory(engine: Engine) -> sessionmaker:
 
 
 def check_schema(engine: Engine) -> None:
-    """Read-only compatibility check for the five Phase 2 operational tables."""
+    """Read-only column compatibility check for audit and source-intake mappings."""
     inspector = inspect(engine)
     for table in Base.metadata.sorted_tables:
         actual = {column["name"] for column in inspector.get_columns(table.name, schema="ci")}

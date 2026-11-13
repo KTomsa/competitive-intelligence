@@ -22,6 +22,7 @@ class RegisteredPage(StrictModel):
 class RegisteredSupplier(StrictModel):
     supplier_id: str
     name: str
+    database_code: str | None = Field(default=None, min_length=1, max_length=80)
     pages: list[RegisteredPage] = Field(min_length=1, max_length=4)
 
 

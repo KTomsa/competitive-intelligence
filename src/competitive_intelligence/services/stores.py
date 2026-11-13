@@ -1,10 +1,7 @@
 """Snapshot and baseline storage for the Web Scout.
 
-File-backed for now: snapshots and approved baselines are small, non-personal
-text records that can be reviewed and versioned in Git. On a read-only
-filesystem (a deployed serverless function) saving simply reports failure and
-the bundled files keep working as fallbacks. A database or blob store can
-replace these classes behind the same two protocols.
+File and memory adapters support the process-local demonstration and tests.
+The durable worker substitutes Azure-backed adapters scoped to its lease.
 """
 
 import json
@@ -13,7 +10,7 @@ from typing import Any, Protocol
 
 from pydantic import AwareDatetime, Field
 
-from ..schemas import StrictModel
+from ..schemas import Source, StrictModel
 from ..schemas.claim import SHA256_PATTERN
 
 
@@ -46,6 +43,13 @@ class SnapshotStore(Protocol):
 
 class BaselineStore(Protocol):
     def get(self, source_id: str) -> Baseline | None: ...
+
+
+class SourceStorage(Protocol):
+    snapshots: SnapshotStore
+    baselines: BaselineStore
+
+    def record(self, source: Source) -> None: ...
 
 
 def _read[T: StrictModel](model: type[T], path: Path) -> T | None:

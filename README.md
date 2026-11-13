@@ -4,6 +4,8 @@
 
 > Project status: Azure audit persistence and live source intake are implemented. With `DATABASE_URL`, the Flask UI/API enqueues fixture or live audits for a separate leased worker, with bounded retries, versioned results and explicit publication. Live intake covers registered ČEZ, E.ON and innogy pages with baseline/snapshot fallback. Claim extraction from changed pages, live reference data and LLM agents remain unfinished. Azure write/restart integration and Vercel deployment remain unverified. See [merge validation](docs/MERGE_VALIDATION.md) for executed checks and limits.
 
+Phase 3 now adds shared Azure canonical-text archives, audit-source provenance links and reads of active approved baseline claims. The database owner confirmed `ok` as the success status; it is now the default, so no extra status configuration is required. A separate test database is unavailable; Azure write/restart behavior remains unverified while offline implementation continues. See [Phase 3 source storage](docs/PHASE_3.md) for configuration and verification limits.
+
 ## Technology
 
 - **Backend:** Python 3.14, Flask, Jinja2, Pydantic v2, SQLAlchemy.

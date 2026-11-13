@@ -3,6 +3,7 @@
   "suppliers": [
     {
       "supplier_id": "cez",
+      "database_code": "cez_prodej",
       "name": "ČEZ",
       "pages": [
         {"source_id": "cez_home", "url": "https://www.cez.cz/", "page_kind": "homepage"},
@@ -11,6 +12,7 @@
     },
     {
       "supplier_id": "eon",
+      "database_code": "eon_energie",
       "name": "E.ON",
       "pages": [
         {"source_id": "eon_home", "url": "https://www.eon.cz/", "page_kind": "homepage"},
@@ -20,6 +22,7 @@
     },
     {
       "supplier_id": "innogy",
+      "database_code": "innogy_energie",
       "name": "innogy",
       "pages": [
         {"source_id": "innogy_home", "url": "https://www.innogy.cz/", "page_kind": "homepage"},

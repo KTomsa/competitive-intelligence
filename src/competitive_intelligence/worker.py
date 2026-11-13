@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 from contextlib import contextmanager
+from dataclasses import replace
 from pathlib import Path
 
 from .config import Settings
@@ -72,6 +73,9 @@ def process_next(repo: AuditRepository, context: PipelineContext | FixtureBundle
         with keep_lease(repo, audit_id):
             if repo.get_request(audit_id).mode is AuditMode.LIVE:
                 ctx = context if isinstance(context, PipelineContext) else build_context()
+                storage = repo.source_storage(audit_id, ctx.registry)
+                if storage is not None:
+                    ctx = replace(ctx, scout=ctx.scout.with_storage(storage))
                 run_live_audit(repo, audit_id, ctx)
             else:
                 bundle = context.bundle if isinstance(context, PipelineContext) else context
@@ -149,7 +153,7 @@ def main(argv=None) -> int:
         if args.command == "check-db":
             with repo.sessions() as session:
                 repo._now(session)  # exercise driver/UTC conversion with a read-only query
-            print("Azure SQL connectivity and Phase 2 schema: OK")
+            print("Azure SQL connectivity and audit/source schema: OK")
             return 0
         if args.command == "publish":
             result = repo.publish(args.audit_id, approved_by=args.approved_by)
