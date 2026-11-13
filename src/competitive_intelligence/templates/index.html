@@ -1,11 +1,57 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="cs">
 <head>
-<title>Fact or Watt</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fact or Watt</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <header class="top">
+    <div class="wrap">
+      <h1>Fact or Watt</h1>
+      <p class="lead">Ověření marketingových tvrzení dodavatelů elektřiny proti veřejným datům ERÚ a OTE.</p>
+    </div>
+  </header>
 
-<h1>Content</h1>
+  <main class="wrap">
+    <section class="panel" aria-labelledby="setup-title">
+      <h2 id="setup-title">Koho ověřit</h2>
+      <form id="audit-form">
+        <div class="choices">
+          {% for s in suppliers %}
+          <label class="choice">
+            <input type="checkbox" name="supplier" value="{{ s.id }}" checked>
+            <span>{{ s.name }}</span>
+          </label>
+          {% endfor %}
+        </div>
+        <p class="hint">
+          Srovnávací profil: {{ profile.commodity }}, sazba {{ profile.tariff }}.
+          Stránky dodavatelů a data ERÚ a OTE se při běhu stahují znovu.
+          {% if llm %}Tvrzení a briefing zpracovává jazykový model, čísla a verdikty počítá kód.
+          {% else %}Jazykový model není nastaven: nová tvrzení se hledají podle klíčových slov a briefing je ze šablony.{% endif %}
+        </p>
+        {% if needs_code %}
+        <label class="code">Přístupový kód <input type="password" id="demo-code" autocomplete="off"></label>
+        {% endif %}
+        <div class="actions">
+          <button type="submit" class="primary" id="run-live">Spustit živý audit</button>
+          <button type="button" id="run-snapshot">Spustit z uložených dat</button>
+          <button type="button" id="show-example">Zobrazit uloženou ukázku</button>
+        </div>
+      </form>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
 
+    <div id="report" hidden></div>
+  </main>
+
+  <footer class="wrap foot">
+    Interní nástroj pro konkurenční zpravodajství. Výsledek není právní posouzení.
+    „Nelze ověřit“ neznamená, že je tvrzení nepravdivé.
+  </footer>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

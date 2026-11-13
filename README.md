@@ -1,81 +1,106 @@
 # Fact or Watt — Competitive Intelligence
 
-**Fact or Watt** is a Flask-based web application that helps analysts assess marketing claims made by Czech electricity suppliers against traceable reference evidence. It retrieves approved supplier web pages, extracts literal claims, uses bounded AI agents to select evidence-gathering tools, applies deterministic verification rules, and produces a neutral managerial briefing.
+Studentská ukázka: nástroj, který ověřuje marketingová tvrzení českých dodavatelů elektřiny proti veřejným datům **ERÚ** a **OTE** a vrací manažerovi krátký briefing s doporučeným krokem.
 
-> Project status: early implementation. The current repository contains a Flask skeleton and design documents; production database integration, live agents and Vercel deployment must still be implemented and tested.
+Rozsah vychází z revize architektury z 13. 11. 2026 (jedna aplikace, žádná databáze, živý úřední zdroj). Technologie zůstává Flask.
 
-## Technology
+## Co aplikace dělá
 
-- **Backend:** Python 3.14, Flask, Jinja2, Pydantic v2, SQLAlchemy, Alembic.
-- **Frontend:** server-rendered HTML, vanilla JavaScript, CSS, optionally Bootstrap 5. No Next.js/React/TypeScript.
-- **Persistent database:** an **Azure-hosted database**, assumed here to be **Azure SQL Database (Microsoft SQL Server)**; use SQLAlchemy 2.1+ with the `mssql+mssqlpython` dialect after validating the actual service and driver compatibility.
-- **Deployment:** Vercel for Flask UI/API; a dedicated Python worker (recommended: Azure Container Apps; optional: Vercel Daemons public beta) for queued audits.
-- **Dependencies:** `uv`, `pyproject.toml`, `uv.lock`.
+1. **Stáhne stránky dodavatelů** (ČEZ Prodej, Centropol, E.ON, bezDodavatele) a zkontroluje, že připravené citáty a ceny na nich stále jsou.
+2. **Stáhne úřední data**: indikativní cenová pásma ERÚ (CSV) a počty odběrných míst dodavatelů z OTE.
+3. **Vyhodnotí tvrzení pravidly v kódu** (ne jazykovým modelem) a ke každému vrátí kartu: tvrzení, nález, omezení, doporučený krok, podklady s výpočtem.
+4. **Sestaví briefing** s nejvýše třemi prioritami.
 
-If the existing Azure service is **Azure Database for PostgreSQL** instead, change the SQLAlchemy URL dialect/driver and database-specific migrations accordingly. The repository does not currently identify which database service was provisioned.
+Když živé stažení selže, použije se datovaný snapshot a rozhraní to viditelně označí. Snapshot se nikdy nevydává za živá data.
 
-## Project layout
-
-```text
-src/
-  index.py                     # Vercel WSGI entry point (thin adapter)
-  competitive_intelligence/
-    __init__.py
-    app.py                     # Flask application factory
-    web/                       # page and API blueprints (planned)
-    models/                    # SQLAlchemy models (planned)
-    schemas/                   # Pydantic DTOs (planned)
-    services/                  # audit orchestration, persistence, publication (planned)
-    agents/                    # LLM agents (planned)
-    tools/                     # allowlisted deterministic tools (planned)
-    rules/                     # deterministic verdict rules (planned)
-    connectors/                # approved data sources (planned)
-    templates/                 # Jinja2 HTML
-    static/                    # JavaScript and CSS
-    worker.py                  # independent worker CLI (planned)
-.github/
-  copilot-instructions.md
-  instructions/
-docs/
-  ARCHITECTURE.md
-  DATABASE_AZURE.md
-  DEPLOYMENT_VERCEL.md
-  API_CONTRACTS.md
-  RULE_CATALOG.md
-  DATA_SOURCES.md
-  IMPLEMENTATION_PLAN.md
-tests/
-pyproject.toml
-uv.lock
-vercel.json
-.env.example
-```
-
-The directory list is the **target architecture**, not a claim that each module already exists. Follow `docs/IMPLEMENTATION_PLAN.md` instead of generating empty directories.
-
-## Local development
+## Spuštění
 
 ```bash
 uv sync
-uv run flask --app competitive_intelligence.app:create_app run --debug
+```
+
+```bash
+uv run flask --app src/index.py run --debug
+```
+
+```bash
 uv run pytest
 ```
 
-Use a local `.env` (never commit it). For real DB-backed functionality, set `DATABASE_URL`, `SECRET_KEY` and the relevant audit/LLM credentials. For fixture-mode tests, fake repository adapters are used without production DB credentials.
+Bez `uv` stačí virtuální prostředí a `pip install flask httpx beautifulsoup4 pydantic google-genai python-dotenv pytest`.
 
-## Audits
+Testy běží bez sítě a bez jazykového modelu (nad uloženými snapshoty).
 
-- `POST /api/v1/audits` (authorized) enqueues an audit and returns HTTP 202.
-- `GET /api/v1/audits/<audit_id>` returns its persisted stage, events and warnings.
-- `GET /api/v1/audits/<audit_id>/results` returns completed results.
-- `GET /api/v1/audits/latest` returns the last explicitly published and sanitized audit.
+### Užitečné příkazy
 
-A **separate worker** processes jobs. Do not run a long-running crawler/LLM pipeline in the Flask request or a detached thread inside a Vercel Function. Claims and evidence retain source URL, source location, timestamps and data origin (`live`, `baseline`, `snapshot`).
+```bash
+uv run python -m competitive_intelligence.snapshot
+```
 
-## Deployment
+Uloží aktuální živé zdroje jako nové snapshoty (`data/snapshots/`).
 
-See **[Vercel deployment](docs/DEPLOYMENT_VERCEL.md)** and **[Azure database](docs/DATABASE_AZURE.md)**. Vercel supports Flask apps with a top-level WSGI `app` in `src/index.py`. Configure secrets through Vercel Project Settings; verify Azure firewall/network access, migrations and worker startup before publishing. No live deployment has been verified from this documentation alone.
+```bash
+uv run python -m competitive_intelligence.workflow --save-example
+```
 
-## Verification principles
+Spustí živý audit a uloží ho jako ukázkovou zprávu (`data/example_report.json`), kterou rozhraní umí zobrazit bez stahování.
 
-Evidence agents may use only approved read-only tools; calculations and the initial verdict belong to deterministic Python rules. The Judge may downgrade a verdict to `unverifiable`, never upgrade it. Missing evidence is not proof of falsity. This is an internal Competitive Intelligence tool, not a legal assessment or a public ranking of dishonest suppliers.
+## Jazykový model (volitelný)
+
+Bez modelu aplikace funguje celá. S modelem navíc:
+
+- **Claim Extractor** hledá na stránce další tvrzení; kód ověří, že citát na stránce doslova je.
+- **Strategist** přepíše briefing; kód ověří, že odkazuje jen na existující tvrzení.
+
+Zapnutí: zkopírujte `.env.example` jako `.env`, nastavte `CI_USE_LLM=1` a `GEMINI_API_KEY` (Google Gemini, stejný poskytovatel a model jako ve větvi `feature/gemini-backend`). Audit s modelem dělá dvě volání (jedno na tvrzení ze všech stránek, jedno na briefing) a trvá zhruba 6 až 7 sekund. Bezplatná vrstva Gemini nesnáší souběžná volání, proto se stránky posílají najednou. Při chybě modelu se použije cesta bez modelu a rozhraní to uvede.
+
+Model nesmí do briefingu psát čísla: nálezy, ceny a lhůty doplňuje kód. Text s číslicí od modelu se zahodí a použije se šablona.
+
+## Struktura
+
+```text
+src/
+  index.py                      # vstupní bod pro Vercel
+  competitive_intelligence/
+    app.py                      # Flask: stránka + POST /api/v1/analyze + GET /api/v1/example
+    workflow.py                 # jeden běh auditu
+    rules.py                    # pravidla a verdikty
+    agents.py                   # Claim Extractor, Strategist
+    connectors/                 # http (allowlist), eru, ote, web
+    data/suppliers.json         # připravené vstupy: citáty, URL, data zachycení, ceny
+    data/snapshots/             # datované zálohy zdrojů
+    data/example_report.json    # uložená ukázka
+    templates/, static/
+tests/
+docs/ARCHITECTURE.md, RULE_CATALOG.md, DATA_SOURCES.md
+```
+
+## Co je připravené a co se děje při běhu
+
+| Připraveno předem (`suppliers.json`) | Staženo a spočítáno při běhu |
+|---|---|
+| Seznam dodavatelů a schválených URL | Stránky dodavatelů; kontrola, že citát a cena stále platí |
+| Doslovné citáty s datem zachycení a přiřazeným pravidlem | Pásma ERÚ pro sazbu, fixaci a měsíc nabídky |
+| Ceny nabídek (produkt, sazba, fixace, základ DPH) | Pořadí dodavatelů podle OPM z OTE |
+| | Verdikt, nález, omezení a doporučený krok |
+
+Verdikty se předem nepřipravují.
+
+## Zásady ověřování
+
+- Chybějící nebo nesrovnatelný podklad znamená „nelze ověřit“, ne „nepravdivé“.
+- Pozice vůči pásmu ERÚ je nález, ne důkaz klamání.
+- Nejnižší cena ve vzorku čtyř dodavatelů neprokazuje nejnižší cenu na trhu.
+- OPM jsou odběrná místa, ne zákazníci.
+- Výsledek není právní posouzení.
+
+## Nasazení
+
+`vercel.json` a `src/index.py` jsou připravené pro Vercel, ale **nasazení zatím nikdo nevyzkoušel**. Před prezentací je potřeba ověřit hlavně to, že nasazená aplikace dosáhne na `eru.gov.cz` a `www.ote-cr.cz`. Na veřejném nasazení nastavte `DEMO_CODE`.
+
+## Známá omezení
+
+- Stálý měsíční plat je znám jen u jedné nabídky (Centropol, 3 roky), proto pravidlo o cenovém prvenství zatím nikde nevydá „v rozporu s daty“; cesta je pokrytá testem.
+- E.ON na stránce neuvádí, zda je cena s DPH, ani sazbu, takže jeho cenu nelze s pásmem ERÚ srovnat.
+- Zelená tvrzení nemají produktový podklad (záruky původu), takže končí jako „nelze ověřit“.
+- `uv.lock` neodpovídá novým závislostem; po stažení spusťte `uv lock`.

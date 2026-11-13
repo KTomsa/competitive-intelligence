@@ -1,0 +1,227 @@
+{
+  "_note": "Připravené vstupy (ne verdikty). Citáty a ceny byly zachyceny z uvedených URL v uvedený den; při běhu se ověřuje, zda je stránka stále obsahuje. Verdikty počítá kód z živých dat ERÚ/OTE.",
+  "profile": {
+    "commodity": "elektřina",
+    "tariff": "D02d",
+    "annual_mwh": [
+      2,
+      4
+    ],
+    "vat_rate": 0.21
+  },
+  "suppliers": [
+    {
+      "id": "cez",
+      "name": "ČEZ Prodej",
+      "ote_name": "ČEZ Prodej, a.s.",
+      "source_url": "https://www.cez.cz/cs/prejdeteknam",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "cez-1",
+          "quote": "Jsme největší dodavatel elektřiny a plynu v ČR, a proto máme stabilně výhodné ceny.",
+          "rule_id": "market_size",
+          "params": {
+            "scope": "all",
+            "commodities": [
+              "elektřina",
+              "plyn"
+            ]
+          }
+        },
+        {
+          "id": "cez-2",
+          "quote": "Jsme největší dodavatel elektřiny a plynu v ČR, a proto máme stabilně výhodné ceny.",
+          "rule_id": "price_favorable",
+          "params": {}
+        },
+        {
+          "id": "cez-3",
+          "quote": "Jsme nejdůvěryhodnější dodavatel energií",
+          "rule_id": "soft_trust",
+          "params": {}
+        }
+      ],
+      "offers": [
+        {
+          "id": "cez-fix36",
+          "product": "Elektřina Fix na 3 roky",
+          "tariff": "D02d",
+          "fixation_months": 36,
+          "price_mwh_excl_vat": 2686,
+          "price_mwh_incl_vat": 3250,
+          "monthly_fee_incl_vat": null,
+          "page_marker": "3 250 Kč"
+        },
+        {
+          "id": "cez-online12",
+          "product": "Elektřina Online na 1 rok",
+          "tariff": "D02d",
+          "fixation_months": 12,
+          "price_mwh_excl_vat": 2760,
+          "price_mwh_incl_vat": 3340,
+          "monthly_fee_incl_vat": null,
+          "page_marker": "3 340 Kč"
+        },
+        {
+          "id": "cez-neurcito",
+          "product": "Elektřina na neurčito",
+          "tariff": "D02d",
+          "fixation_months": null,
+          "price_mwh_excl_vat": 3190,
+          "price_mwh_incl_vat": 3860,
+          "monthly_fee_incl_vat": null,
+          "page_marker": "3 860 Kč"
+        }
+      ],
+      "green_evidence": []
+    },
+    {
+      "id": "centropol",
+      "name": "Centropol",
+      "ote_name": "CENTROPOL ENERGY, a.s.",
+      "source_url": "https://www.centropol.cz/domacnost/elektrina/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "centropol-1",
+          "quote": "Ke stabilní dodávce energií dáváme Garanci nejnižší ceny.",
+          "rule_id": "price_rank",
+          "params": {
+            "kind": "price_match_guarantee"
+          }
+        },
+        {
+          "id": "centropol-2",
+          "quote": "Největší český dodavatel energií",
+          "rule_id": "market_size",
+          "params": {
+            "scope": "czech_owned"
+          }
+        },
+        {
+          "id": "centropol-3",
+          "quote": "Přidejte se k nám a ušetříte.",
+          "rule_id": "price_favorable",
+          "params": {
+            "basis": "customer_saving"
+          }
+        }
+      ],
+      "offers": [
+        {
+          "id": "centropol-fix36",
+          "product": "Fixně online pro začátek na 3 roky",
+          "tariff": "D02d",
+          "fixation_months": 36,
+          "price_mwh_excl_vat": 2817,
+          "price_mwh_incl_vat": 3409,
+          "monthly_fee_incl_vat": 163.35,
+          "page_marker": "2 817 Kč",
+          "detail_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-cez-01012026.pdf"
+        },
+        {
+          "id": "centropol-fix24",
+          "product": "Fixně online pro začátek na 2 roky",
+          "tariff": null,
+          "fixation_months": 24,
+          "price_mwh_excl_vat": 3213,
+          "price_mwh_incl_vat": 3888,
+          "monthly_fee_incl_vat": null,
+          "page_marker": "3 213 Kč"
+        },
+        {
+          "id": "centropol-fix12",
+          "product": "Fixně online pro začátek na 1 rok",
+          "tariff": null,
+          "fixation_months": 12,
+          "price_mwh_excl_vat": 3608,
+          "price_mwh_incl_vat": 4366,
+          "monthly_fee_incl_vat": null,
+          "page_marker": "3 608 Kč"
+        }
+      ],
+      "green_evidence": []
+    },
+    {
+      "id": "eon",
+      "name": "E.ON",
+      "ote_name": "E.ON Energie, a.s.",
+      "source_url": "https://www.eon.cz/domacnosti/elektrina/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "eon-1",
+          "quote": "Získejte výhodnější elektřinu s garancí stálé ceny na celé 3 roky.",
+          "rule_id": "price_guarantee",
+          "params": {
+            "fixation_months": 36
+          }
+        },
+        {
+          "id": "eon-2",
+          "quote": "v Česku se staráme o 1,5 milionu zákazníků",
+          "rule_id": "customer_count",
+          "params": {
+            "claimed": 1500000
+          }
+        },
+        {
+          "id": "eon-3",
+          "quote": "Jsme férovým dodavatelem elektřiny pro každého",
+          "rule_id": "soft_trust",
+          "params": {}
+        }
+      ],
+      "offers": [
+        {
+          "id": "eon-variant36",
+          "product": "Variant PRO na 3 roky",
+          "tariff": null,
+          "fixation_months": 36,
+          "price_mwh_excl_vat": null,
+          "price_mwh_incl_vat": null,
+          "price_mwh_unknown_vat": 3387,
+          "monthly_fee_incl_vat": null,
+          "page_marker": "3 387 Kč"
+        }
+      ],
+      "green_evidence": []
+    },
+    {
+      "id": "bezdodavatele",
+      "name": "bezDodavatele",
+      "ote_name": "bezDodavatele a.s.",
+      "source_url": "https://www.bezdodavatele.cz/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "bezdodavatele-1",
+          "quote": "Garantujeme, že 100 % námi dodané elektřiny pochází ze zelených zdrojů dle taxonomie EU.",
+          "rule_id": "green_share",
+          "params": {
+            "share_pct": 100
+          }
+        },
+        {
+          "id": "bezdodavatele-2",
+          "quote": "Objevte způsob, jak získat nejlepší ceny na trhu.",
+          "rule_id": "price_rank",
+          "params": {
+            "kind": "superlative"
+          }
+        },
+        {
+          "id": "bezdodavatele-3",
+          "quote": "Emise CO₂ z dodaného plynu navíc kompenzujeme.",
+          "rule_id": "carbon_neutral",
+          "params": {
+            "uses_offsets": true
+          }
+        }
+      ],
+      "offers": [],
+      "green_evidence": []
+    }
+  ]
+}

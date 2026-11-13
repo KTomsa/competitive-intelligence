@@ -1,34 +1,35 @@
-# Uzavřený katalog ověřovacích pravidel — Fact or Watt v2
+# Katalog ověřovacích pravidel
 
-Každý `Claim.rule.id` musí být jednou z níže uvedených hodnot. `Claim Extractor` nesmí generovat vlastní identifikátory. `params` se validují podle Pydantic discriminated union modelu. Výpočet a výsledný `rule_verdict` patří **kódu**, nikoli LLM.
+Každé tvrzení má právě jedno `rule_id` z tohoto seznamu. Výpočet a verdikt patří kódu (`rules.py`), ne jazykovému modelu.
 
-**Verdikty:** `supported` (relevantní podklady potvrzují), `partially_supported` (pouze doložené oddělitelné části), `contradicted` (validní proti-důkaz), `unverifiable` (nedostatečná nebo nesrovnatelná data). Odděleně `possible_regulatory_risk` + `risk_reason`, případně `review_required`; toto **není** právní závěr.
+**Verdikty:** `supported` (podloženo), `partially_supported` (částečně; vždy s rozpisem dílčích tvrzení), `contradicted` (v rozporu s daty), `unverifiable` (nelze ověřit). Odděleně příznak `possible_regulatory_risk`; není to právní závěr.
 
-| Rule ID | Typický výrok | Deterministické hodnocení a hranice |
-|---|---|---|
-| `price_rank` | „Nejlevnější elektřina v ČR“ | Výpočet ročního nákladu u stejných profilů/období; validní levnější konkurent → `contradicted`; pořadí 1. z 3–5 **nepotvrdí** celotržní výrok → `unverifiable`; při explicitním tvrzení „v našem vzorku“ lze `supported`. |
-| `price_pct_cheaper` | „O 15 % levnější než X“ | Potřeba přesného výchozího produktu, metriky, data a profilu. Bez referenčního základu → `unverifiable`; měřené hodnoty se tolerují jen v definované toleranci. |
-| `price_guarantee` | „Fixace do roku 2028“ | Potvrdit produkt i fixovanou část ceny a podmínky ze stejného platného ceníku/smlouvy; nejasné výluky → `unverifiable` + kontrola člověkem. |
-| `green_share` | „100 % zelená elektřina“ | Doložit konkrétní produkt, období a relevantní mix/záruky původu; samotný národní zbytkový mix → `unverifiable`. |
-| `green_generic` | „Zelená, šetrná k přírodě“ | Vágní rámec, bez konkrétní ověřitelné metriky většinou `unverifiable` + možné regulatorní riziko; nelze vydávat `contradicted` pouze kvůli nedostupnosti certifikátu. |
-| `carbon_neutral` | „Uhlíkově neutrální produkt“ | Posoudit, zda je uvedená metodika doložená a zda se výrok opírá o offsety; při neúplných podkladech `unverifiable`, oddělený signál možného právního rizika. |
-| `customer_count` | „Máme milion zákazníků“ | OTE OPM samo nestačí na počet unikátních zákazníků; použij odpovídající zákaznickou metriku nebo `unverifiable`. |
-| `customer_growth` | „Rosteme“ / „Nejrychleji rosteme“ | Na OPM lze ověřovat **růst počtu OPM**, pokud to tvrzení výslovně znamená; jinak nepřevádět OPM na zákazníky. Celotržní superlativ vyžaduje příslušný scope. |
-| `rating` | „Máme hodnocení 4,8 na Google“ | Zaznamenat platformu, datum, region/provozovnu, průměr a počet hodnocení; nekonstruovat reprezentativní spokojenost. |
-| `soft_trust` | „Férový a spolehlivý“ | Bez testovatelné operacionalizace `unverifiable`. Sankce ERÚ pouze jako kontext, nikoli automatický důkaz proti sloganu nebo jeho potvrzení. |
-| `other` | Cokoli jiného | Bez vytvořeného a otestovaného pravidla `unverifiable`. |
+| Rule ID | Typický výrok | Zdroj | Jak se rozhoduje |
+|---|---|---|---|
+| `price_favorable` | „Máme výhodné ceny“, „Ušetříte“ | ERÚ | Srovnatelné nabídky (známá sazba, fixace, základ DPH) nejvýše na horní hranici pásma → `supported`. U tvrzení o úspoře zákazníka jen `partially_supported`. Nabídka nad pásmem → `unverifiable` s nálezem, ne rozpor. |
+| `price_rank` | „Nejlepší ceny na trhu“, „Garance nejnižší ceny“ | weby dodavatelů | Levnější srovnatelná nabídka (stejná sazba a fixace) s nižším ročním nákladem včetně stálého platu → `contradicted`. Chybí-li stálý plat → `unverifiable` s nálezem. Prvenství ve vzorku → `unverifiable`. Závazek dorovnání ceny → vždy `unverifiable`, nález uvádí nalezenou nižší cenu. |
+| `price_guarantee` | „Garance ceny na 3 roky“ | web + ERÚ | Produkt s danou fixací existuje a cena nepřesahuje pásmo → `supported`; existuje, ale cenu nelze srovnat → `partially_supported`. |
+| `market_size` | „Největší dodavatel“ | OTE | Pořadí podle počtu OPM elektřiny. 1. místo → `supported` (zahrnuje-li tvrzení i plyn, `partially_supported`); jiné místo → `contradicted`. Nedefinované omezení („český“) → `unverifiable`. |
+| `price_pct_cheaper` | „O 7 % levnější než X“ | weby dodavatelů | Roční náklad obchodní části obou dodavatelů ve všech profilech spotřeby. Platí všude → `supported`, nikde → `contradicted`, jen někde nebo bez stálého platu či základu → `unverifiable`. |
+| `customer_count` | „1,5 milionu zákazníků“ | OTE | `unverifiable`; počet OPM se uvádí jen jako kontext. Jen když tvrzení výslovně mluví o odběrných místech, porovná se s OPM. |
+| `customer_growth` | „Rosteme“ | OTE | Počet OPM mezi prvním a posledním zveřejněným měsícem roku: růst → `supported`, jinak `contradicted`. Superlativ („nejrychleji“) → `unverifiable`. |
+| `carbon_neutral` | „Emise kompenzujeme“ | – | `unverifiable` + příznak rizika s důvodem. |
+| `green_share` | „100 % zelená elektřina“ | podklad k produktu | Bez produktového dokladu (záruky původu) → `unverifiable` + příznak rizika. |
+| `green_generic` | „Šetrná k přírodě“ | – | `unverifiable` + příznak rizika. |
+| `soft_trust` | „Férový a spolehlivý“ | – | `unverifiable`. |
+| `other` | cokoli jiného | – | `unverifiable`. |
 
-## Srovnatelný cenový profil pro pilot
-- Komodita: **elektřina**; sazba `D02d`, jistič `3×25 A`, běžný zákazník, geografická oblast a dostupná nabídka; **zaznamenat region a konkrétní produkt**.
-- Referenční spotřeba: **2 MWh a 4 MWh za rok** (parametry auditu, nikoli zamlčená konstanta).
-- Cíl: standardní nabídka pro nového zákazníka s fixací přibližně 12 měsíců; pokud odpovídající produkt není dostupný, nesrovnávej nesrovnatelné tarify.
-- Pro **obchodní složku** vč. DPH: `annual_trade_cost = 12 × monthly_supplier_fee + annual_mwh × supplier_energy_price_mwh` (+ jiné obchodní poplatky/slevy, pokud relevantní). `Decimal` a explicitní měnové jednotky.
-- Reklama na **celkovou cenu** vyžaduje kompletní cenovou metodiku včetně regulovaných složek; obchodní složku nelze vydávat za úplný roční účet.
-- Cenové údaje validuj pro datum tvrzení i datum porovnání, uveď čas platnosti tarifu a datum získání. Pokud období neodpovídají, `unverifiable`.
+## Srovnávací profil
 
-## Další závazná pravidla
-1. Chybějící podklad ≠ důkaz nepravdivosti. Jeden validní protipříklad univerzálního výroku ≠ automaticky protipříklad produktu či období s jiným scopingem.
-2. `partially_supported` vyžaduje strukturu `subclaims`, která obsahuje konkrétně ověřené části; běžný nerozložitelný superlativ nemá tuto možnost.
-3. Kódové pravidlo vrací `(rule_verdict, evidence_ids, limitations, metrics, rule_version)`. `Judge` může pouze snížit na `unverifiable` při prokazatelném nesouladu.
-4. Použití snapshotu není samo o sobě důvod ke `contradicted`, ale stáří/reference mismatch může vyvolat `unverifiable`.
-5. Při relevantní právní obavě `possible_regulatory_risk=true`, `review_required=true`, `risk_reason` s odkazem na posuzované znění; bez právního verdiktu.
+- Elektřina, sazba `D02d`, roční spotřeba 2 a 4 MWh (parametry v `suppliers.json`).
+- Cena komodity se srovnává bez DPH; roční náklad obchodní části s DPH: `12 × stálý plat + MWh × cena`.
+- Pásmo ERÚ se bere pro měsíc, ve kterém nabídka platí (živě potvrzená nabídka = aktuální měsíc).
+
+## Závazné zásady
+
+1. Chybějící podklad není důkaz nepravdivosti.
+2. Být nad pásmem ERÚ nedokazuje klamání.
+3. Vzorek několika dodavatelů může celotržní superlativ vyvrátit, ne potvrdit.
+4. OPM nejsou zákazníci; prázdná buňka v tabulce OTE není nula.
+5. Pásmo ERÚ je cena komodity bez stálého platu a regulovaných složek; nelze ho vydávat za celkový účet.
+6. Neshoda sazby, fixace, období nebo základu DPH zastaví verdikt.
