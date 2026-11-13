@@ -1,8 +1,8 @@
 ---
-applyTo: "app/**/*.py"
+applyTo: "src/compatitive_intelligence/**/*.py"
 ---
 # Backend Python/Flask — architektura v2
-- Implementuj `create_app(config=None)`, Blueprints, Pydantic v2 schémata, oddělený worker (`python -m app.worker`) a transakční persistenci; nikdy nesvazuj live audit se životností HTTP requestu.
+- Implementuj `create_app(config=None)`, Blueprints, Pydantic v2 schémata, oddělený worker a transakční persistenci; nikdy nesvazuj live audit se životností HTTP requestu.
 - Web Scout i agentní pipeline musí být injektovatelné/mokovatelné, aby režim fixture nevyžadoval síť ani klíč.
 - Pro live audity validuj serverovou autorizaci; publikovaný `GET latest` pouze čte poslední výsledek.
 - Na každý audit ulož per-source `origin`, `captured_at`, `valid_as_of`, URL, `canonical_hash`, `baseline_hash`, `fallback_reason`, human_reviewed a event timeline.

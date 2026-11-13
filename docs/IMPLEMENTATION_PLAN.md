@@ -4,7 +4,7 @@ Fáze se realizují postupně. **Každá fáze musí být spustitelná a otestov
 
 ## Fáze 1 — celé UI/API, fixture pipeline a úložiště
 **Cíl:** webová stránka zobrazí ukázkový poslední audit; autorizovaný uživatel spustí fixture audit; worker zpracuje celý průchod bez externího LLM a webu.
-- Flask `create_app`, blueprints, Pydantic Claims/Evidence/Verdicts/Audit/Source, SQLite modely a transakční job fronta.
+- Flask `create_app`, blueprints, Pydantic Claims/Evidence/Verdicts/Audit/Source, SQL alchemy modely a napojení na AZURE DB a transakční job fronta.
 - `/`, `/audits/<id>`, `POST /api/v1/audits`, `GET status/results/latest`, publikace sanitized results.
 - Worker CLI a fake/deterministic agent adapters; ukázkové zdroje v `data/fixtures` označené jako fiktivní.
 - Bootstrap/HTML/vanilla JS: výběr, polling log, výsledky, legendy/zdroje, omezení.
@@ -46,7 +46,6 @@ Fáze se realizují postupně. **Každá fáze musí být spustitelná a otestov
 
 ## Nasazení a demo (Flask stack)
 - V první řadě Python hosting s trvalým diskem + worker a Flask/Gunicorn; vyzkoušej restart a obnovu jobů.
-- Vercel je **možný pro Flask**, ale samostatný lokální SQLite worker nesmí být přesunut do serverless bez změny perzistence/queue. Alternativně publikuj pouze read-only výsledky a live zpracování spusť jinde.
 - Pro 10min obhajobu: 1 min problém/KIT, 2 min PESTEL/Porter/konkurence, 4 min demo, 2 min architektura/golden set/omezení, 1 min KIQ5. Při live demo spusť jednoho dodavatele a ostatní ukaž ze skutečně uloženého auditu.
 
 ## Harmonogram z podkladu v2 (orientační)

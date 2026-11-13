@@ -19,7 +19,7 @@
 flowchart TB
     UI[Flask HTML/Jinja2 + JavaScript] -->|POST autorizovaný audit| API[Flask API]
     UI -->|GET status, výsledky, latest| API
-    API <--> DB[(SQLite: audit, events, claims, evidence)]
+    API <--> DB[(AZURE: audit, events, claims, evidence)]
     WORKER[Samostatný Python worker] <--> DB
     WORKER --> O[Orchestrátor]
     O --> W[Web Scout: živý fetch + canonical hash]
@@ -53,7 +53,6 @@ flowchart TB
 | Deterministic rules | čistý Python | evidenční fakta | `rule_verdict`, metriky, omezení |
 | Judge | LLM s omezenými oprávněními | Claim + Evidence + rule_verdict | `final_verdict`, případný downgrade |
 | Strategist | LLM | pouze hotové audity | briefing s claim IDs |
-| Worker/storage | Python + SQLite/files | job, eventy, snapshoty | trvalý audit / poslední publikovaná verze |
 
 ## 3. Režim živého sběru a provenience
 `mode=fixture` je offline a neslibuje živá data. `mode=live` při **každém běhu** zkusí bezpečně stáhnout schválené stránky dodavatelů (MVP 2–4 stránky na každou ze 3 firem). Referenční zdroje se nemusejí stahovat při každém auditu — mají kurátorované/verzované podklady a data platnosti.
@@ -79,7 +78,7 @@ Specializované LLM evidence agenty mají vlastní instrukce, vstupní schéma a
 - Podrobná hranice mezi kódem (API/scraping/parsing) a agenty je v `DATA_SOURCES.md`.
 
 ## 6. Stav auditů, rozhraní a UI
-- `POST /api/v1/audits` pouze pro oprávněné uživatele, odpoví `202`, worker běží odděleně. SQLite stavová fronta jen tam, kde je disk opravdu perzistentní.
+- `POST /api/v1/audits` pouze pro oprávněné uživatele, odpoví `202`, worker běží odděleně. 
 - UI polluje `GET /api/v1/audits/<id>` a načte `.../results`; `/api/v1/audits/latest` je veřejně čitelný publikovaný poslední audit.
 - Stage: `queued → collecting → extracting → verifying → judging → reporting → completed`, možné `failed`/`partial` (v dalších verzích). Eventy obsahují `stage`, `timestamp`, `origin` a lidsky čitelný popis. Jednotlivé nerozhodnutelné claims mohou mít `unverifiable` i při celkově `completed`.
 - UI: výběr dodavatelů a odběrového profilu; live průběh; tabulka tvrzení s důkazy, stářím dat, čtyřmi verdikty a briefing. **Žádné globální „skóre pravdivosti“**.
@@ -89,12 +88,12 @@ Specializované LLM evidence agenty mají vlastní instrukce, vstupní schéma a
 .github/
   copilot-instructions.md
   instructions/{flask-backend,evidence-pipeline,frontend,tests}.instructions.md
-app/
+src/compatitive_intelligence/
   __init__.py                  # create_app
   config.py
   web/{pages,api}.py
   schemas/{claim,evidence,verdict,audit}.py
-  models/                     # ORM / sqlite persistence
+  models/
   services/{orchestrator,web_scout,snapshots,baseline,publication}.py
   connectors/{supplier_web,ote,eru}.py
   parsers/{html,prices,pdf,xlsx}.py
@@ -106,7 +105,6 @@ app/
   templates/{index,audit}.html
   static/{js,css}/
 config/{suppliers.yaml,profiles.yaml}
-data/{baseline,reference,fixtures,raw,snapshots}/
 eval/golden.json
 tests/                 # anonymizované golden fixtures a unit/integration testy
 docs/{ARCHITECTURE,ARCHITECTURE_VALIDATION,API_CONTRACTS,RULE_CATALOG,DATA_SOURCES,IMPLEMENTATION_PLAN,CHANGELOG_V2}.md
@@ -114,12 +112,7 @@ docs/{ARCHITECTURE,ARCHITECTURE_VALIDATION,API_CONTRACTS,RULE_CATALOG,DATA_SOURC
 pyproject.toml
 README.md
 ```
-Názvy adresářů jsou plánované. Nedoplňuj prázdné moduly bez implementační potřeby. `data/raw`, pracovní snapshoty, reálná SQLite DB a `.env` nepatří do Gitu; schválené neosobní baseline/fixtures do Gitu patřit mohou.
-
-## 8. Nasazení — důležitá odchylka od předlohy
-**Preferované MVP:** Python web service (Gunicorn + Flask), jeden **samostatný worker** a perzistentní volume/SQLite, vše na platformě umožňující běžící proces a zachování dat. Flask dev server jen lokálně.
-
-**Pokud školní zadání explicitně vyžaduje Vercel:** podporuje přímo Flask/Python, není třeba Next.js. Pro serverless ale nepoužívej lokální SQLite/JSON soubory jako permanentní stav ani threads po návratu response. Varianta A: na Vercelu je pouze veřejný read-only Flask viewer posledního publikovaného auditu; audity/worker jinde. Varianta B: plné Vercel Python řešení s perzistentní externí DB + object storage a Queue/Workflow/Daemon (vyžaduje ověřit plán a dostupnost). Nesměšovat tyto varianty s lokálním modelem.
+Názvy adresářů jsou plánované. Nedoplňuj prázdné moduly bez implementační potřeby. `data/raw`, pracovní snapshoty, `.env` nepatří do Gitu; schválené neosobní baseline/fixtures do Gitu patřit mohou.
 
 ## 9. Reprodukovatelnost, testování a demo
 - `fixture` end-to-end včetně interních agentních stubů; `live` musí mít skutečné tool calling pro Price/Green v MVP.

@@ -1,5 +1,5 @@
 ---
-applyTo: "app/connectors/**/*.py,app/parsers/**/*.py,app/services/**/*.py,app/agents/**/*.py,app/rules/**/*.py,app/llm/**/*.py"
+applyTo: "src/compatitive_intelligence/connectors/**/*.py,src/compatitive_intelligence/parsers/**/*.py,src/compatitive_intelligence/services/**/*.py,src/compatitive_intelligence/agents/**/*.py,src/compatitive_intelligence/rules/**/*.py,src/compatitive_intelligence/llm/**/*.py"
 ---
 # Pipeline, web scraping, LLM agenti a pravidla
 - `WebScout` je kód, **ne LLM**; při každém live runu provede bezpečný fetch předem vybraných 2–4 URL dodavatele. Kanonizuj relevantní obsah a ukládej hash (nikoli pouze raw HTML hash), URL, čas a parser verzi.
