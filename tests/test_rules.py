@@ -193,6 +193,97 @@ def test_params_are_read_from_quote_of_automatically_found_claims():
     assert out["verdict"] == rules.SUPPORTED
 
 
+def gas_ctx():
+    ctx = make_ctx([])
+    ctx["ote_gas"] = {
+        "ranking": [("plynar", 2000), ("velky", 300), ("stredni", 100)],
+        "source": {"data_period": "2026-09"},
+    }
+    return ctx
+
+
+def test_largest_in_electricity_and_gas_checks_both_commodities():
+    claim = {"params": {"scope": "all", "commodities": ["elektřina", "plyn"]}}
+    out = rules.market_size(claim, supplier("velky", []), gas_ctx())
+    # velky: elektřina 1., plyn 2. (první je plynar), v součtu 2. za plynarem → jen částečně
+    assert out["verdict"] == rules.PARTIAL
+    statuses = [sub["status"] for sub in out["subclaims"]]
+    assert statuses[0] == "ověřeno" and statuses[1].startswith("v rozporu") and "plynar" in statuses[1]
+    ctx = gas_ctx()
+    ctx["ote_gas"]["ranking"] = [("velky", 900), ("stredni", 100)]
+    assert rules.market_size(claim, supplier("velky", []), ctx)["verdict"] == rules.SUPPORTED
+
+
+def test_customer_count_against_electricity_plus_gas_supply_points():
+    ctx = gas_ctx()  # velky: 1000 + 300 = 1300 OPM
+    ok = rules.customer_count({"params": {"claimed": 1200}}, supplier("velky", []), ctx)
+    assert ok["verdict"] == rules.PARTIAL and len(ok["subclaims"]) == 2
+    too_many = rules.customer_count({"params": {"claimed": 2000}}, supplier("velky", []), ctx)
+    assert too_many["verdict"] == rules.CONTRADICTED
+    slightly = rules.customer_count({"params": {"claimed": 1350}}, supplier("velky", []), ctx)
+    assert slightly["verdict"] == rules.UNVERIFIABLE
+    abroad = {"params": {"claimed": 100000, "includes_other_markets": "Česko a Slovensko"}}
+    out = rules.customer_count(abroad, supplier("velky", []), ctx)
+    assert out["verdict"] == rules.UNVERIFIABLE and "1,3 %" in out["finding"]
+
+
+def test_supply_point_claim_of_merged_companies_sums_electricity_and_gas():
+    ctx = gas_ctx()  # velky 1000 + 300, stredni 500 + 100 → 1900
+    claim = lambda n: {"params": {"claimed": n, "metric": "opm", "merged_with": ["stredni"]}}
+    assert rules.customer_count(claim(1850), supplier("velky", []), ctx)["verdict"] == rules.SUPPORTED
+    assert rules.customer_count(claim(2500), supplier("velky", []), ctx)["verdict"] == rules.CONTRADICTED
+
+
+def test_claimed_number_is_read_from_quote():
+    assert rules._claimed_from_quote("staráme se o více než 185 000 odběrných míst") == (185000, "opm")
+    assert rules._claimed_from_quote("v Česku se staráme o 1,5 milionu zákazníků") == (1500000, None)
+    assert rules._claimed_from_quote("250 tis. zákazníků") == (250000, None)
+    assert rules._claimed_from_quote("jsme tu pro vás") == (None, None)
+
+
+def test_undefined_qualifier_is_never_a_verdict_but_reports_who_is_bigger():
+    ctx = gas_ctx()
+    claim = {"params": {"scope": "qualified", "qualifier": "alternativní",
+                        "merged_with": ["maly"], "exclude": ["velky", "plynar"]}}
+    out = rules.market_size(claim, supplier("maly", []), ctx)  # maly 10 + maly 10? jen jednou → 10
+    assert out["verdict"] == rules.UNVERIFIABLE
+    assert "stredni" in out["finding"] and out["opportunity"]
+    solo = rules.market_size({"params": {"scope": "czech_owned"}}, supplier("maly", []), ctx)
+    assert solo["verdict"] == rules.UNVERIFIABLE
+
+
+def test_stepped_products_and_other_areas_are_not_compared():
+    mine = supplier("a", [offer("a1", 3000.0, fee=150.0)])
+    stepped = supplier("b", [{**offer("b1", 2000.0, fee=150.0), "stepped": True}])
+    claim = {"params": {"kind": "superlative"}}
+    assert rules.price_rank(claim, mine, make_ctx([mine, stepped]))["evidence"] == []
+    mine["offers"][0]["area"] = "PREdistribuce"
+    elsewhere = supplier("c", [{**offer("c1", 2000.0, fee=150.0), "area": "EG.D"}])
+    assert rules.price_rank(claim, mine, make_ctx([mine, elsewhere]))["evidence"] == []
+
+
+def test_fee_can_outweigh_a_lower_unit_price():
+    # nižší cena za MWh, ale vysoký stálý plat: při nízké spotřebě dražší → žádný rozpor
+    mine = supplier("a", [offer("a1", 3000.0, fee=100.0)])
+    rival = supplier("b", [offer("b1", 2900.0, fee=400.0)])
+    out = rules.price_rank({"params": {"kind": "superlative"}}, mine, make_ctx([mine, rival]))
+    assert out["verdict"] == rules.UNVERIFIABLE
+
+
+def test_green_claim_with_product_evidence_is_supported_until_evidence_disappears():
+    s = supplier("a", [])
+    s["green_evidence"] = [{"label": "Produkt EKO", "value": "kryto zárukami původu", "status": "nalezeno"}]
+    assert rules.green_share({"params": {}}, s, make_ctx([]))["verdict"] == rules.SUPPORTED
+    s["green_evidence"][0]["stale"] = True
+    assert rules.green_share({"params": {}}, s, make_ctx([]))["verdict"] == rules.UNVERIFIABLE
+
+
+def test_below_band_means_cheapest_quarter_in_finding():
+    s = supplier("a", [offer("a1", 3700.0)])
+    out = rules.price_favorable({"params": {}}, s, make_ctx([s]))
+    assert out["verdict"] == rules.SUPPORTED and "nejlevnější čtvrtinou" in out["finding"]
+
+
 def test_unknown_rule_gets_no_verdict():
     assert rules.evaluate({"rule_id": "vymyslene"}, supplier("a", []), make_ctx([]))["verdict"] == rules.UNVERIFIABLE
 

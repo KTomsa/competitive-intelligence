@@ -94,6 +94,19 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px soli
 .matrix td { color: var(--muted); font-variant-numeric: tabular-nums; }
 .matrix td.has { color: var(--ink); font-weight: 600; }
 
+h3 { font-size: 16px; margin: 18px 0 4px; }
+.cmp { border-collapse: collapse; font-size: 14px; width: 100%; min-width: 640px; }
+.cmp th, .cmp td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; }
+.cmp th { color: var(--muted); font-weight: 600; font-size: 13px; }
+.cmp th:first-child, .cmp td:first-child { text-align: left; }
+.cmp td { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cmp td.cmp-name { white-space: normal; min-width: 200px; }
+.cmp tr:nth-child(2) td { background: var(--ok-bg); }
+.badge.pos-below { background: var(--ok-bg); color: var(--ok); }
+.badge.pos-above { background: var(--part-bg); color: var(--part); }
+.pricelists { margin-top: 10px; }
+.pricelists .sources { margin-top: 10px; }
+
 .sources { list-style: none; padding: 0; margin: 0; }
 .source { padding: 10px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
 .source:first-child { border-top: 0; padding-top: 0; }

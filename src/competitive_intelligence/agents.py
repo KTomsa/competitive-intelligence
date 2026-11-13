@@ -19,7 +19,7 @@ from .rules import CONTRADICTED, PARTIAL, RULE_LABELS, SUPPORTED, UNVERIFIABLE
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
 LLM_TIMEOUT_MS = 15_000
 MAX_PAGE_CHARS = 60_000
-MAX_NEW_CLAIMS = 5
+MAX_NEW_CLAIMS = 3
 
 RuleId = Literal[
     "price_favorable", "price_rank", "price_pct_cheaper", "price_guarantee", "market_size",
@@ -103,9 +103,9 @@ EXTRACTOR_SYSTEM = (
 
 KEYWORD_RULES: list[tuple[str, str]] = [
     ("price_rank", r"nejlevn|nejnižší cen|nejlepší cen|bezkonkurenčn"),
-    ("customer_count", r"\d[\d ,]*\s*(milion|mil\.|tis\.|tisíc)\w*\s+zákazník"),
+    ("customer_count", r"\d[\d ,]*\s*(milion|mil\.|tis\.|tisíc)\w*\s+zákazník|\d[\d ]*\s*odběrných míst"),
     ("green_share", r"100\s*%.{0,60}(zelen|obnoviteln)"),
-    ("market_size", r"\bnejvětší\b.{0,40}dodavatel"),
+    ("market_size", r"\bnejvětší\w*.{0,40}dodavatel"),
     ("price_pct_cheaper", r"o \d+\s*% levněj"),
     ("carbon_neutral", r"uhlíkově neutráln|emise CO.{0,30}kompenz"),
     ("customer_growth", r"nejrychleji rost|\brosteme\b"),
@@ -138,6 +138,18 @@ def _stems(text: str) -> set[str]:
     return {w[:5] for w in re.findall(r"\w{4,}", text.casefold())}
 
 
+def _checked_rule(rule_id: str, quote: str) -> str:
+    """Pravidlo navržené modelem platí jen tehdy, když mu citát odpovídá i podle klíčových slov.
+
+    Jinak se tvrzení zařadí jako `other` (bez verdiktu), aby chybná klasifikace modelu
+    nevedla k verdiktu „podloženo“ nebo „v rozporu“ u tvrzení, které o tom vůbec není.
+    """
+    if rule_id == "other":
+        return rule_id
+    pattern = dict(KEYWORD_RULES).get(rule_id)
+    return rule_id if pattern and re.search(pattern, quote, re.I) else "other"
+
+
 def _accept(candidates: list[dict], page: dict, known_quotes: list[str]) -> list[dict]:
     """Ponechá jen citáty, které doslova existují ve staženém textu a nejsou duplicitní."""
     claims, seen = [], [normalize(q).casefold() for q in known_quotes]
@@ -147,6 +159,8 @@ def _accept(candidates: list[dict], page: dict, known_quotes: list[str]) -> list
         key = quote.casefold()
         if not contains(page["text"], quote):
             continue
+        if "plyn" in key and "elektřin" not in key:
+            continue  # tvrzení jen o plynu nelze posuzovat cenami a daty o elektřině
         if any(key in s or s in key for s in seen):
             continue
         stems = _stems(key)
@@ -154,7 +168,7 @@ def _accept(candidates: list[dict], page: dict, known_quotes: list[str]) -> list
             continue  # stejné tvrzení v jiném tvaru nebo jeho zkrácená verze
         seen.append(key)
         seen_stems.append(stems)
-        claims.append({"quote": quote, "rule_id": cand["rule_id"], "params": {}})
+        claims.append({"quote": quote, "rule_id": _checked_rule(cand["rule_id"], quote), "params": {}})
         if len(claims) >= MAX_NEW_CLAIMS:
             break
     return claims

@@ -12,6 +12,7 @@ import re
 from decimal import Decimal
 
 from .connectors import eru as eru_connector
+from .connectors import ote as ote_connector
 
 SUPPORTED = "supported"
 PARTIAL = "partially_supported"
@@ -133,7 +134,13 @@ def benchmark_offer(offer: dict, ctx: dict) -> dict:
     return out
 
 
-POSITION_LABEL = {"below": "pod pásmem", "within": "v pásmu", "above": "nad pásmem", "unknown": "nelze určit"}
+POSITION_SHORT = {"below": "pod pásmem", "within": "v pásmu", "above": "nad pásmem", "unknown": "nelze určit"}
+POSITION_LABEL = {
+    "below": "pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+    "within": "v pásmu (mezi 25. a 50. percentilem nabídek)",
+    "above": "nad pásmem (dražší než přibližně polovina nabídek)",
+    "unknown": "nelze určit",
+}
 
 
 def band_evidence(bm: dict, ctx: dict) -> dict:
@@ -187,12 +194,19 @@ def price_favorable(claim, supplier, ctx):
             evidence,
             opportunity=True,
         )
-    summary = "; ".join(f"{m['product']} {POSITION_LABEL[m['position']]}" for m in eligible)
+    summary = "; ".join(f"{m['product']} {POSITION_SHORT[m['position']]}" for m in eligible)
+    all_below = all(m["position"] == "below" for m in eligible)
+    if all_below:
+        level = (
+            "Všechny srovnatelné nabídky jsou pod pásmem ERÚ, tedy podle ERÚ mezi nejlevnější čtvrtinou "
+            "fixovaných nabídek na trhu"
+        )
+    else:
+        level = "Srovnatelné nabídky nepřesahují horní hranici pásma ERÚ (přibližně medián trhu)"
     if claim.get("params", {}).get("basis") == "customer_saving":
         return result(
             PARTIAL,
-            f"Srovnatelné nabídky nejsou nad pásmem ERÚ ({summary}). Skutečná úspora konkrétního zákazníka "
-            "ale závisí na jeho současné smlouvě.",
+            f"{level} ({summary}). Skutečná úspora konkrétního zákazníka ale závisí na jeho současné smlouvě.",
             ERU_LIMIT,
             "Tvrzení o úspoře je pro zákazníka neověřitelné předem; můžeme nabídnout konkrétní kalkulaci úspory.",
             evidence,
@@ -201,11 +215,15 @@ def price_favorable(claim, supplier, ctx):
                 {"text": "Zákazník přechodem ušetří", "status": "neověřeno – závisí na jeho současné ceně"},
             ],
         )
+    if all_below:
+        action = "Cenou komodity tohoto konkurenta nepodbízet; odlišit se stálým platem, podmínkami a službami."
+    else:
+        action = "Konkurent je cenou v běžném pásmu, ne mezi nejlevnějšími; na ceně komodity s ním lze soutěžit."
     return result(
         SUPPORTED,
-        f"Všechny srovnatelné nabídky jsou nejvýše na horní hranici pásma ERÚ ({summary}).",
+        f"{level} ({summary}).",
         ERU_LIMIT + " „Výhodná cena“ je zde vyložena jako cena nepřesahující pásmo ERÚ.",
-        "Na ceně komodity tohoto konkurenta nenapadat; hledat rozdíl ve stálém platu, podmínkách a službách.",
+        action,
         evidence,
     )
 
@@ -215,10 +233,15 @@ def price_favorable(claim, supplier, ctx):
 def _comparable(offer: dict, ctx: dict) -> bool:
     return (
         not offer.get("stale")
+        and not offer.get("stepped")  # produkty s postupně se měnící cenou nelze srovnávat jednou cenou
         and offer.get("tariff") == ctx["profile"]["tariff"]
         and offer.get("fixation_months") is not None
         and offer.get("price_mwh_excl_vat") is not None
     )
+
+
+def _same_area(a: dict, b: dict) -> bool:
+    return not a.get("area") or not b.get("area") or a["area"] == b["area"]
 
 
 def _annual_cost(offer: dict, mwh: float) -> float | None:
@@ -229,81 +252,114 @@ def _annual_cost(offer: dict, mwh: float) -> float | None:
     return float((12 * fee + Decimal(str(mwh)) * price).quantize(Decimal("0.01")))
 
 
+annual_cost = _annual_cost  # veřejný název pro přehled nabídek
+
+
+def _cost_pairs(costs, profile) -> str:
+    return "; ".join(f"{m} MWh/rok: {czk(a)} vs. {czk(b)}" for m, (a, b) in zip(profile["annual_mwh"], costs))
+
+
 def price_rank(claim, supplier, ctx):
     kind = claim.get("params", {}).get("kind")
     if kind is None:  # automaticky nalezené tvrzení: „garance nejnižší ceny“ je závazek dorovnání
         kind = "price_match_guarantee" if "garanc" in claim.get("quote", "").casefold() else "superlative"
+    profile = ctx["profile"]
     own = [o for o in supplier["offers"] if _comparable(o, ctx)]
-    sample = [s["name"] for s in ctx["suppliers"] if s["id"] != supplier["id"]]
+    sample = sorted({
+        s["name"] for s in ctx["suppliers"]
+        if s["id"] != supplier["id"] and any(_comparable(o, ctx) for o in s["offers"])
+    })
     sample_note = (
-        f"Srovnání pokrývá jen vzorek: {', '.join(sample)}; sazba {ctx['profile']['tariff']}, "
-        "stejná délka fixace, cena komodity bez DPH."
+        f"Srovnání pokrývá jen vzorek ({', '.join(sample) or 'žádný další dodavatel'}): sazba {profile['tariff']}"
+        + (f", distribuční území {profile['area']}" if profile.get("area") else "")
+        + ", stejná délka fixace, jen produkty s jednou pevnou cenou."
     )
     if not own:
         return result(
             UNVERIFIABLE,
-            "Dodavatel nemá ve vzorku fixovanou nabídku se známou sazbou a cenou; "
-            "například spotový tarif nelze s fixovanými tarify přímo srovnat.",
+            "Pro dodavatele nemáme ceník fixovaného produktu se známou sazbou a cenou, takže ho nelze "
+            "srovnat (spotový tarif s fixovanými tarify srovnávat nelze vůbec).",
             sample_note,
-            "Nesrovnávat nesrovnatelné. Pokud chceme reagovat, vysvětlit zákazníkům rozdíl mezi spotem a fixací.",
+            "Doplnit ceník dodavatele pro stejnou sazbu a distribuční území; do té doby tvrzení nehodnotit.",
         )
     evidence, cheaper_unit, cheaper_total = [], [], []
     for mine in own:
-        for other_supplier in ctx["suppliers"]:
-            if other_supplier["id"] == supplier["id"]:
+        for other in ctx["suppliers"]:
+            if other["id"] == supplier["id"]:
                 continue
-            for theirs in other_supplier["offers"]:
-                if not _comparable(theirs, ctx) or theirs["fixation_months"] != mine["fixation_months"]:
+            for theirs in other["offers"]:
+                if (
+                    not _comparable(theirs, ctx)
+                    or theirs["fixation_months"] != mine["fixation_months"]
+                    or not _same_area(mine, theirs)
+                ):
                     continue
                 diff = mine["price_mwh_excl_vat"] - theirs["price_mwh_excl_vat"]
+                costs = [(_annual_cost(mine, m), _annual_cost(theirs, m)) for m in profile["annual_mwh"]]
+                known = all(a is not None and b is not None for a, b in costs)
+                value = (
+                    f"{other['name']} – {theirs['product']}: {czk(theirs['price_mwh_excl_vat'])}/MWh "
+                    f"(rozdíl {'+' if diff > 0 else ''}{num(diff)} Kč/MWh bez DPH)"
+                )
+                if known:
+                    value += "; roční náklad obchodní části s DPH " + _cost_pairs(costs, profile)
                 evidence.append({
-                    "label": f"Fixace {mine['fixation_months']} měs.: {supplier['name']} {czk(mine['price_mwh_excl_vat'])}/MWh",
-                    "value": (
-                        f"{other_supplier['name']} – {theirs['product']}: {czk(theirs['price_mwh_excl_vat'])}/MWh "
-                        f"(rozdíl {'+' if diff > 0 else ''}{num(diff)} Kč/MWh)"
+                    "label": (
+                        f"Fixace {mine['fixation_months']} měs.: {supplier['name']} – {mine['product']} "
+                        f"{czk(mine['price_mwh_excl_vat'])}/MWh"
                     ),
-                    "source": f"web:{other_supplier['id']}",
+                    "value": value,
+                    "source": f"web:{other['id']}",
                 })
                 if diff > 0:
-                    cheaper_unit.append((mine, other_supplier, theirs, diff))
-                    costs = [(_annual_cost(mine, m), _annual_cost(theirs, m)) for m in ctx["profile"]["annual_mwh"]]
-                    if all(a is not None and b is not None and b < a for a, b in costs):
-                        cheaper_total.append((mine, other_supplier, theirs, costs))
+                    cheaper_unit.append((mine, other, theirs, diff))
+                if known and all(b < a for a, b in costs):
+                    cheaper_total.append((mine, other, theirs, costs))
+    cheaper_unit.sort(key=lambda item: -item[3])
+    cheaper_total.sort(key=lambda item: -(item[3][0][0] - item[3][0][1]))  # největší úspora první
+
     if kind == "price_match_guarantee":
+        limitation = sample_note + " Zda dodavatel garanci skutečně plní, z veřejných dat ověřit nelze."
+        if cheaper_total:
+            mine, other, theirs, costs = cheaper_total[0]
+            return result(
+                UNVERIFIABLE,
+                "Jde o závazek dorovnat nižší cenu, ne o tvrzení, že ceník je nejnižší. Levnější srovnatelná "
+                f"nabídka veřejně existuje: {other['name']} – {theirs['product']} proti {mine['product']}. "
+                f"Roční náklad obchodní části (s DPH) {_cost_pairs(costs, profile)}.",
+                limitation,
+                "Příležitost: slogan „Garance nejnižší ceny“ nezaručuje nejnižší ceník; zákazník musí o dorovnání "
+                "sám požádat a nižší cenu doložit. V komunikaci lze ukázat konkrétní levnější ceníkovou nabídku.",
+                evidence, opportunity=2,
+            )
         if cheaper_unit:
             mine, other, theirs, diff = cheaper_unit[0]
-            finding = (
-                f"Jde o závazek dorovnat nižší cenu, ne o tvrzení, že ceník je nejnižší. Veřejně nabízená "
-                f"nižší cena komodity existuje: {other['name']} – {theirs['product']} za "
-                f"{czk(theirs['price_mwh_excl_vat'])}/MWh proti {czk(mine['price_mwh_excl_vat'])}/MWh "
-                f"({mine['product']}), rozdíl {num(diff)} Kč/MWh bez DPH."
+            return result(
+                UNVERIFIABLE,
+                "Jde o závazek dorovnat nižší cenu, ne o tvrzení, že ceník je nejnižší. Nižší cena komodity "
+                f"veřejně existuje: {other['name']} – {theirs['product']} za {czk(theirs['price_mwh_excl_vat'])}/MWh "
+                f"proti {czk(mine['price_mwh_excl_vat'])}/MWh ({mine['product']}), rozdíl {num(diff)} Kč/MWh bez DPH.",
+                limitation + " Stálý měsíční plat není u obou nabídek znám.",
+                "Doplnit stálé platy z ceníků obou produktů; pak lze ukázat rozdíl v ročním nákladu.",
+                evidence, opportunity=2,
             )
-            action = (
-                "Příležitost: slogan „Garance nejnižší ceny“ nezaručuje nejnižší ceník. V komunikaci můžeme "
-                "ukázat konkrétní nižší ceníkovou cenu a nutnost o dorovnání aktivně žádat. Před použitím "
-                "ověřit stálé platy v cenících obou produktů."
-            )
-        else:
-            finding = "Ve vzorku jsme nenašli nižší srovnatelnou ceníkovou cenu. Jde o závazek dorovnání, ne o prvenství."
-            action = "Bez akce; sledovat ceníky při další kontrole."
         return result(
-            UNVERIFIABLE, finding,
-            sample_note + " Zda dodavatel garanci skutečně plní, z veřejných dat ověřit nelze. "
-            "Stálý měsíční plat není u všech nabídek znám.",
-            action, evidence, opportunity=2 if cheaper_unit else False,
+            UNVERIFIABLE,
+            "Ve vzorku jsme nenašli nižší srovnatelnou ceníkovou cenu. Jde o závazek dorovnání, ne o prvenství.",
+            limitation, "Bez akce; sledovat ceníky při další kontrole.", evidence,
         )
     if cheaper_total:
         mine, other, theirs, costs = cheaper_total[0]
-        pairs = "; ".join(
-            f"{m} MWh/rok: {czk(a)} vs. {czk(b)}" for m, (a, b) in zip(ctx["profile"]["annual_mwh"], costs)
-        )
+        others = sorted({o["name"] for _, o, _, _ in cheaper_total})
         return result(
             CONTRADICTED,
-            f"Existuje levnější srovnatelná nabídka: {other['name']} – {theirs['product']}. "
-            f"Roční náklad obchodní části (s DPH) {pairs}.",
-            sample_note + " Jde o obchodní část ceny (komodita a stálý plat), ne o celkový účet.",
-            "Příležitost: tvrzení o nejnižší ceně lze doložitelně zpochybnit konkrétním protipříkladem. "
-            "Před komunikací ověřit oba ceníky a datum platnosti.",
+            f"Existuje levnější srovnatelná nabídka: {other['name']} – {theirs['product']} proti "
+            f"{mine['product']}. Roční náklad obchodní části (s DPH) {_cost_pairs(costs, profile)}. "
+            f"Levnější srovnatelnou nabídku ve vzorku mají: {', '.join(others)}.",
+            sample_note + " Jde o obchodní část ceny (komodita a stálý plat), ne o celkový účet. "
+            "Tvrzení může „nejlepší cenou“ myslet i něco jiného než ceníkovou cenu.",
+            "Příležitost: tvrzení o nejlepší ceně lze doložitelně zpochybnit konkrétním protipříkladem z veřejných "
+            "ceníků. Před komunikací znovu ověřit oba ceníky a datum platnosti.",
             evidence, opportunity=3,
         )
     if cheaper_unit:
@@ -311,7 +367,8 @@ def price_rank(claim, supplier, ctx):
         return result(
             UNVERIFIABLE,
             f"Nižší cena komodity existuje ({other['name']} – {theirs['product']}, o {num(diff)} Kč/MWh bez DPH), "
-            "ale stálý měsíční plat není u obou nabídek znám, takže roční náklad nelze srovnat.",
+            "ale roční náklad včetně stálého platu nevychází nižší ve všech profilech spotřeby, nebo stálý plat "
+            "není znám.",
             sample_note,
             "Doplnit stálé platy z ceníků; pokud vyjde nižší i roční náklad, lze tvrzení doložitelně zpochybnit.",
             evidence, opportunity=True,
@@ -348,6 +405,7 @@ def price_pct_cheaper(claim, supplier, ctx):
         for mine in supplier["offers"] if _comparable(mine, ctx)
         for theirs in rival["offers"]
         if _comparable(theirs, ctx) and theirs["fixation_months"] == mine["fixation_months"]
+        and _same_area(mine, theirs)
     ]
     holds, evidence = [], []
     for mine, theirs in pairs:
@@ -432,19 +490,52 @@ def price_guarantee(claim, supplier, ctx):
 
 # ---------- OTE: velikost a počty ----------
 
-def _ote_rank(supplier, ctx):
-    ranking = ctx["ote"]["ranking"]
+OTE_LIMIT = "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby."
+CUSTOMER_TOLERANCE = 1.10  # o kolik smí tvrzený počet zákazníků převýšit součet OPM, než jde o rozpor
+
+
+def _ote_position(data: dict | None, supplier: dict):
+    """(pořadí, počet OPM, celé pořadí) dodavatele v jedné tabulce OTE; (None, None, …), když v ní není."""
+    if not data:
+        return None, None, []
+    ranking = data["ranking"]
     for position, (name, count) in enumerate(ranking, start=1):
-        if name == supplier.get("ote_name"):
+        if ote_connector.same_supplier(name, supplier.get("ote_name") or ""):
             return position, count, ranking
     return None, None, ranking
 
 
-OTE_LIMIT = "OPM jsou odběrná místa elektřiny, ne zákazníci, objem dodávky ani tržby; plyn tabulka neobsahuje."
+def _combined_ranking(ctx: dict) -> list[tuple[str, int]]:
+    """Součet OPM elektřiny a plynu podle dodavatele."""
+    ele = ctx["ote"]["ranking"]
+    gas = (ctx.get("ote_gas") or {}).get("ranking") or []
+    totals = []
+    for name, count in ele:
+        extra = next((c for g, c in gas if ote_connector.same_supplier(g, name)), 0)
+        totals.append((name, count + extra))
+    for g, c in gas:
+        if not any(ote_connector.same_supplier(g, name) for name, _ in ele):
+            totals.append((g, c))
+    return sorted(totals, key=lambda p: -p[1])
+
+
+def _full_name(name: str, ctx: dict) -> str:
+    """Tabulka plynu zkracuje názvy; vrátí celý název z tabulky elektřiny, pokud tam dodavatel je."""
+    for full, _ in ctx["ote"]["ranking"]:
+        if ote_connector.same_supplier(name, full):
+            return full
+    return name
+
+
+def _top(ranking, ctx=None, n=5) -> str:
+    return "; ".join(
+        f"{i}. {_full_name(name, ctx) if ctx else name} ({num(count)})"
+        for i, (name, count) in enumerate(ranking[:n], start=1)
+    )
 
 
 def market_size(claim, supplier, ctx):
-    position, count, ranking = _ote_rank(supplier, ctx)
+    position, count, ranking = _ote_position(ctx["ote"], supplier)
     period = ctx["ote"]["source"]["data_period"]
     if position is None:
         return result(
@@ -452,84 +543,281 @@ def market_size(claim, supplier, ctx):
             f"Dodavatel pod názvem „{supplier.get('ote_name')}“ není v tabulce OTE nalezen.",
             OTE_LIMIT, "Ověřit název právnické osoby v tabulce OTE.",
         )
-    top = "; ".join(f"{i}. {n} ({num(c)})" for i, (n, c) in enumerate(ranking[:5], start=1))
     evidence = [
-        {"label": f"{supplier['ote_name']}: {num(count)} OPM ({period})",
+        {"label": f"Elektřina – {supplier['ote_name']}: {num(count)} OPM ({period})",
          "value": f"{position}. místo z {len(ranking)} dodavatelů", "source": "ote"},
-        {"label": "Pět největších podle OPM", "value": top, "source": "ote"},
+        {"label": "Pět největších v elektřině podle OPM", "value": _top(ranking), "source": "ote"},
     ]
     params = claim.get("params", {})
-    if params.get("scope") == "czech_owned":
+    limitation = OTE_LIMIT + " Tvrzení může myslet jinou metriku."
+    if params.get("scope") in ("czech_owned", "qualified"):
+        qualifier = params.get("qualifier", "český")
+        merged = [supplier["ote_name"]] + list(params.get("merged_with", []))
+        excluded = list(params.get("exclude", []))
+        if len(merged) == 1 and not excluded:
+            return result(
+                UNVERIFIABLE,
+                f"Podle OTE je dodavatel {position}. podle počtu odběrných míst elektřiny ({num(count)} OPM, "
+                f"{period}). Tvrzení se ale omezuje na „{qualifier}“ dodavatele a OTE takové členění neeviduje.",
+                OTE_LIMIT + f" Bez definice pojmu „{qualifier} dodavatel“ nelze pořadí sestavit.",
+                f"Příležitost: superlativ „největší {qualifier}“ stojí na nedefinovaném pojmu. Pokud komunikujeme "
+                "velikost, uvádět konkrétní číslo a zdroj (OTE).",
+                evidence, opportunity=True,
+            )
+
+        def among(name, names):
+            return any(ote_connector.same_supplier(name, n) for n in names)
+
+        combined = _combined_ranking(ctx)
+        own_total = sum(c for name, c in combined if among(name, merged))
+        bigger = [(name, c) for name, c in combined if c > own_total and not among(name, excluded + merged)]
+        who = " + ".join(merged)
+        evidence.append({
+            "label": f"Součet OPM elektřiny a plynu – {who}: {num(own_total)}",
+            "value": (
+                "větší mimo tradiční dodavatele: " + "; ".join(f"{n} ({num(c)})" for n, c in bigger[:5])
+                if bigger else "mimo tradiční dodavatele není nikdo větší"
+            ),
+            "source": "ote",
+        })
+        reading = (
+            f"Za „{qualifier}“ zde bereme dodavatele mimo tradiční: {', '.join(excluded)}." if excluded else ""
+        )
+        if bigger:
+            names = ", ".join(f"{n} ({num(c)} OPM)" for n, c in bigger[:3])
+            return result(
+                UNVERIFIABLE,
+                f"Podle OTE má {who} dohromady {num(own_total)} odběrných míst elektřiny a plynu. Víc jich mají "
+                f"{names}. Pojem „{qualifier} dodavatel“ ani metrika (odběrná místa, objem dodávky) nejsou "
+                "v tvrzení definovány.",
+                OTE_LIMIT + " " + reading + " Dodavatel může myslet objem dodané energie, který OTE nezveřejňuje.",
+                f"Příležitost: podle počtu odběrných míst tvrzení neplatí a „{qualifier}“ není definováno. "
+                "Lze ho zpochybnit čísly OTE s výhradou, že může jít o objem dodávky.",
+                evidence, opportunity=2,
+            )
         return result(
             UNVERIFIABLE,
-            f"Podle OTE je dodavatel {position}. podle počtu odběrných míst elektřiny ({num(count)} OPM, {period}). "
-            "Tvrzení se ale omezuje na „české“ dodavatele a OTE vlastnickou strukturu neeviduje.",
-            OTE_LIMIT + " Bez definice „českého dodavatele“ nelze pořadí sestavit.",
-            "Příležitost: superlativ „největší český“ stojí na nedefinovaném pojmu. Pokud komunikujeme velikost, "
-            "uvádět konkrétní číslo a zdroj (OTE).",
-            evidence, opportunity=True,
+            f"Podle OTE má {who} dohromady {num(own_total)} odběrných míst elektřiny a plynu a mimo tradiční "
+            f"dodavatele není nikdo větší. Pojem „{qualifier} dodavatel“ ale není v tvrzení definován.",
+            OTE_LIMIT + " " + reading,
+            "Bez akce; při tomto výkladu tvrzení podle počtu odběrných míst obstojí.",
+            evidence,
         )
-    if position == 1:
-        commodities = list(params.get("commodities", ["elektřina"]))
-        if "plyn" in claim.get("quote", "").casefold() and "plyn" not in commodities:
-            commodities.append("plyn")
-        if any(c != "elektřina" for c in commodities):
+    commodities = list(params.get("commodities", ["elektřina"]))
+    if "plyn" in claim.get("quote", "").casefold() and "plyn" not in commodities:
+        commodities.append("plyn")
+    wants_gas = any(c != "elektřina" for c in commodities)
+    leader, leader_count = ranking[0]
+    if not wants_gas:
+        if position == 1:
+            return result(
+                SUPPORTED,
+                f"Dodavatel je největší podle počtu odběrných míst elektřiny ({num(count)} OPM, {period}).",
+                limitation, "Tvrzení o velikosti nenapadat.", evidence,
+            )
+        return result(
+            CONTRADICTED,
+            f"Podle počtu odběrných míst elektřiny je dodavatel {position}. ({num(count)} OPM); "
+            f"největší je {leader} ({num(leader_count)} OPM, {period}).",
+            limitation, "Příležitost: tvrzení o prvenství lze zpochybnit veřejnými daty OTE.",
+            evidence, opportunity=3,
+        )
+
+    gas_data = ctx.get("ote_gas")
+    gas_pos, gas_count, gas_ranking = _ote_position(gas_data, supplier)
+    if not gas_data or gas_pos is None:
+        if position == 1:
             return result(
                 PARTIAL,
                 f"U elektřiny je dodavatel největší podle počtu odběrných míst ({num(count)} OPM, {period}). "
-                "Plyn tento zdroj nepokrývá.",
-                OTE_LIMIT,
-                "Tvrzení o velikosti u elektřiny nenapadat.",
-                evidence,
+                "Údaj o plynu není k dispozici.",
+                limitation, "Tvrzení o velikosti u elektřiny nenapadat.", evidence,
                 subclaims=[
                     {"text": "Největší dodavatel elektřiny (podle OPM)", "status": "ověřeno"},
-                    {"text": "Největší dodavatel plynu", "status": "neověřeno – mimo pokrytí zdroje"},
+                    {"text": "Největší dodavatel plynu", "status": "neověřeno – údaj není k dispozici"},
                 ],
             )
         return result(
-            SUPPORTED,
-            f"Dodavatel je největší podle počtu odběrných míst elektřiny ({num(count)} OPM, {period}).",
-            OTE_LIMIT, "Tvrzení o velikosti nenapadat.", evidence,
+            CONTRADICTED,
+            f"Podle počtu odběrných míst elektřiny je dodavatel {position}. ({num(count)} OPM); "
+            f"největší je {leader} ({num(leader_count)} OPM, {period}).",
+            limitation, "Příležitost: tvrzení o prvenství lze zpochybnit veřejnými daty OTE.",
+            evidence, opportunity=3,
         )
-    leader, leader_count = ranking[0]
+    gas_period = gas_data["source"]["data_period"]
+    gas_leader, gas_leader_count = gas_ranking[0]
+    gas_leader = _full_name(gas_leader, ctx)
+    combined = _combined_ranking(ctx)
+    comb_pos, comb_count = next(
+        ((i, c) for i, (name, c) in enumerate(combined, start=1)
+         if ote_connector.same_supplier(name, supplier["ote_name"])),
+        (None, None),
+    )
+    evidence += [
+        {"label": f"Plyn – {supplier['ote_name']}: {num(gas_count)} OPM ({gas_period})",
+         "value": f"{gas_pos}. místo z {len(gas_ranking)} dodavatelů", "source": "ote_gas"},
+        {"label": "Pět největších v plynu podle OPM", "value": _top(gas_ranking, ctx), "source": "ote_gas"},
+        {"label": f"Součet elektřina + plyn: {num(comb_count)} OPM",
+         "value": f"{comb_pos}. místo; pět největších: {_top(combined)}", "source": "ote"},
+    ]
+
+    def status(pos, who=None):
+        if pos == 1:
+            return "ověřeno"
+        return f"v rozporu s daty OTE – {pos}. místo" + (f", největší je {who}" if who else "")
+
+    subclaims = [
+        {"text": "Největší dodavatel elektřiny (podle OPM)", "status": status(position, leader)},
+        {"text": "Největší dodavatel plynu (podle OPM)", "status": status(gas_pos, gas_leader)},
+        {"text": "Největší v součtu elektřiny a plynu", "status": status(comb_pos, combined[0][0])},
+    ]
+    if position == 1 and gas_pos == 1:
+        return result(
+            SUPPORTED,
+            f"Dodavatel je největší v elektřině ({num(count)} OPM) i v plynu ({num(gas_count)} OPM).",
+            limitation, "Tvrzení o velikosti nenapadat.", evidence, subclaims,
+        )
+    if position == 1 or comb_pos == 1:
+        return result(
+            PARTIAL,
+            f"V elektřině je dodavatel {position}. ({num(count)} OPM, {period}). V plynu je {gas_pos}. "
+            f"({num(gas_count)} OPM, {gas_period}); největší v plynu je {gas_leader} ({num(gas_leader_count)} OPM). "
+            f"V součtu elektřiny a plynu je {comb_pos}. ({num(comb_count)} OPM).",
+            limitation,
+            "Příležitost: tvrzení platí pro elektřinu a pro součet obou komodit, ne pro plyn samostatně. "
+            "Kdo je silný v plynu, může to doložit přesnými čísly OTE.",
+            evidence, subclaims, opportunity=2,
+        )
     return result(
         CONTRADICTED,
-        f"Podle počtu odběrných míst elektřiny je dodavatel {position}. ({num(count)} OPM); "
-        f"největší je {leader} ({num(leader_count)} OPM, {period}).",
-        OTE_LIMIT + " Tvrzení může myslet jinou metriku.",
-        "Příležitost: tvrzení o prvenství lze zpochybnit veřejnými daty OTE.",
-        evidence, opportunity=True,
+        f"Dodavatel není největší v elektřině ({position}. místo), v plynu ({gas_pos}. místo) "
+        f"ani v součtu ({comb_pos}. místo).",
+        limitation, "Příležitost: tvrzení o prvenství lze zpochybnit veřejnými daty OTE.",
+        evidence, subclaims, opportunity=3,
     )
 
 
+def _claimed_from_quote(quote: str):
+    """Vyčte z citátu tvrzený počet a metriku: (počet, "opm" | None). Pro automaticky nalezená tvrzení."""
+    found = re.search(
+        r"(\d[\d ]*(?:[.,]\d+)?)\s*(milion\w*|mil\.|tis\.|tisíc\w*)?\s*(?:spokojených\s+)?"
+        r"(zákazník|odběrných míst|klient|domácnost)",
+        quote, re.I,
+    )
+    if not found:
+        return None, None
+    number = float(found.group(1).replace(" ", "").replace(",", "."))
+    unit = (found.group(2) or "").casefold()
+    if unit.startswith("mil"):
+        number *= 1_000_000
+    elif unit.startswith("tis"):
+        number *= 1_000
+    return int(number), ("opm" if "odběrných míst" in found.group(3).casefold() else None)
+
+
 def customer_count(claim, supplier, ctx):
-    position, count, _ = _ote_rank(supplier, ctx)
+    params = claim.get("params", {})
+    claimed, metric = params.get("claimed"), params.get("metric")
+    if claimed is None:
+        claimed, parsed_metric = _claimed_from_quote(claim.get("quote", ""))
+        metric = metric or parsed_metric
+    _, ele, _ = _ote_position(ctx["ote"], supplier)
+    gas_data = ctx.get("ote_gas")
+    _, gas, _ = _ote_position(gas_data, supplier)
     period = ctx["ote"]["source"]["data_period"]
-    claimed = claim.get("params", {}).get("claimed")
-    if claim.get("params", {}).get("metric") == "opm" and count is not None and claimed:
-        evidence = [{"label": f"{supplier['ote_name']}: {num(count)} OPM elektřiny ({period})",
-                     "value": f"tvrzeno {num(claimed)} OPM", "source": "ote"}]
-        if count >= claimed:
-            return result(SUPPORTED, "Počet odběrných míst podle OTE tvrzení potvrzuje.",
-                          OTE_LIMIT, "Tvrzení nenapadat.", evidence)
-        return result(CONTRADICTED, "Počet odběrných míst podle OTE je nižší než tvrzení.", OTE_LIMIT,
-                      "Příležitost: tvrzení lze zpochybnit veřejnými daty OTE.", evidence, opportunity=3)
     evidence = []
-    context = "Dodavatel není v tabulce OTE nalezen."
-    if count is not None:
-        evidence.append({
-            "label": f"{supplier['ote_name']}: {num(count)} OPM elektřiny ({period})",
-            "value": f"tvrzený počet zákazníků: {num(claimed)}" if claimed else "tvrzený počet neuveden",
-            "source": "ote",
-        })
-        context = f"OTE eviduje {num(count)} odběrných míst elektřiny ({period})."
+    if ele is not None:
+        evidence.append({"label": f"Elektřina – {supplier['ote_name']}: {num(ele)} OPM ({period})",
+                         "value": f"tvrzeno: {num(claimed)}" if claimed else "tvrzený počet neuveden",
+                         "source": "ote"})
+    if gas is not None:
+        evidence.append({"label": f"Plyn – {supplier['ote_name']}: {num(gas)} OPM "
+                                  f"({gas_data['source']['data_period']})",
+                         "value": "druhá komodita téhož dodavatele", "source": "ote_gas"})
+    if metric == "opm" and ele is not None and claimed:
+        # tvrzení mluví výslovně o odběrných místech: lze je porovnat přímo s evidencí OTE
+        merged = [supplier["ote_name"]] + list(params.get("merged_with", []))
+        total, parts = 0, []
+        for name in merged:
+            entity = {"ote_name": name}
+            _, e, _ = _ote_position(ctx["ote"], entity)
+            _, g, _ = _ote_position(gas_data, entity)
+            total += (e or 0) + (g or 0)
+            parts.append(f"{name}: {num(e or 0)} elektřina" + (f" + {num(g)} plyn" if g else ""))
+        breakdown = "; ".join(parts)
+        opm_evidence = [{"label": f"Součet odběrných míst podle OTE: {num(total)}",
+                         "value": f"{breakdown}; tvrzeno {num(claimed)}", "source": "ote"}]
+        limit = OTE_LIMIT + ("" if gas_data else " Údaj o plynu není k dispozici, počítá se jen elektřina.")
+        if total >= claimed:
+            return result(
+                SUPPORTED,
+                f"OTE eviduje {num(total)} odběrných míst ({breakdown}). Tvrzených {num(claimed)} tedy platí.",
+                limit, "Tvrzení nenapadat; je formulované přesně a opírá se o ověřitelnou metriku.", opm_evidence,
+            )
+        return result(
+            CONTRADICTED,
+            f"OTE eviduje {num(total)} odběrných míst ({breakdown}), tedy méně než tvrzených {num(claimed)}.",
+            limit, "Příležitost: tvrzení lze zpochybnit veřejnými daty OTE.", opm_evidence, opportunity=3,
+        )
+    if ele is None or not claimed:
+        return result(
+            UNVERIFIABLE,
+            "Dodavatel není v tabulce OTE nalezen nebo tvrzení neuvádí konkrétní počet.",
+            OTE_LIMIT, "Ověřit název právnické osoby v tabulce OTE.", evidence,
+        )
+    limitation = (
+        OTE_LIMIT + " Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat i jiné služby "
+        "než dodávku energií."
+    )
+    if not gas_data:
+        return result(
+            UNVERIFIABLE,
+            f"OTE eviduje {num(ele)} odběrných míst elektřiny ({period}); údaj o plynu není k dispozici, "
+            "takže celkový počet nelze posoudit.",
+            limitation, "Bez akce. Údaj OTE použít jen jako kontext řádové velikosti.", evidence,
+        )
+    total = ele + (gas or 0)
+    evidence.append({"label": f"Součet elektřina + plyn: {num(total)} OPM",
+                     "value": f"tvrzeno {num(claimed)} zákazníků", "source": "ote"})
+    parts = f"{num(ele)} odběrných míst elektřiny a {num(gas or 0)} plynu, dohromady {num(total)}"
+    markets = params.get("includes_other_markets")
+    if markets:
+        share = f"{total / claimed * 100:.1f}".replace(".", ",")
+        return result(
+            UNVERIFIABLE,
+            f"Tvrzení sčítá zákazníky ve více zemích ({markets}). V Česku eviduje OTE {parts}, "
+            f"tedy nejvýše {share} % tvrzeného počtu.",
+            limitation + " OTE pokrývá jen český trh, zahraniční část ověřit nelze.",
+            "Příležitost: číslo působí na českého zákazníka mnohem větší, než jaká je česká část. "
+            "Pokud komunikujeme velikost, uvádět český údaj a zdroj.",
+            evidence, opportunity=2,
+        )
+    if claimed <= total:
+        return result(
+            PARTIAL,
+            f"OTE eviduje {parts}. Tvrzených {num(claimed)} zákazníků je s tím řádově v souladu "
+            "(zákazníků s dodávkou energií nemůže být víc než odběrných míst).",
+            limitation, "Tvrzení o velikosti nenapadat.", evidence,
+            subclaims=[
+                {"text": "Řádová velikost odpovídá počtu odběrných míst", "status": "ověřeno"},
+                {"text": "Jde o počet zákazníků, ne odběrných míst", "status": "neověřeno – OTE zákazníky neeviduje"},
+            ],
+        )
+    if claimed > total * CUSTOMER_TOLERANCE:
+        return result(
+            CONTRADICTED,
+            f"OTE eviduje {parts}. Tvrzených {num(claimed)} zákazníků je víc než všech odběrných míst "
+            "dodavatele; zákazníků s dodávkou energií nemůže být víc než odběrných míst.",
+            limitation,
+            "Příležitost: tvrzený počet zákazníků neodpovídá veřejným datům OTE. Před použitím ověřit, "
+            "zda dodavatel nepočítá i jiné služby.",
+            evidence, opportunity=3,
+        )
     return result(
         UNVERIFIABLE,
-        f"{context} Počet zákazníků z toho odvodit nelze: zákazník může mít více odběrných míst "
-        "a tvrzení může zahrnovat i plyn.",
-        OTE_LIMIT,
-        "Bez akce. Údaj OTE použít jen jako kontext řádové velikosti.",
-        evidence,
+        f"OTE eviduje {parts}. Tvrzených {num(claimed)} zákazníků je mírně nad tímto součtem, "
+        "rozdíl je ale v toleranci zaokrouhlení.",
+        limitation, "Bez akce.", evidence,
     )
 
 
@@ -570,12 +858,26 @@ def customer_growth(claim, supplier, ctx):
 def green_share(claim, supplier, ctx):
     proof = supplier.get("green_evidence") or []
     if proof:
-        evidence = [{"label": p["label"], "value": p["value"], "source": f"web:{supplier['id']}"} for p in proof]
+        evidence = [
+            {"label": p["label"], "value": f"„{p['value']}“ ({p.get('status', 'z přípravy')})",
+             "source": f"web:{supplier['id']}"}
+            for p in proof
+        ]
+        if any(p.get("stale") for p in proof):
+            return result(
+                UNVERIFIABLE,
+                "Prohlášení o krytí zárukami původu, o které se podklad opíral, už na živé stránce není.",
+                "Chybějící podklad není důkaz nepravdivosti.",
+                "Podklad znovu zachytit z webu dodavatele.", evidence,
+            )
         return result(
             SUPPORTED,
-            "K produktu existuje doložený podklad o původu elektřiny.",
-            "Podklad pochází od dodavatele; nebyl nezávisle auditován.",
-            "Bez akce.", evidence,
+            "Dodavatel k produktu výslovně uvádí, že spotřeba je kryta zárukami původu. Tvrzení je doložené "
+            "podkladem vázaným na konkrétní produkt.",
+            "Podklad je prohlášení dodavatele; samotné záruky původu v evidenci OTE jsme neověřovali. "
+            "Krytí zárukami původu neznamená fyzickou dodávku zelené elektřiny.",
+            "Bez akce. Dobrý příklad, jak zelené tvrzení formulovat doložitelně a bez přehánění.",
+            evidence,
         )
     return result(
         UNVERIFIABLE,

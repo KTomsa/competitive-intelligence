@@ -1,4 +1,4 @@
-"""OTE – měsíční počty odběrných a předacích míst (OPM) dodavatelů elektřiny.
+"""OTE – měsíční počty odběrných a předacích míst (OPM) dodavatelů elektřiny a plynu.
 
 OPM nejsou zákazníci: jeden zákazník může mít více OPM. Prázdná buňka znamená
 chybějící údaj, ne nulu.
@@ -11,8 +11,20 @@ from bs4 import BeautifulSoup
 
 from .http import fetch
 
-PAGE_URL = "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote"
-SNAPSHOT = "ote_opm.html"
+COMMODITIES = {
+    "ele": {
+        "url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote",
+        "snapshot": "ote_opm.html",
+        "label": "elektřiny",
+    },
+    "gas": {
+        "url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu",
+        "snapshot": "ote_opm_gas.html",
+        "label": "plynu",
+    },
+}
+PAGE_URL = COMMODITIES["ele"]["url"]
+SNAPSHOT = COMMODITIES["ele"]["snapshot"]
 
 
 class OteFormatError(Exception):
@@ -24,7 +36,7 @@ def parse_table(html: str) -> dict:
     table = soup.find("table", class_="report_table")
     if table is None or table.find("tbody") is None:
         raise OteFormatError("Na stránce OTE nebyla nalezena tabulka počtů OPM.")
-    year_match = re.search(r"Pocet_OPM_dodavatele_(\d{4})", html)
+    year_match = re.search(r"Pocet_OPM_dodavatele_(?:plyn_)?(\d{4})", html)
     year = int(year_match.group(1)) if year_match else None
     suppliers: dict[str, list[int | None]] = {}
     for tr in table.find("tbody").find_all("tr"):
@@ -54,15 +66,27 @@ def ranking(table: dict) -> list[tuple[str, int]]:
     return sorted(pairs, key=lambda p: -p[1])
 
 
-def load(live: bool = True) -> dict:
-    fetched = fetch(PAGE_URL, SNAPSHOT, live=live)
+def same_supplier(table_name: str, legal_name: str) -> bool:
+    """Tabulka plynu zkracuje názvy na 20 znaků, proto se porovnává i předpona."""
+    if table_name == legal_name:
+        return True
+    return len(table_name) >= 15 and legal_name.startswith(table_name)
+
+
+def load(live: bool = True, commodity: str = "ele") -> dict:
+    cfg = COMMODITIES[commodity]
+    fetched = fetch(cfg["url"], cfg["snapshot"], live=live)
     table = parse_table(fetched.content.decode("utf-8", "replace"))
     year = table["year"] or "rok neuveden"
     source = fetched.meta()
     source.update({
-        "name": "OTE – počty OPM dodavatelů elektřiny",
-        "page_url": PAGE_URL,
+        "name": f"OTE – počty OPM dodavatelů {cfg['label']}",
+        "page_url": cfg["url"],
         "data_period": f"{year}-{table['latest_month']:02d}",
         "unit": "počet odběrných a předacích míst (OPM), ne zákazníků",
     })
     return {"table": table, "ranking": ranking(table), "source": source, "_fetched": fetched}
+
+
+def load_gas(live: bool = True) -> dict:
+    return load(live=live, commodity="gas")

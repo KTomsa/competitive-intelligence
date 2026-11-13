@@ -18,6 +18,13 @@ ALLOWED_HOSTS = {
     "www.centropol.cz",
     "www.eon.cz",
     "www.bezdodavatele.cz",
+    "epet.cz",
+    "1684053905.rsc.cdn77.org",  # CDN, ze kterého epet vydává své ceníky
+    "www.pre.cz",
+    "www.mnd.cz",
+    "dobra-energie.eu",
+    "www.spp.cz",
+    "www.lamaenergy.cz",
 }
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130 Safari/537.36"
 TIMEOUT_S = 20.0

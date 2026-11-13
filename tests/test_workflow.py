@@ -3,7 +3,7 @@ import pytest
 
 from competitive_intelligence import agents, workflow
 from competitive_intelligence.app import create_app
-from competitive_intelligence.connectors import eru, http, ote, web
+from competitive_intelligence.connectors import eru, http, ote, pricelist, web
 
 
 @pytest.fixture(autouse=True)
@@ -44,8 +44,14 @@ def test_prepared_quotes_exist_in_snapshot_pages():
         page = web.load(supplier, live=False)
         for claim in supplier["claims"]:
             assert web.contains(page["text"], claim["quote"]), claim["id"]
+        for proof in supplier.get("green_evidence") or []:
+            assert web.contains(page["text"], proof["page_marker"]), proof["label"]
         for offer in supplier["offers"]:
-            assert web.contains(page["text"], offer["page_marker"]), offer["id"]
+            if offer.get("page_marker"):
+                assert web.contains(page["text"], offer["page_marker"]), offer["id"]
+            document = pricelist.load(offer, live=False)
+            if document is not None:  # ceník se stažitelnou adresou musí obsahovat cenu i stálý plat
+                assert pricelist.contains_all(document["text"], offer["price_list"]["markers"]), offer["id"]
 
 
 def test_official_snapshots_parse():
@@ -54,6 +60,11 @@ def test_official_snapshots_parse():
     table = ote.load(live=False)
     assert table["ranking"][0][1] > table["ranking"][1][1]
     assert all(count is not None for _, count in table["ranking"])  # prázdná buňka není nula
+    gas = ote.load_gas(live=False)
+    assert gas["source"]["data_period"].startswith("20") and len(gas["ranking"]) > 10
+    # tabulka plynu zkracuje názvy na 20 znaků
+    assert ote.same_supplier("innogy Energie, s.r.", "innogy Energie, s.r.o.")
+    assert not ote.same_supplier("ČEZ, a. s.", "ČEZ Prodej, a.s.")
 
 
 def test_keyword_discoveries_get_no_verdict():
@@ -127,24 +138,68 @@ def test_api_requires_demo_code_when_configured(monkeypatch):
     assert client.post("/api/v1/analyze", json={**body, "code": "tajne"}).status_code == 200
 
 
-def test_price_gone_from_live_page_no_longer_decides(monkeypatch):
-    def changed_page(url):
-        name = {"www.cez.cz": "web_cez.html", "www.centropol.cz": "web_centropol.html",
-                "www.eon.cz": "web_eon.html", "www.bezdodavatele.cz": "web_bezdodavatele.html"}
-        host = url.split("/")[2]
-        if host not in name:
-            raise http.FetchError("úřední zdroj v testu nedostupný")
-        content = (http.SNAPSHOT_DIR / name[host]).read_bytes()
-        if host == "www.cez.cz":
-            content = content.replace("3 340".encode(), "3 999".encode())
-        return http.Fetched(content=content, url=url, fetched_at="2026-11-13T12:00:00+00:00", origin="live")
+def _live_from_snapshot(alter=None):
+    """Napodobí živě stažené ceníky pomocí snapshotů; `alter` může text jednoho ceníku změnit."""
+    original = pricelist.load
 
-    monkeypatch.setattr(http, "fetch_live", changed_page)
+    def fake(offer, live=True):
+        document = original(offer, live=False)
+        if document is None:
+            return None
+        document["source"]["origin"], document["source"]["warning"] = "live", None
+        if alter:
+            document["text"] = alter(offer, document["text"])
+        return document
+
+    return fake
+
+
+def test_price_missing_from_live_price_list_no_longer_decides(monkeypatch):
+    def alter(offer, text):
+        return text.replace("3 340,00", "3 999,00") if offer["id"] == "cez-online12" else text
+
+    monkeypatch.setattr(pricelist, "load", _live_from_snapshot(alter))
     report = workflow.run(["cez"], live=True)
     offers = {o["id"]: o for o in report["suppliers"][0]["offers"]}
     assert offers["cez-online12"]["stale"] and not offers["cez-online12"]["benchmark"]["eligible"]
     assert offers["cez-fix36"]["confirmed_live"]
-    assert any("už na živé stránce není" in w for w in report["warnings"])
+    assert any("už neplatí" in w for w in report["warnings"])
+    listed = [row["product"] for group in report["comparison"] for row in group["rows"]]
+    assert "Elektřina Online na 1 rok" not in listed  # zastaralá nabídka se nesrovnává
+
+
+def test_real_data_verdicts_from_snapshots():
+    report = workflow.run(live=False)
+    claims = {c["id"]: c for s in report["suppliers"] for c in s["claims"]}
+    # epet: „vždy tu nejlepší cenu“ – existuje levnější srovnatelná nabídka včetně stálého platu
+    assert claims["epet-1"]["verdict"] == "contradicted"
+    assert "ČEZ Prodej" in claims["epet-1"]["finding"]
+    # ČEZ: největší v elektřině a v součtu, v plynu ne
+    assert claims["cez-1"]["verdict"] == "partially_supported"
+    statuses = [sub["status"] for sub in claims["cez-1"]["subclaims"]]
+    assert statuses[0] == "ověřeno" and statuses[1].startswith("v rozporu") and statuses[2] == "ověřeno"
+    # PRE: zelené tvrzení s produktovým podkladem
+    assert claims["pre-1"]["verdict"] == "supported"
+    # počty zákazníků řádově odpovídají součtu odběrných míst elektřiny a plynu
+    assert claims["eon-2"]["verdict"] == "partially_supported"
+    assert claims["mnd-1"]["verdict"] == "partially_supported"
+    # menší dodavatelé: nález s konkrétními čísly, verdikt zůstává opatrný
+    assert claims["spp-1"]["verdict"] == "unverifiable" and "Slovensko" in claims["spp-1"]["finding"]
+    assert claims["dobra-1"]["verdict"] == "unverifiable" and "CENTROPOL" in claims["dobra-1"]["finding"]
+    # garance dorovnání ceny není tvrzení o prvenství
+    assert claims["centropol-1"]["verdict"] == "unverifiable"
+
+
+def test_comparison_is_sorted_by_annual_cost_and_matches_price_lists():
+    report = workflow.run(live=False)
+    group = report["comparison"][0]
+    assert group["fixation_months"] == 36
+    costs = [row["annual_cost"][0] for row in group["rows"]]
+    assert costs == sorted(costs) and all(c is not None for c in costs)
+    cheapest = group["rows"][0]
+    assert cheapest["supplier"] == "ČEZ Prodej"
+    assert cheapest["annual_cost"] == [12 * 163.35 + 2 * 3250.0, 12 * 163.35 + 4 * 3250.0]
+    assert report["sources"]["ote_gas"]["origin"] == "snapshot" and len(report["price_lists"]) >= 9
 
 
 def test_snapshot_mode_never_calls_model(monkeypatch):
@@ -167,6 +222,26 @@ def test_model_duplicates_of_prepared_claims_are_dropped(monkeypatch):
     monkeypatch.setattr(agents, "_parse", fake_parse)
     known = ["Ke stabilní dodávce energií dáváme Garanci nejnižší ceny."]
     assert agents.extract_claims(page, known, use_llm=True)[0] == []
+
+
+def test_model_cannot_assign_a_rule_the_quote_does_not_support(monkeypatch):
+    lines = [
+        "90% klientů by nás doporučilo dál",
+        "Získejte výhodnější plyn s garancí stálé ceny na celé 3 roky.",
+        "Máme nejlevnější elektřinu v celé republice.",
+    ]
+    page = {"lines": lines, "text": " ".join(lines)}
+
+    def fake_parse(system, user, schema):
+        return schema(claims=[
+            {"quote": lines[0], "rule_id": "customer_growth"},  # chybná klasifikace modelu
+            {"quote": lines[1], "rule_id": "price_guarantee"},   # tvrzení jen o plynu
+            {"quote": lines[2], "rule_id": "price_rank"},
+        ])
+
+    monkeypatch.setattr(agents, "_parse", fake_parse)
+    claims, _ = agents.extract_claims(page, [], use_llm=True)
+    assert [(c["quote"], c["rule_id"]) for c in claims] == [(lines[0], "other"), (lines[2], "price_rank")]
 
 
 def test_vercel_entrypoint_imports():

@@ -27,8 +27,8 @@
           {% endfor %}
         </div>
         <p class="hint">
-          Srovnávací profil: {{ profile.commodity }}, sazba {{ profile.tariff }}.
-          Stránky dodavatelů a data ERÚ a OTE se při běhu stahují znovu.
+          Srovnávací profil: {{ profile.commodity }}, sazba {{ profile.tariff }}, distribuční území {{ profile.area }}.
+          Stránky dodavatelů, jejich ceníky a data ERÚ a OTE se při běhu stahují znovu.
           {% if llm %}Tvrzení a briefing zpracovává jazykový model, čísla a verdikty počítá kód.
           {% else %}Jazykový model není nastaven: nová tvrzení se hledají podle klíčových slov a briefing je ze šablony.{% endif %}
         </p>

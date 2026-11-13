@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="cs" data-vivo-locale="cs">
+	<head>
+
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0"/>
+		<meta name="Distribution" content="global"/>
+		<meta name="Expires" content="never"/>
+		<meta name="Revisit-after" content="7 Days"/>
+		<meta name="Resource-type" content="document"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+		<meta name="author" content="Pražská energetika, a. s."/>
+		<meta name="keywords" content="PRE, Pražská energetika, energie, elektřina, plyn, dodavatel"/>
+		<meta name="description" content="Spolehlivost, garance, jistota"/>
+		<meta name="mobile-web-app-capable" content="yes"/>
+		<meta name="theme-color" content="#fff"/>
+		<meta name="application-name" content="@pre-app/guide-html"/>
+		<meta name="apple-mobile-web-app-capable" content="yes"/>
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+		<meta name="apple-mobile-web-app-title" content="@pre-app/guide-html"/>
+		<meta name="msapplication-TileColor" content="#fff"/>
+		<meta name="msapplication-TileImage" content="assets2/favicons/mstile-144x144.png"/>
+		<meta name="msapplication-config" content="assets2/favicons/browserconfig.xml"/>
+		<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"/>
+		<base href="https://www.pre.cz/"/>
+		<title>Elektřina | PRE</title>
+		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
+		<link href="/assets2/index.css?m=1793612783" rel="stylesheet" type="text/css" media="screen"/>
+		<link rel="icon" type="image/png" sizes="16x16" href="assets2/favicons/favicon-16x16.png" media="screen"/>
+		<link rel="icon" type="image/png" sizes="32x32" href="assets2/favicons/favicon-32x32.png" media="screen"/>
+		<link rel="icon" type="image/png" sizes="48x48" href="assets2/favicons/favicon-48x48.png" media="screen"/>
+		<link rel="icon" type="image/png" sizes="228x228" href="assets2/favicons/coast-228x228.png" media="screen"/>
+		<link rel="manifest" href="assets2/favicons/manifest.json" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="57x57" href="assets2/favicons/apple-touch-icon-57x57.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="60x60" href="assets2/favicons/apple-touch-icon-60x60.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="72x72" href="assets2/favicons/apple-touch-icon-72x72.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="76x76" href="assets2/favicons/apple-touch-icon-76x76.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="114x114" href="assets2/favicons/apple-touch-icon-114x114.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="120x120" href="assets2/favicons/apple-touch-icon-120x120.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="144x144" href="assets2/favicons/apple-touch-icon-144x144.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="152x152" href="assets2/favicons/apple-touch-icon-152x152.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="167x167" href="assets2/favicons/apple-touch-icon-167x167.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="180x180" href="assets2/favicons/apple-touch-icon-180x180.png" type="text/css" media="screen"/>
+		<link rel="apple-touch-icon" sizes="1024x1024" href="assets2/favicons/apple-touch-icon-1024x1024.png" type="text/css" media="screen"/>
+		<link rel="yandex-tableau-widget" href="assets2/favicons/yandex-browser-manifest.json" type="text/css" media="screen"/>
+<script type="text/javascript">
+//<![CDATA[
+window["_tsbp_"] = { ba : "X-TS-BP-Action", bh : "X-TS-AJAX-Request"};
+//]]>
+</script><script type="text/javascript" src="/TSbd/080a5dd09dab2000d0bf27fc1e566f2f490e6ec77d7d879adc9374d2d4bd0916ab3baaf559863c79?type=2"></script><script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-W2B5HJ');</script>		<script data-pre-kc-check="1">(function(){
+	var cfg = {"authUrl":"https:\/\/auth.pre.cz\/realms\/pre-prod\/protocol\/openid-connect\/auth?scope=openid&response_type=code&prompt=none&state=ad1ca3f0de577635d675f1acca0435e6&redirect_uri=https%3A%2F%2Fwww.pre.cz%2Fkc-check.php&client_id=moje-pre","source":"pre-kc-check","resultLoggedIn":"logged-in","maxReloads":3,"frameId":"pre-kc-check"};
+	var RELOAD_KEY = 'preKcCheckReloads';
+	var TIMEOUT_MS = 8000;
+	var frame = null, timer = null, done = false;
+
+	function cleanup() {
+		if (timer) { window.clearTimeout(timer); timer = null; }
+		window.removeEventListener('message', onMessage);
+		if (frame && frame.parentNode) { frame.parentNode.removeChild(frame); }
+		frame = null;
+	}
+
+	function reloadCount() {
+		try { return parseInt(window.sessionStorage.getItem(RELOAD_KEY) || '0', 10) || 0; }
+		catch (e) { return 0; }
+	}
+
+	function onMessage(event) {
+		if (done || !frame) { return; }
+		if (event.origin !== window.location.origin) { return; }
+		if (event.source !== frame.contentWindow) { return; }
+
+		var data = event.data;
+		if (!data || data.source !== cfg.source) { return; }
+
+		done = true;
+		cleanup();
+
+		if (data.result !== cfg.resultLoggedIn) { return; }
+
+		// Pojistka proti smycce reloadu, kdyby se login do session nepropsal.
+		var count = reloadCount();
+		if (count >= cfg.maxReloads) { return; }
+		try { window.sessionStorage.setItem(RELOAD_KEY, String(count + 1)); } catch (e) {}
+
+		// replace() a ne reload() - reload by u stranky po POSTu poslal data znovu.
+		window.location.replace(window.location.href);
+	}
+
+	function start() {
+		if (done) { return; }
+		frame = document.createElement('iframe');
+		frame.id = cfg.frameId;
+		frame.setAttribute('aria-hidden', 'true');
+		frame.setAttribute('title', 'keycloak check');
+		frame.setAttribute('tabindex', '-1');
+		frame.style.cssText = 'position:absolute;width:0;height:0;border:0;visibility:hidden;';
+		frame.src = cfg.authUrl;
+
+		window.addEventListener('message', onMessage);
+		document.body.appendChild(frame);
+
+		// Keycloak muze vratit HTML chybovou stranku, kterou X-Frame-Options nepusti -
+		// pak zadna zprava neprijde a check se jen zahodi.
+		timer = window.setTimeout(function(){ done = true; cleanup(); }, TIMEOUT_MS);
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', start);
+	} else {
+		start();
+	}
+})();</script>
+
+	</head>
+	<body class="households">
+
+    
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-W2B5HJ"
+                          height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    
+<script>
+    var __preCookieBotEnabled = false;
+</script>
+    <script>
+        __preCookieBotEnabled = true;
+    </script>
+    <script src="js/update-browser-component.js?m=1740675470"></script>
+<!-- page start -->
+    <script src="js/cookiebot.js?m=1740675470"></script>
+<!-- d22 start -->
+<!-- d22 header start -->
+<div class="header">
+    <div class="container header__nav">
+        <div class="header__nav-left">
+                            <a href="/cs/domacnosti/"
+                   class="header__nav-item header__nav-item--active">Domácnosti</a>
+                            <a href="/cs/bytove-domy"
+                   class="header__nav-item ">Bytové domy</a>
+                            <a href="/cs/firmy/"
+                   class="header__nav-item ">Firmy</a>
+                            <a href="/cs/velkoodberatele/"
+                   class="header__nav-item ">Velkoodběratelé</a>
+                    </div>
+        <div class="header__nav-right">
+            <form action="/cs/vyhledavani/">
+                <div id="header-search" class="header-search">
+                    <button class="btn p-0 header-search__prefix" type="submit">
+                        <img class="" src="../../assets2/images/search-icons/search.svg"
+                             alt="Ikona vyhledávání"/>
+                    </button>
+                    <input name="query" class="header-search__input" type="text" value="">
+                    <img id="header-search-close" class="header-search__afix"
+                         src="../../assets2/images/search-icons/search-close.svg"
+                         alt="Ikona zavření vyhledávání"/>
+                </div>
+            </form>
+            <span class="header__nav-item header__nav-item--search header__nav-item--non-underline">
+                <img src="../../assets2/images/menu-icons/menu-search.svg" alt="Vyhledávání"
+                     id="header-search-icon"
+                     class="header__icon"/>
+            </span>
+                            <a href="/cs/profil-spolecnosti/"
+                   class="header__nav-item ">O Skupině PRE</a>
+                            <a href="/cs/kariera-v-pre/"
+                   class="header__nav-item ">Kariéra</a>
+                        <a href="/en" class="header__nav-item header__nav-item--non-underline">EN</a>
+        </div>
+    </div>
+</div>
+<div class="navigation">
+    <div class="container navigation-line">
+        <div class="navigation__wrapper">
+            <div class="navigation__wrapper-left">
+                <a href="/cs/domacnosti/" class="navigation__logo">
+                    <img class="navigation__logo-image" src="../../assets2/images/logo.svg" alt="Logo PRE">
+                </a>
+                                    <a href="/cs/domacnosti/elektrina/"
+                                                            data-id="elektrina"
+                                                   class="navigation__item">Elektřina</a>
+                                    <a href="/cs/domacnosti/plyn/"
+                                                            data-id="plyn"
+                                                   class="navigation__item">Plyn</a>
+                                    <a href="/cs/domacnosti/sluzby/"
+                                                            data-id="technologie"
+                                                   class="navigation__item">Technologie</a>
+                                    <a href="/cs/domacnosti/potrebuji-zaridit/"
+                                                            data-id="potrebuji-zaridit"
+                                                   class="navigation__item">Potřebuji zařídit</a>
+                                    <a href="/cs/domacnosti/emobilita"
+                                                            data-id="emobilita"
+                                                   class="navigation__item">Emobilita</a>
+                                    <a href="https://eshop.preenergo.cz/"
+                                                   class="navigation__item">E-shop</a>
+                            </div>
+            <div class="navigation__wrapper-right">
+                <a href="/en" class="navigation__link navigation__link--mobile">EN</a>
+                <span class="navigation-search__icon">
+                    <img src="../../assets2/images/menu-icons/menu-search.svg" alt="Vyhledávání" id="nav-search-icon"
+                         class="navigation-search-icon navigation__icon"/>
+                </span>
+                <form action="/cs/vyhledavani/" id="nav-search" class="navigation-search">
+                    <button class="btn p-0 w-auto navigation-search__prefix" type="submit">
+                        <img class="" src="../../assets2/images/search-icons/search.svg"
+                             alt="Ikona vyhledávání"/>
+                    </button>
+                    <input class="navigation-search__input" value="" name="query">
+                    <span id="nav-search-close" class="navigation-search__afix"><img
+                                src="assets2/images/search-icons/search-close.svg"
+                                alt="Ikona zavření vyhledávání"></span>
+                </form>
+                <span class="navigation-burger">
+                    <img src="../../assets2/images/menu-icons/menu-burger.svg" alt="Menu"
+                         class="navigation__icon navigation__icon-burger"/>
+                    <img src="../../assets2/images/menu-icons/menu-close.svg" alt="Menu"
+                         class="navigation__icon navigation__icon-close"/>
+                </span>
+                
+                    <a href="/cs/domacnosti/kontakty/"
+                                                            data-id="kontakty"
+                                                   class="navigation__item">Kontakty</a>
+                
+                                    <a class="btn btn--secondary navigation-box__btn navigation-box__btn--desktop"
+                       href="/cs/moje-pre/neprihlaseny-uzivatel/prihlaseni-uzivatele/">Moje PRE</a>
+                            </div>
+        </div>
+    </div>
+    <nav class="navigation-box first-nav">
+                    <div class="navigation-profile__wrapper navigation-profile__wrapper--not-logged">
+                <a class="btn btn--secondary navigation-box__btn"
+                   href="/cs/moje-pre/neprihlaseny-uzivatel/prihlaseni-uzivatele/">Moje PRE</a>
+            </div>
+                <ul class="navigation-box__list">
+                                                <li class="navigation-box__item navigation-first-level navigation-first-level--main">
+                        <a href="/cs/domacnosti/" class="navigation-box__link">Domácnosti</a>
+
+                    </li>
+                                                                                                                
+                            <li class="navigation-box__item navigation-first-level">
+                                        <a data-id="elektrina" class="navigation-box__link second-nav ">Elektřina</a>
+                    <span data-id="elektrina" class="navigation-box__arrow second-nav">
+                        <img src="../../assets2/images/menu-icons/menu-arrow.svg" alt="Šipka doprava"/>
+                                    </span>
+                </li>
+                            <li class="navigation-box__item navigation-first-level">
+                                        <a data-id="plyn" class="navigation-box__link second-nav ">Plyn</a>
+                    <span data-id="plyn" class="navigation-box__arrow second-nav">
+                        <img src="../../assets2/images/menu-icons/menu-arrow.svg" alt="Šipka doprava"/>
+                                    </span>
+                </li>
+                            <li class="navigation-box__item navigation-first-level">
+                                        <a data-id="technologie" class="navigation-box__link second-nav ">Technologie</a>
+                    <span data-id="technologie" class="navigation-box__arrow second-nav">
+                        <img src="../../assets2/images/menu-icons/menu-arrow.svg" alt="Šipka doprava"/>
+                                    </span>
+                </li>
+                            <li class="navigation-box__item navigation-first-level">
+                                        <a data-id="potrebuji-zaridit" class="navigation-box__link second-nav ">Potřebuji zařídit</a>
+                    <span data-id="potrebuji-zaridit" class="navigation-box__arrow second-nav">
+                        <img src="../../assets2/images/menu-icons/menu-arrow.svg" alt="Šipka doprava"/>
+                                    </span>
+                </li>
+                            <li class="navigation-box__item navigation-first-level">
+                                        <a data-id="emobilita" class="navigation-box__link second-nav ">Emobilita</a>
+                    <span data-id="emobilita" class="navigation-box__arrow second-nav">
+                        <img src="../../assets2/images/menu-icons/menu-arrow.svg" alt="Šipka doprava"/>
+                                    </span>
+                </li>
+                            <li class="navigation-box__item navigation-first-level">
+                                            <a href="https://eshop.preenergo.cz/"
+                           class="navigation-box__link navigation-box__link--full second-nav ">E-shop</a>
+                                        </span>
+                </li>
+                                        <li class="navigation-box__item navigation-first-level">
+                                            <a data-id="kontakty" class="navigation-box__link second-nav">Kontakty</a>
+                        <span data-id="kontakty" class="navigation-box__arrow second-nav">
+                        <img src="../../assets2/images/menu-icons/menu-arrow.svg" alt="Šipka doprava"/>
+                                    </span>
+                </li>
+                                                                                        <li class="navigation-box__item navigation-first-level navigation-first-level--main">
+                        <a href="/cs/bytove-domy" class="navigation-box__link">Bytové domy</a>
+                    </li>
+                                                                <li class="navigation-box__item navigation-first-level navigation-first-level--main">
+                        <a href="/cs/firmy/" class="navigation-box__link">Firmy</a>
+                    </li>
+                                                                <li class="navigation-box__item navigation-first-level navigation-first-level--main">
+                        <a href="/cs/velkoodberatele/" class="navigation-box__link">Velkoodběratelé</a>
+                    </li>
+                                                                            <li class="navigation-box__item navigation-first-level navigation-first-level--main">
+                        <a href="/cs/profil-spolecnosti/" class="navigation-box__link">O Skupině PRE</a>
+                    </li>
+                                                                <li class="navigation-box__item navigation-first-level navigation-first-level--main">
+                        <a href="/cs/kariera-v-pre/" class="navigation-box__link">Kariéra</a>
+                    </li>
+                                    </ul>
+
+    </nav>
+    <div class="navigation-box-wrapper">
+        <div class="navigation-box-wrapper__inner" id="navigation-wrapper-inner">
+                            <nav id="elektrina" class="navigation-box navigation-box--second">
+                    <div class="navigation-box__item navigation-box__item--back navigation-second-level">
+                        <a href="/cs/domacnosti/elektrina/#elektrina"
+                           class="navigation-second-level__link second-level-menu-close">
+                            <img src="../../assets2/images/menu-icons/menu-back.svg" alt="Šipka zpět"
+                                 class="navigation-second-level__arrow"/> Zpět</a>
+                    </div>
+                    <div class="navigation-box__item navigation-second-level navigation-second-level__mobileMenu">
+                        <a href="/cs/domacnosti/elektrina/"
+                           class="navigation-box__item--back navigation-second-level__link navigation-second-level__realLink">ELEKTŘINA</a>
+                    </div>
+                    <div class="navigation-box-in">
+                                                                                    <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">CHCI ELEKTŘINU OD PRE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/chci-uzavrit-smlouvu-s-pre/chci-uzavrit-novou-smlouvu/"
+                                           class="navigation-second-level__link">On-line uzavření smlouvy</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/elektrina/pre-proud-nefix/"
+                                           class="navigation-second-level__link">Elektřina bez závazků</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-smlouva-s-pre/smlouva-se-zakaznikem-prevod-opm/?type=2"
+                                           class="navigation-second-level__link">Převod elektřiny</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/elektrina/kalkulacka"
+                                           class="navigation-second-level__link">Vyberte si produkt na míru</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                                                    <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">MÁM ELEKTŘINU OD PRE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-smlouva-s-pre/smlouva-se-zakaznikem-prevod-opm/?type=1"
+                                           class="navigation-second-level__link">Převod elektřiny</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-faktura-pre/zmena-zaloh/"
+                                           class="navigation-second-level__link">Změna záloh</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/preproudeko/"
+                                           class="navigation-second-level__link">Elektřina krytá zárukami původu</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/potrebuji-zaridit/faktura/potrebujete-potvrdit-naklady-za-elektrinu-nebo-plyn/"
+                                           class="navigation-second-level__link">Potvrzení nákladů za elektřinu</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">ČASTO HLEDÁTE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/moje-pre/prihlaseny-uzivatel/uvod-prehled-uctu/"
+                                           class="navigation-second-level__link">On-line stav účtu</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/fotovoltaicke-elektrarny/"
+                                           class="navigation-second-level__link">Fotovoltaika</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/verejne-dobijeni/"
+                                           class="navigation-second-level__link">Veřejné dobíjení</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/dokumenty-ke-stazeni/dokumenty-elektrina/formulare-vztahujici-se-k-prodeji-elektriny/"
+                                           class="navigation-second-level__link">Formuláře pro elektřinu</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                                                                            <div class="navigation-box-in__column-one">
+<div class="navigation-box__cta">
+<div class="navigation-box__cta-title h5">Najděte řešení<br /> snadno a rychle</div>
+<a class="btn btn-primary" href="/cs/domacnosti/elektrina/">Elektřina od PRE</a></div>
+</div>
+                                                                                                                                                                                </div>
+                </nav>
+                            <nav id="plyn" class="navigation-box navigation-box--second">
+                    <div class="navigation-box__item navigation-box__item--back navigation-second-level">
+                        <a href="/cs/domacnosti/elektrina/#plyn"
+                           class="navigation-second-level__link second-level-menu-close">
+                            <img src="../../assets2/images/menu-icons/menu-back.svg" alt="Šipka zpět"
+                                 class="navigation-second-level__arrow"/> Zpět</a>
+                    </div>
+                    <div class="navigation-box__item navigation-second-level navigation-second-level__mobileMenu">
+                        <a href="/cs/domacnosti/plyn/"
+                           class="navigation-box__item--back navigation-second-level__link navigation-second-level__realLink">PLYN</a>
+                    </div>
+                    <div class="navigation-box-in">
+                                                                                    <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">Chci plyn od PRE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/chci-uzavrit-smlouvu-s-pre/chci-uzavrit-novou-smlouvu/"
+                                           class="navigation-second-level__link">On-line uzavření smlouvy</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/plyn/kalkulacka"
+                                           class="navigation-second-level__link">Vyberte si produkt na míru</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/plyn/pre-plyn-nefix/"
+                                           class="navigation-second-level__link">Plyn bez závazků</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                                                    <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">MÁM PLYN OD PRE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/potrebuji-zaridit/smlouva/mate-zajem-o-vyhodnejsi-elektrinu-nebo-plyn/"
+                                           class="navigation-second-level__link">Změna produktu</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-faktura-pre/zmena-zaloh/"
+                                           class="navigation-second-level__link">Změna záloh</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/potrebuji-zaridit/faktura/potrebujete-potvrdit-naklady-za-elektrinu-nebo-plyn/"
+                                           class="navigation-second-level__link">Potvrzení nákladů za plyn</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">ČASTO HLEDÁTE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/moje-pre/prihlaseny-uzivatel/uvod-prehled-uctu/"
+                                           class="navigation-second-level__link">On-line stav účtu</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/plynove-kotle/"
+                                           class="navigation-second-level__link">Plynové kotle</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/dokumenty-ke-stazeni/dokumenty-plyn/formulare-vztahujici-se-k-prodeji-plynu/"
+                                           class="navigation-second-level__link">Formuláře pro plyn</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                                                                            <div class="navigation-box-in__column-one">
+<div class="navigation-box__cta">
+<div class="navigation-box__cta-title h5">Najděte řešení<br /> snadno a rychle</div>
+<a class="btn btn-primary" href="/cs/domacnosti/plyn/">Plyn od PRE</a></div>
+</div>
+                                                                                                                                                                                </div>
+                </nav>
+                            <nav id="technologie" class="navigation-box navigation-box--second">
+                    <div class="navigation-box__item navigation-box__item--back navigation-second-level">
+                        <a href="/cs/domacnosti/elektrina/#technologie"
+                           class="navigation-second-level__link second-level-menu-close">
+                            <img src="../../assets2/images/menu-icons/menu-back.svg" alt="Šipka zpět"
+                                 class="navigation-second-level__arrow"/> Zpět</a>
+                    </div>
+                    <div class="navigation-box__item navigation-second-level navigation-second-level__mobileMenu">
+                        <a href="/cs/domacnosti/sluzby/"
+                           class="navigation-box__item--back navigation-second-level__link navigation-second-level__realLink">TECHNOLOGIE</a>
+                    </div>
+                    <div class="navigation-box-in">
+                                                                                                                                        <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">VYTÁPĚNÍ/VĚTRÁNÍ
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/tepelna-cerpadla/"
+                                           class="navigation-second-level__link">Tepelná čerpadla</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/elektricke-vytapeni/"
+                                           class="navigation-second-level__link">Elektrické vytápění</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/plynove-kotle/"
+                                           class="navigation-second-level__link">Plynové vytápění</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/klimatizace/"
+                                           class="navigation-second-level__link">Klimatizace</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">DALŠÍ TECHNOLOGIE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/fotovoltaicke-elektrarny/"
+                                           class="navigation-second-level__link">Fotovoltaika</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="https://www.premereni.cz/cs/sluzby/ohrev-vody/"
+                                           class="navigation-second-level__link">Ohřev vody</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby/elektroinstalacni-prace/"
+                                           class="navigation-second-level__link">Elektroinstalační práce</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="https://www.pre.cz/preenergo/prodejna/"
+                                           class="navigation-second-level__link">Prodejna</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                        <div class="navigation-box-in__column-one">
+<div class="navigation-box__cta">
+<div class="navigation-box__cta-title h5">Najděte řešení<br /> snadno a rychle</div>
+<a class="btn btn-primary" href="/cs/domacnosti/sluzby/">Technologie od PRE</a></div>
+</div>
+                                                                                                                                                                                </div>
+                </nav>
+                            <nav id="potrebuji-zaridit" class="navigation-box navigation-box--second">
+                    <div class="navigation-box__item navigation-box__item--back navigation-second-level">
+                        <a href="/cs/domacnosti/elektrina/#potrebuji-zaridit"
+                           class="navigation-second-level__link second-level-menu-close">
+                            <img src="../../assets2/images/menu-icons/menu-back.svg" alt="Šipka zpět"
+                                 class="navigation-second-level__arrow"/> Zpět</a>
+                    </div>
+                    <div class="navigation-box__item navigation-second-level navigation-second-level__mobileMenu">
+                        <a href="/cs/domacnosti/potrebuji-zaridit/"
+                           class="navigation-box__item--back navigation-second-level__link navigation-second-level__realLink">POTŘEBUJI ZAŘÍDIT</a>
+                    </div>
+                    <div class="navigation-box-in">
+                                                                                                                                        <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">MOJE SMLOUVA
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-smlouva-s-pre/smlouva-se-zakaznikem-prevod-opm/?type=1"
+                                           class="navigation-second-level__link">Převod elektřiny</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-smlouva-s-pre/zmena-kontaktnich-a-osobnich-udaju/"
+                                           class="navigation-second-level__link">Změna osobních údajů</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/co-delat-kdyz/hdo/"
+                                           class="navigation-second-level__link">Časy spínání nízkého tarifu</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/dokumenty-ke-stazeni/"
+                                           class="navigation-second-level__link">Formuláře ke stažení</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">FAKTURY/ZÁLOHY
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-faktura-pre/zmena-zaloh/"
+                                           class="navigation-second-level__link">Změna záloh</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/co-delat-kdyz/jakym-zpusobem-muzete-hradit-zalohy-nebo-faktury/"
+                                           class="navigation-second-level__link">Jak zaplatit fakturu/zálohu</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-faktura-pre/mimoradna-fakturace/uvod"
+                                           class="navigation-second-level__link">Mimořádná faktura</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/moje-faktura-pre/nahlaseni-samoodectu/vyber-odbernych-mist"
+                                           class="navigation-second-level__link">Samoodečet elektřiny/plynu</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline"> MOJE PRE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/moje-pre/prihlaseny-uzivatel/uvod-prehled-uctu/"
+                                           class="navigation-second-level__link">On-line stav účtu</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/moje-pre/neprihlaseny-uzivatel/registrace-uzivatele-zadost-o-pristup/"
+                                           class="navigation-second-level__link">Založení účtu Moje PRE</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/moje-pre/neprihlaseny-uzivatel/zapomenute-heslo/"
+                                           class="navigation-second-level__link">Zapomenuté heslo</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/moje-pre/neprihlaseny-uzivatel/prihlaseni-uzivatele/"
+                                           class="navigation-second-level__link">Přihlášení do Moje PRE</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                        <div class="navigation-box-in__column-one">
+<div class="navigation-box__cta">
+<div class="navigation-box__cta-title h5">Nenašli jste,<br /> co jste hledali?</div>
+<a class="btn btn-primary" href="/cs/domacnosti/potrebuji-zaridit/">Najít řešení</a></div>
+</div>
+                                                                                                                                                                                                                                    </div>
+                </nav>
+                            <nav id="emobilita" class="navigation-box navigation-box--second">
+                    <div class="navigation-box__item navigation-box__item--back navigation-second-level">
+                        <a href="/cs/domacnosti/elektrina/#emobilita"
+                           class="navigation-second-level__link second-level-menu-close">
+                            <img src="../../assets2/images/menu-icons/menu-back.svg" alt="Šipka zpět"
+                                 class="navigation-second-level__arrow"/> Zpět</a>
+                    </div>
+                    <div class="navigation-box__item navigation-second-level navigation-second-level__mobileMenu">
+                        <a href="/cs/domacnosti/emobilita"
+                           class="navigation-box__item--back navigation-second-level__link navigation-second-level__realLink">EMOBILITA</a>
+                    </div>
+                    <div class="navigation-box-in">
+                                                                                                                                        <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">DOBÍJENÍ OD PRE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/rodinny-dum"
+                                           class="navigation-second-level__link">Rodinný dům</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/bytovy-dum-svj"
+                                           class="navigation-second-level__link">Bytový dům / SVJ</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/verejne-dobijeni"
+                                           class="navigation-second-level__link">Veřejné dobíjení</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/elektrokola"
+                                           class="navigation-second-level__link">Elektrokola</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">ČASTO HLEDÁTE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/verejne-dobijeni/#block-regular-scroll"
+                                           class="navigation-second-level__link">Chci objednat čip od PRE</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/rodinny-dum/dobijeci-stanice/"
+                                           class="navigation-second-level__link">Chci dobíjet v rodinném domě</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/emobilita/bytovy-dum-svj/dobijeci-stanice-svj/"
+                                           class="navigation-second-level__link">Chci dobíjet v bytovém domě</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="https://chargepre.smatrics.com/cs/"
+                                           class="navigation-second-level__link">Mapa dobíjecích stanic</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                        <div class="navigation-box-in__column-one">
+<div class="navigation-box__cta">
+<div class="navigation-box__cta-title h5">Nenašli jste,<br /> co jste hledali?</div>
+<a class="btn btn-primary" href="/cs/domacnosti/emobilita/">Najít řešení</a></div>
+</div>
+                                                                                                                                                                                </div>
+                </nav>
+                            <nav id="e-shop" class="navigation-box navigation-box--second">
+                    <div class="navigation-box__item navigation-box__item--back navigation-second-level">
+                        <a href="/cs/domacnosti/elektrina/#e-shop"
+                           class="navigation-second-level__link second-level-menu-close">
+                            <img src="../../assets2/images/menu-icons/menu-back.svg" alt="Šipka zpět"
+                                 class="navigation-second-level__arrow"/> Zpět</a>
+                    </div>
+                    <div class="navigation-box__item navigation-second-level navigation-second-level__mobileMenu">
+                        <a href="https://eshop.preenergo.cz/"
+                           class="navigation-box__item--back navigation-second-level__link navigation-second-level__realLink">E-SHOP</a>
+                    </div>
+                    <div class="navigation-box-in">
+                                                                    </div>
+                </nav>
+            
+                            <nav id="kontakty" class="navigation-box navigation-box--second navigation-box--right">
+                    <div class="navigation-box__item navigation-box__item--back navigation-second-level">
+                        <a href="/cs/domacnosti/elektrina/#kontakty"
+                           class="navigation-second-level__link second-level-menu-close">
+                            <img src="../../assets2/images/menu-icons/menu-back.svg" alt="Šipka zpět"
+                                 class="navigation-second-level__arrow"/> Zpět</a>
+                    </div>
+                    <div class="navigation-box__item navigation-second-level navigation-second-level__mobileMenu">
+                        <a href="/cs/domacnosti/kontakty/"
+                           class="navigation-box__item--back navigation-second-level__link navigation-second-level__realLink">KONTAKTY</a>
+                    </div>
+                    <div class="navigation-box-in">
+                                                                                                                                        <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">KONTAKTY
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/kontakty/kontaktni-formular/"
+                                           class="navigation-second-level__link">Napište nám</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/kontakty/zakaznicke-centrum-pre/"
+                                           class="navigation-second-level__link">Domluvte si osobní schůzku</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/kontakty/zakaznicka-linka-pre/"
+                                           class="navigation-second-level__link">Zavolejte nám</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/technicke-sluzby-pre/hlaseni-poruchy/"
+                                           class="navigation-second-level__link">Nahlášení poruchy</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                <div class="navigation-box-in__column-one navigation-box-in__column-one__mobile">
+                                <div class="navigation-second-level__headline">ČASTO HLEDÁTE
+                                </div>
+                                                                    <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/kontakty/adresa-sidla-spolecnosti/"
+                                           class="navigation-second-level__link">Kontaktní adresy</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/kontakty/bankovni-spojeni"
+                                           class="navigation-second-level__link">Bankovní spojení</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/domacnosti/sluzby-zakaznikum/dokumenty-ke-stazeni/"
+                                           class="navigation-second-level__link">Formuláře ke stažení</a>
+                                    </div>
+                                                                                                        <div class="navigation-box__item navigation-second-level">
+                                        <a href="/cs/kontakty/pohledavky/"
+                                           class="navigation-second-level__link">Pohledávky a upomínky</a>
+                                    </div>
+                                                                                                    </div>
+                                                                                                                                        <div class="navigation-box-in__column-one">
+<div class="navigation-box__cta">
+<div class="navigation-box__cta-title h5">Nevíte si rady?<br /> Kontaktujte nás.</div>
+<a class="btn btn-primary" href="/cs/kontakty/kontaktni-formular/">Kontaktní formulář</a></div>
+</div>
+                                                                                                                                                                                </div>
+                </nav>
+                    </div>
+    </div>
+    </div>
+<!-- d22 header stop -->
+
+    
+
+<div class="content-holder ">
+<!-- d22 household start -->
+<div class="content">
+    <div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav class="navigation-breadcrumb">
+                <ol class="breadcrumb">
+                                                                        <li class="breadcrumb-item"><a href="/cs/domacnosti/">Domácnosti</a></li>
+                                                                                                <li class="breadcrumb-item active"><span>Elektřina</span></li>
+                                                            </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+    <div class="heading-symbiosis">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>Elektřina od&nbsp;PRE</h1>
+                                <h2 class="h--red" style="display: none;">Spolehlivost, garance, jistota</h2>
+                            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    "load resize".split(" ").forEach(function (e) {
+        window.addEventListener(e, function () {
+            if (window.innerWidth <= 1199) {
+                document.querySelector('.h--red').style.display = 'none';
+            } else {
+                document.querySelector('.h--red').style.display = 'inline-block';
+            }
+        });
+    });
+</script><div id="carouselComponent"></div>
+
+<script>
+    window.slidesData = [
+        {
+            link: '/preproudeko/',
+            link_caption: 'Zjistit více',
+            subheading: ['Přejděte na&nbsp;<b>PRE&nbsp;PROUD&nbsp;EKO</b>', 'z&nbsp;obnovitelných zdrojů'],
+            tooltipButton: 'Informace o produktu',
+            tooltipText: 'U produktu PRE&nbsp;PROUD&nbsp;EKO zákazník nezískává fyzicky elektřinu z&nbsp;obnovitelných zdrojů, jeho spotřeba je kryta odpovídajícím množstvím záruk původu.',
+            xl: {
+                img: 'assets2/images/content/promo-carousel/zelena_liska_1126x494.png',
+                heading: ['<b>PRE&nbsp;PROUD&nbsp;EKO</b> se&nbsp;rozrůstá'],
+                subheading: ['Přidejte&nbsp;se i&nbsp;vy a&nbsp;podpořte výrobu elektřiny z&nbsp;obnovitelných zdrojů'],
+            },
+            lg: {
+                img: 'assets2/images/content/promo-carousel/zelena_liska_1126x494.png',
+                heading: ['<b>PRE&nbsp;PROUD&nbsp;EKO</b> se&nbsp;rozrůstá'],
+                subheading: ['Přidejte&nbsp;se i&nbsp;vy a&nbsp;podpořte výrobu elektřiny z&nbsp;obnovitelných zdrojů'],
+            },
+            md: {
+                img: 'assets2/images/content/promo-carousel/zelena_liska_768x440.png',
+                heading: ['<b>PRE&nbsp;PROUD&nbsp;EKO</b> se&nbsp;rozrůstá'],
+                subheading: ['Přidejte&nbsp;se i&nbsp;vy a&nbsp;podpořte<br />výrobu elektřiny<br />z&nbsp;obnovitelných zdrojů'],
+            },
+            sm: {
+                img: 'assets2/images/content/promo-carousel/zelena_liska_767x400.png',
+                heading: ['<b>PRE&nbsp;PROUD&nbsp;EKO</b>'],
+                subheading: ['Podpořte&nbspi&nbspvy výrobu<br />elektřiny<br />z&nbspobnovitelných<br />zdrojů'],
+            },
+            xs: {
+                img: 'assets2/images/content/promo-carousel/zelena_liska_499x360.png',
+                heading: ['<b>PRE&nbsp;PROUD&nbsp;EKO</b>'],
+                subheading: ['Podpořte&nbspi&nbspvy<br /> výrobu elektřiny<br />z&nbspobnovitelných<br />zdrojů'],
+            }
+        },
+        {
+            link: '/cs/domacnosti/plyn/kalkulacka/',
+            link_caption: 'Zjistit více',
+            lg: {
+                img: 'assets2/images/content/promo-carousel/gas_1126x494.jpg',
+                heading: ['Odebírejte od nás i plyn'],
+                subheading: ['Mějte své energie na jednom místě'],
+            },
+            md: {
+                img: 'assets2/images/content/promo-carousel/gas_768x440.jpg',
+                heading: ['Odebírejte od nás i plyn'],
+                subheading: ['Mějte své energie na jednom místě'],
+            },
+            sm: {
+                img: 'assets2/images/content/promo-carousel/gas_767x400.jpg',
+                heading: ['Odebírejte od nás i plyn'],
+                subheading: ['Mějte své energie na jednom místě'],
+            },
+            xs: {
+                img: 'assets2/images/content/promo-carousel/gas_499x360.jpg',
+                heading: ['Odebírejte', 'od nás i&nbsp;plyn'],
+                subheading: ['Mějte své energie', 'na jednom místě'],
+            }
+        },
+        {
+            link: '/jakusetrit/',
+            link_caption: 'Zjistit více',
+            heading: ['Ušetřete na energiích'],
+            subheading: ['Tipy, které mají jiskru'],
+            dark: false,
+            lg: {
+                img: 'assets2/images/content/promo-carousel/liska_1126x494.jpg',
+            },
+            md: {
+                img: 'assets2/images/content/promo-carousel/liska_768x440.jpg',
+            },
+            sm: {
+                img: 'assets2/images/content/promo-carousel/liska_767x400.jpg',
+            },
+            xs: {
+                img: 'assets2/images/content/promo-carousel/liska_499x360.jpg',
+            }
+        },
+    ];
+</script>
+
+<section class="block block--white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="h3">S čím vám můžeme pomoci?</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="icon-points icon-points-group icon-points-group--more">
+                    <a href="/cs/domacnosti/sluzby-zakaznikum/moje-smlouva-s-pre/smlouva-se-zakaznikem-prevod-opm/?type=2" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/new-icons/6-stehovani.svg"
+                                alt="Převod elektřiny na sebe">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/new-icons/6-stehovani--hover.svg"
+                                alt="Převod elektřiny na sebe">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Převod elektřiny na sebe
+                        </span>
+                        <span class="icon-points__text-description">
+                          Koupili jste nemovitost nebo se přestěhovali do nového pronájmu? Přepište si na sebe elektřinu snadno on-line.
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/domacnosti/sluzby-zakaznikum/moje-smlouva-s-pre/smlouva-se-zakaznikem-prevod-opm/?type=1" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/new-icons/7-prepis_energii.svg"
+                                alt="Převod elektřiny na někoho jiného">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/new-icons/7-prepis_energii--hover.svg"
+                                alt="Převod elektřiny na někoho jiného">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Převod elektřiny na někoho jiného
+                        </span>
+                        <span class="icon-points__text-description">
+                          Stěhujete se nebo prodáváte nemovitost? Převeďte smlouvu jednoduše a on-line na nového zákazníka.
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/domacnosti/sluzby-zakaznikum/chci-uzavrit-smlouvu-s-pre/chci-uzavrit-novou-smlouvu/" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/icon-change-supplier.svg"
+                                alt="Přejít / vrátit se k PRE">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/icon-change-supplier--hover.svg"
+                                alt="Přejít / vrátit se k PRE">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Přejít / vrátit se k PRE
+                        </span>
+                        <span class="icon-points__text-description">
+                          Nejste spokojeni se svým stávajícím dodavatelem? Přejít k PRE je snadné.
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/domacnosti/sluzby-zakaznikum/moje-faktura-pre/zmena-zaloh/" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/icon-change-payments.svg"
+                                alt="Změna záloh">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/icon-change-payments--hover.svg"
+                                alt="Změna záloh">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Změna záloh
+                        </span>
+                        <span class="icon-points__text-description">
+                          Nevyhovují vám nastavené zálohy?<br class="d-none d-md-block"> Změňte si výši nebo četnost jejich placení.
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/moje-pre/prihlaseny-uzivatel/uvod-prehled-uctu/" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/new-icons/I-3-0056_online_sprava.svg"
+                                alt="Ověření stavu plateb za elektřinu">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/new-icons/I-3-0056_online_sprava--hover.svg"
+                                alt="Ověření stavu plateb za elektřinu">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Ověření stavu plateb za elektřinu
+                        </span>
+                        <span class="icon-points__text-description">
+                          Zajímá vás stav vašeho zákaznického účtu?<br class="d-none d-md-block">V Moje PRE naleznete vždy aktuální informace.
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/domacnosti/sluzby-zakaznikum/pre-vam-dava-vice/kalkulacka-pro-vypocet-nakladu/" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/icon-kalkulacka.svg"
+                                alt="Zrušení změny dodavatele">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/icon-kalkulacka--hover.svg"
+                                alt="Zrušení změny dodavatele">
+                      </span>
+                        <span class="icon-points__text">
+                       <span class="icon-points__text-title">
+                          Kalkulačka nákladů
+                        </span>
+                        <span class="icon-points__text-description">
+                          Spočítejte si jednoduše své náklady za elektřinu od PRE. Stačí zadat jen stavy elektroměru.
+                        </span>
+                      </span>
+                    </a>
+                    <div class="icon-points-group__more">
+                      <span class="btn btn--primary icon-points-group__more-more">
+                        <span class="btn__text">Více</span>
+                        <span class="btn__icon material-icons">expand_more</span>
+                      </span>
+                        <span class="btn btn--primary icon-points-group__more-less">
+                        <span class="btn__text">Méně</span>
+                        <span class="btn__icon material-icons">expand_less</span>
+                      </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center text-md-start">
+                <a href="/cs/domacnosti/potrebuji-zaridit/" class="btn btn--lg btn--text btn--text-small-icon btn--compact">
+                    <span class="btn__text">Potřebuji zařídit něco jiného</span>
+                    <span class="btn__icon material-icons">chevron_right</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="block block--gray pb-0">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="h3 h--condensed-th">Doporučujeme</h2>
+                </div>
+            </div>
+        <div class="row pb-boxes">
+                                            <div class="col-12 col-md-12 col-xl-12 mb-5">
+
+                    <div class="box box--collapsible box--with-image box--eko">
+                        <div class="box__head">
+                            <div class="box__head-product">PRE PROUD EKO</div>
+                            <h3 class="h5 box__head-title box__head-title--raw">Podpora výroby elektřiny z obnovitelných zdrojů</h3>
+                            <div class="box__head-more"><span class="box__head-control-more"><span
+                                            class="btn__icon material-icons">expand_more</span> </span><span
+                                        class="box__head-control-less"><span class="btn__icon material-icons">expand_less</span></span>
+                            </div>
+                        </div>
+                        <div class="box__content">
+                                                            <p class="mb-1">Přejděte na PRE&nbsp;PROUD&nbsp;EKO a&nbsp;staňte se součástí změny.</p>
+                                                                                                                                        </div>
+                        <a class="btn btn--lg btn--primary box__btn btn--eko"
+                           href="/cs/domacnosti/elektrina/pre-proud-eko/">Více informací</a> <img
+                                class="box__icon" src="assets2/images/icons/icon-elektrina-s.svg"
+                                alt="PRE PROUD EKO"/>
+                        <div class="box__aside box__aside--info">
+                            <picture>
+                                <source srcset="/Components/produkty/staticke-stranky/elektrina/top-vyhody-d22/pre-proud-eko-domacnosti/Contents/4/imageMin1200.jpg"
+                                        media="(min-width: 1200px)">
+                                <source srcset="/Components/produkty/staticke-stranky/elektrina/top-vyhody-d22/pre-proud-eko-domacnosti/Contents/4/imageMin768.jpg"
+                                        media="(min-width: 768px)">
+                                <img class="box__aside-picture"
+                                     src="/Components/produkty/staticke-stranky/elektrina/top-vyhody-d22/pre-proud-eko-domacnosti/Contents/4/imageDefault.jpg"
+                                     alt="Podpora výroby elektřiny z obnovitelných zdrojů">
+                            </picture>
+                                                            <div class="box__info">
+                                    <div class="info-tooltip">
+                                        <button type="button" class="info-tooltip__trigger" aria-describedby="box-info-eko">
+                                            Informace o produktu
+                                            <svg class="info-tooltip__icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                                                <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                                <rect x="7.25" y="7" width="1.5" height="4.5" fill="currentColor"/>
+                                                <rect x="7.25" y="4.5" width="1.5" height="1.5" fill="currentColor"/>
+                                            </svg>
+                                        </button>
+                                        <div class="info-tooltip__bubble" id="box-info-eko" role="tooltip">
+                                           U produktu PRE PROUD EKO zákazník nezískává fyzicky elektřinu z obnovitelných zdrojů, jeho spotřeba je kryta odpovídajícím množstvím záruk původu.
+                                        </div>
+                                    </div>
+                                </div>
+                                                    </div>
+                    </div>
+                </div>
+                                                                            <div class="col-12 col-md-6 col-xl-4 ">
+                        <div class="box box-product box-product box--collapsible box--highlight ">
+                            <div class="box__head">
+                                <div class="box__head-product">PRE PROUD FAVORIT 2</div>
+                                <h3 class="h5 box__head-title box__head-title--raw">Výhodná cena elektřiny až na 2&nbsp;roky</h3>
+                                <div class="box__head-more"><span class="box__head-control-more"><span
+                                                class="btn__icon material-icons">expand_more</span> </span><span
+                                            class="box__head-control-less"><span class="btn__icon material-icons">expand_less</span></span>
+                                </div>
+                            </div>
+                            <div class="box__content">
+                                <ul class="list list--check">
+                                                                            <li>Garance ceny elektřiny </li>
+                                                                                                                <li>Možnost plánování výdajů</li>
+                                                                                                                                            </ul>
+                            </div>
+                            <a class="btn btn--lg btn--secondary box__btn"
+                               href="/cs/domacnosti/elektrina/pre-proud-favorit-2/">Více informací</a> <img
+                                    class="box__icon" src="assets2/images/icons/icon-elektrina-s.svg"
+                                    alt="PRE PROUD FAVORIT 2">
+                        </div>
+                    </div>
+                                                                <div class="col-12 col-md-6 col-xl-4 ">
+                        <div class="box box-product box-product box--collapsible box--collapsible-close">
+                            <div class="box__head">
+                                <div class="box__head-product">PRE PROUD NEFIX</div>
+                                <h3 class="h5 box__head-title box__head-title--raw">Elektřina na dobu neurčitou</h3>
+                                <div class="box__head-more"><span class="box__head-control-more"><span
+                                                class="btn__icon material-icons">expand_more</span> </span><span
+                                            class="box__head-control-less"><span class="btn__icon material-icons">expand_less</span></span>
+                                </div>
+                            </div>
+                            <div class="box__content">
+                                <ul class="list list--check">
+                                                                            <li>Smlouva bez závazku</li>
+                                                                                                                <li>Možnost změny produktu</li>
+                                                                                                                                            </ul>
+                            </div>
+                            <a class="btn btn--lg btn--primary box__btn"
+                               href="/cs/domacnosti/elektrina/pre-proud-nefix/">Více informací</a> <img
+                                    class="box__icon" src="assets2/images/icons/icon-elektrina-s.svg"
+                                    alt="PRE PROUD NEFIX">
+                        </div>
+                    </div>
+                                                                <div class="col-12 col-md-6 col-xl-4 ">
+                        <div class="box box-product box-product box--collapsible box--collapsible-close">
+                            <div class="box__head">
+                                <div class="box__head-product">PRE PROUD FAVORIT&nbsp;3</div>
+                                <h3 class="h5 box__head-title box__head-title--raw">Výhodná cena elektřiny až na 3&nbsp;roky</h3>
+                                <div class="box__head-more"><span class="box__head-control-more"><span
+                                                class="btn__icon material-icons">expand_more</span> </span><span
+                                            class="box__head-control-less"><span class="btn__icon material-icons">expand_less</span></span>
+                                </div>
+                            </div>
+                            <div class="box__content">
+                                <ul class="list list--check">
+                                                                            <li>Garance ceny elektřiny </li>
+                                                                                                                <li>Možnost plánování výdajů</li>
+                                                                                                                                            </ul>
+                            </div>
+                            <a class="btn btn--lg btn--primary box__btn"
+                               href="/cs/domacnosti/elektrina/pre-proud-favorit-3/">Více informací</a> <img
+                                    class="box__icon" src="assets2/images/icons/icon-elektrina-s.svg"
+                                    alt="PRE PROUD FAVORIT&nbsp;3">
+                        </div>
+                    </div>
+                                    </div>
+    </div>
+</section>
+
+    <div class="block block--gray block--dark-blue block--dark-blue-xl-no pt-0 pb-0 pb-md-0 pb-xl-5">
+<div class="container">
+<div class="row">
+<div class="col-12">
+<div class="banner-box mb-0 py-0">
+<div class="banner-box__in banner-box__in--calc">
+<div class="banner-box__text">Využijte naši kalkulačku<br class="d-xl-none" /> a vyberte si produkt na míru vašim potřebám</div>
+<div class="banner-box__controls banner-box__controls--calc"><a class="btn btn--lg btn--secondary" href="/cs/domacnosti/elektrina/kalkulacka">Spočítejte si, kolik zaplatíte</a></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<section class="block block--gray pt-xl-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="h3 h--condensed-th">Prémiová nabídka</h2>
+            </div>
+        </div>
+        <div class="row">
+                        <div class="col-12  col-xl-12 " >
+                <div class="box box--highlight box--collapsible box--with-image box--mb-custom">
+                    <div class="box__head">
+                        <div class="box__head-product">PRE PROUD SOLAR</div>
+                        <h3 class="h5 box__head-title box__head-title--raw">Elektřina se slevou za přetoky</h3>
+                        <div class="box__head-more">
+                      <span class="box__head-control-more">
+                        <span class="btn__icon material-icons">expand_more</span>
+                      </span>
+                            <span class="box__head-control-less">
+                        <span class="btn__icon material-icons">expand_less</span>
+                      </span>
+                        </div>
+                    </div>
+                    <div class="box__content">
+                                                                                    <p>Využijte svou fotovoltaiku naplno a zajistěte si slevu za přetoky.</p>
+                                                                                                                                                            </div>
+                    <a href="/cs/domacnosti/elektrina/pre-proud-solar/" class="btn btn--lg btn--secondary box__btn">Více informací</a>
+                    <img class="box__icon" src="assets2/images/icons/icon-elektrina-s.svg" alt="PRE proud nefix">
+                    <div class="box__aside">
+                        <picture>
+                            <source srcset="/Components/produkty/premium-offers/pre-proud-solar/Contents/0/imageMin1200.jpg" media="(min-width: 1127px)"/>
+                            <source srcset="/Components/produkty/premium-offers/pre-proud-solar/Contents/0/imageMin768.jpg" media="(min-width: 769px)"/>
+                            <source srcset="" media="(min-width: 321px)"/>
+                            <img class="box__aside-picture" src="/Components/produkty/premium-offers/pre-proud-solar/Contents/0/imageMin1200.jpg" alt="Elektřina se slevou za přetoky"/>
+                        </picture>
+                    </div>
+                </div>
+            </div>
+                    </div>
+    </div>
+</section>
+
+<div class="block block--white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-9 col-xl-5 border-right--gray border-right--gray-d-none border-right--gray-d-xl-block">
+                <div class="block__inner d-flex flex-column align-items-start h-100 border-bottom--gray border-bottom--gray-d-xl-none"><h3 class="h4">Staňte se
+                        naším zákazníkem&nbsp;<br class="d-md-none d-xl-block">jednoduše on-line</h3>
+                    <p>Uzavřete s námi smlouvu na dodávku elektřiny&nbsp;<br class="d-none d-md-block">a plynu
+                        teď z pohodlí vašeho domova.</p><a href="/cs/domacnosti/sluzby-zakaznikum/chci-uzavrit-smlouvu-s-pre/chci-uzavrit-novou-smlouvu/"
+                                                                 class="btn btn--lg btn--primary mt-xl-auto">On-line
+                        uzavření smlouvy</a></div>
+            </div>
+            <div class="col-12 col-xl-7 block-switch-form"><h3 class="h4">Přejít k PRE je snadné.&nbsp;<br>Nechte nám kontakt, ozveme se vám</h3>
+                <form class="switch-form" method="post" action="/cs/domacnosti/chci-pre/"><p class="switch-form__label">Mám
+                        zájem odebírat:</p>
+                    <div class="switch-form__item-group"><label class="controls switch-form__item"><span
+                                    class="radio"><input type="radio" name="switchForm" value="electricity"
+                                                         checked="checked""> <span
+                                        class="dot"></span> </span><span class="controls__text">Elektřinu</span>
+                            <img class="switch-form__item-icon"
+                                 src="assets2/images/icons/icon-elektrina-big-m.svg" alt="Elektřina"></label>
+                        <label class="controls switch-form__item"><span class="radio"><input type="radio"
+                                                                                             name="switchForm"
+                                                                                             value="gas" > <span
+                                        class="dot"></span> </span><span class="controls__text">Plyn</span> <img
+                                    class="switch-form__item-icon switch-form__item-icon--offset"
+                                    src="assets2/images/icons/icon-plyn-big-m.svg" alt="Plyn"></label> <label
+                                class="controls switch-form__item"><span class="radio"><input type="radio"
+                                                                                              name="switchForm"
+                                                                                              value="electricity,gas"> <span
+                                        class="dot"></span> </span><span class="controls__text">Oboje</span>
+                            <img class="switch-form__item-icon switch-form__item-icon--offset"
+                                 src="assets2/images/icons/icon-plyn-and-elektrina-big-m.svg"
+                                 alt="Oboje"></label></div>
+                    <button class="btn btn--lg btn--primary">Zavolejte mi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="block block--dark-blue block--with-picture block--without-picture-on-md">
+    <div class="block__content-holder">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-md-9 col-xl-6">
+                    <h2 class="h4 h--condensed">Vyberte si komfort jednoho dodavatele energií.<br class> Vše vyřešíte na jednom místě.</h2>
+                    <p class="d-none d-md-block">Stejně jako u elektřiny si i u plynu zvolíte smlouvu, která vám bude vyhovovat nejvíce.</p>
+                    <div class="icon-tags icon-tags--two-in-row">
+                    <span class="icon-tags__item">
+                      <span class="icon-tags__icon-holder">
+                        <img
+                                class="icon-tags__icon"
+                                src="assets2/images/icons/icon-jeden-dodavatel.svg"
+                                alt="Zkrácená pracovní doba">
+                      </span>
+                      <span class="icon-tags__label">Dodávka  elektřiny a&nbsp;plynu<br class="d-none d-md-block"> od&nbsp;jednoho dodavatele</span>
+                    </span>
+                        <span class="icon-tags__item">
+                      <span class="icon-tags__icon-holder">
+                        <img
+                                class="icon-tags__icon"
+                                src="assets2/images/icons/icon-prehled-na-jednom-miste.svg"
+                                alt="Dovolená a sick days">
+                      </span>
+                      <span class="icon-tags__label">Přehled všech vašich<br class="d-none d-md-block"> energií na&nbsp;jednom místě</span>
+                    </span>
+                        <span class="icon-tags__item">
+                      <span class="icon-tags__icon-holder">
+                        <img
+                                class="icon-tags__icon"
+                                src="assets2/images/icons/new-icons/slouceni_zaloh_do_jedne--white.svg"
+                                alt="Zdravotnická péče">
+                      </span>
+                      <span class="icon-tags__label">Sloučíme všechny vaše<br class="d-none d-md-block"> zálohy do&nbsp;jedné</span>
+                    </span>
+                        <span class="icon-tags__item">
+                      <span class="icon-tags__icon-holder">
+                        <img
+                                class="icon-tags__icon"
+                                src="assets2/images/icons/icon-cas-s.svg"
+                                alt="Příspěvek na stravování">
+                      </span>
+                      <span class="icon-tags__label">Ušetříte čas spojený<br class="d-none d-md-block"> s&nbsp;placením a&nbsp;papírováním</span>
+                    </span>
+                    </div>
+                    <a href="/cs/domacnosti/plyn/kalkulacka/" class="btn btn--lg btn--secondary">Chci nabídku plynu</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="block__picture-holder">
+        <picture>
+            <source
+                    srcset="
+                  assets2/images/content/bg-cross-promo-plyn-1200-1920@2x.jpg 2x,
+                  assets2/images/content/bg-cross-promo-plyn-1200-1920.jpg
+                "
+                    media="(min-width: 1200px)"
+            />
+            <source
+                    srcset="
+                  assets2/images/content/bg-cross-promo-plyn-768-1199@2x.jpg 2x,
+                  assets2/images/content/bg-cross-promo-plyn-768-1199.jpg
+                "
+                    media="(min-width: 768px)"
+            />
+            <img
+                    class="block__picture"
+                    src="assets2/images/content/bg-cross-promo-plyn-320-767.jpg"
+                    alt="Kariéra v PRE"
+            />
+        </picture>
+    </div>
+</section>
+<section class="block block--white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="h3">Nové technologie vám pomohou ušetřit</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="icon-points icon-points-group">
+                    <a href="/cs/domacnosti/sluzby/klimatizace" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/icon-klimatizace.svg"
+                                alt="Klimatizace">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/icon-klimatizace--hover.svg"
+                                alt="Klimatizace">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Klimatizace
+                        </span>
+                        <span class="icon-points__text-description">
+                          Nákup na splátky bez navýšení
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/domacnosti/sluzby/tepelna-cerpadla/" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/icon-tepepla-cerpadla.svg"
+                                alt="Tepelná čerpadla">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/icon-tepepla-cerpadla--hover.svg"
+                                alt="Tepelná čerpadla">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Tepelná čerpadla
+                        </span>
+                        <span class="icon-points__text-description">
+                          Nabízíme pouze kvalitní a osvědčené technologie
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/domacnosti/sluzby/elektricke-vytapeni/" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/icon-el-vytapeni.svg"
+                                alt="Elektrické vytápění">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/icon-el-vytapeni--hover.svg"
+                                alt="Elektrické vytápění">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Elektrické vytápění
+                        </span>
+                        <span class="icon-points__text-description">
+                          Kompletní nabídka řešení na jednom místě
+                        </span>
+                      </span>
+                    </a>
+                    <a href="/cs/domacnosti/sluzby/fotovoltaicke-elektrarny" class="icon-points__item">
+                      <span class="icon-points__icon-holder">
+                        <img
+                                class="icon-points__icon icon-points__icon--default"
+                                src="assets2/images/icons/icon-fotovoltaika.svg"
+                                alt="Fotovoltaika">
+                        <img
+                                class="icon-points__icon icon-points__icon--hover"
+                                src="assets2/images/icons/icon-fotovoltaika--hover.svg"
+                                alt="Fotovoltaika">
+                      </span>
+                        <span class="icon-points__text">
+                        <span class="icon-points__text-title">
+                          Fotovoltaika
+                        </span>
+                        <span class="icon-points__text-description">
+                          Máme bohaté zkušenosti s instalací již od roku 2009
+                        </span>
+                      </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center text-md-start">
+                <a href="/cs/domacnosti/sluzby/" class="btn btn--lg btn--text btn--text-small-icon btn--compact">
+                    <span class="btn__text">Další technologie</span>
+                    <span class="btn__icon material-icons">chevron_right</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="block block--dark-blue">
+    <div class="container">
+        <div class="row">
+            <div class="col-12"><h2 class="h3 h--condensed-snd">S PRE dobijete svůj elektromobil kdekoliv</h2></div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-md-4">
+                <div class="box-holder">
+                    <div class="box-holder__in">
+                        <div class="icon-variable"><img class="icon-variable__mobile"
+                                                        src="assets2/images/icons/new-icons/I-1-dobijeci_stanice--inverse.svg"
+                                                        alt="Dobíjecí čip malá ikona"> <img
+                                    class="icon-variable__desktop" src="assets2/images/icons/new-icons/I-1-dobijeci_stanice--inverse.svg"
+                                                                        alt="dobijeci_stanice"></div>
+                        <p class="h5">Při svých cestách využijte dobíjecí stanice PRE POINT.</p></div>
+                    <a href="/cs/domacnosti/emobilita/verejne-dobijeni/"
+                       class="btn btn--lg btn--secondary">Veřejné dobíjení</a></div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="box-holder">
+                    <div class="box-holder__in">
+                        <div class="icon-variable"><img class="icon-variable__mobile"
+                                                        src="assets2/images/icons/icon-elektromobilita-wallbox-l--inverse.svg"
+                                                        alt="Wallboxy malá ikona"> <img
+                                    class="icon-variable__desktop"
+                                    src="assets2/images/icons/icon-elektromobilita-wallbox-m--inverse.svg"
+                                    alt="Wallboxy velká ikona"></div>
+                        <p class="h5">Dobíjejte svůj elektromobil v pohodlí domova.</p>
+                    </div>
+                    <a href="/cs/domacnosti/emobilita/rodinny-dum/"
+                       class="btn btn--lg btn--secondary">Domácí dobíjení</a></div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="box-holder">
+                    <div class="box-holder__in">
+                        <div class="icon-variable"><img class="icon-variable__mobile"
+                                                        src="assets2/images/icons/new-icons/13-dobijeci-stanice-bod--inverse.svg"
+                                                        alt="Pronájem automobilů malá ikona"> <img
+                                    class="icon-variable__desktop"
+                                    src="assets2/images/icons/new-icons/13-dobijeci-stanice-bod--inverse.svg"
+                                    alt="dobijeci-stanice-bod"></div>
+                        <p class="h5">Naše mapa PRE POINT stanic vám usnadní dobíjení.</p></div>
+                    <a href="https://chargepre.smatrics.com/cs/"
+                       class="btn btn--lg btn--secondary" target="_blank">Mapa stanic</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="block block--gray block--smaller">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="p">
+                    <h3 class="h4 p__title">Nenašli jste svůj ceník?</h3>
+                    <p class="p__description">Prohlédněte si ceníky, které jsou nebo byly součástí naší nabídky.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <a href="/cs/domacnosti/elektrina/prehled-produktu/" class="btn btn--lg btn--text btn--text-small-icon btn--compact">
+                    <span class="btn__text">Přehled ceníků</span>
+                    <span class="btn__icon material-icons">chevron_right</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+</div>
+
+
+<!-- domacnosti a firmy -->
+    <div class="footer">
+        <div class="container">
+            <div class="row">
+                                                            <div class="col-md-3">
+                            <div class="footer-block">
+                                <h3 class="footer-title">Časté požadavky</h3>
+                                                                    <ul class="footer-list">
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/moje-pre/prihlaseny-uzivatel/uvod-prehled-uctu/" class="footer-list__link">
+                                                    On-line stav účtu
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/sluzby-zakaznikum/moje-smlouva-s-pre/smlouva-se-zakaznikem-prevod-opm/?type=1" class="footer-list__link">
+                                                    Převod elektřiny
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/sluzby-zakaznikum/moje-faktura-pre/zmena-zaloh/" class="footer-list__link">
+                                                    Změna záloh
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/sluzby-zakaznikum/dokumenty-ke-stazeni/dokumenty-elektrina/formulare-vztahujici-se-k-prodeji-elektriny/" class="footer-list__link">
+                                                    Formuláře pro elektřinu
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/odstoupeni/" class="footer-list__link">
+                                                    Odstoupení od smlouvy
+                                                </a>
+                                            </li>
+                                                                            </ul>
+                                                            </div>
+                        </div>
+                                            <div class="col-md-3">
+                            <div class="footer-block">
+                                <h3 class="footer-title">Služby pro vás</h3>
+                                                                    <ul class="footer-list">
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/elektrina/" class="footer-list__link">
+                                                    Elektřina
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/plyn/" class="footer-list__link">
+                                                    Plyn
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/sluzby/" class="footer-list__link">
+                                                    Technologie
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/domacnosti/emobilita/" class="footer-list__link">
+                                                    Emobilita
+                                                </a>
+                                            </li>
+                                                                            </ul>
+                                                            </div>
+                        </div>
+                                            <div class="col-md-3">
+                            <div class="footer-block">
+                                <h3 class="footer-title">O Skupině PRE</h3>
+                                                                    <ul class="footer-list">
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/profil-spolecnosti/media/novinky/" class="footer-list__link">
+                                                    Aktuality
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/profil-spolecnosti/o-nas/" class="footer-list__link">
+                                                    O nás
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/profil-spolecnosti/media/" class="footer-list__link">
+                                                    Média
+                                                </a>
+                                            </li>
+                                                                                    <li class="footer-list__item">
+                                                <a href="/cs/profil-spolecnosti/o-nas/ombudsman-pre/" class="footer-list__link">
+                                                    Ombudsman PRE
+                                                </a>
+                                            </li>
+                                                                            </ul>
+                                                            </div>
+                        </div>
+                                                    <div class="col-md-3">
+                    <div class="footer-block footer-block--last">
+                        <h3 class="footer-title">Sledujte nás</h3>
+                        <ul class="social-icons">
+                            <li class="social-icons__item">
+                                <a href="https://cs-cz.facebook.com/prazska.energetika" class="social-icons__link" target="_blank" title="Otevře se v novém okně">
+                                    <span class="social-icons__img-holder social-icons__img-holder--default">
+                                        <img src="../../assets2/images/social-icons/ico_facebook.svg" alt="profil na Facebooku" class="social-icons__img"/>
+                                    </span>
+                                    <span class="social-icons__img-holder social-icons__img-holder--hover">
+                                        <img src="../../assets2/images/social-icons/ico_facebook-hover.svg" alt="profil na Facebooku" class="social-icons__img"/>
+                                    </span></a>
+                            </li>
+                            <li class="social-icons__item">
+                                <a href="https://www.linkedin.com/company/pra-sk-energetika-a.s./" class="social-icons__link" target="_blank" title="Otevře se v novém okně">
+                                    <span class="social-icons__img-holder social-icons__img-holder--default">
+                                        <img src="../../assets2/images/social-icons/ico_linkedin.svg" alt="profil na LinedINu" class="social-icons__img"/>
+                                    </span>
+                                    <span class="social-icons__img-holder social-icons__img-holder--hover">
+                                        <img src="../../assets2/images/social-icons/ico_linkedin-hover.svg" alt="profil na LinedINu" class="social-icons__img"/>
+                                    </span></a>
+                            </li>
+                            <li class="social-icons__item">
+                                <a href="https://www.youtube.com/user/EnergieodPRE" class="social-icons__link" target="_blank" title="Otevře se v novém okně">
+                                    <span class="social-icons__img-holder social-icons__img-holder--default">
+                                        <img src="../../assets2/images/social-icons/ico_youtube.svg" alt="profil na Youtube" class="social-icons__img"/>
+                                    </span>
+                                    <span class="social-icons__img-holder social-icons__img-holder--hover">
+                                        <img src="../../assets2/images/social-icons/ico_youtube-hover.svg" alt="profil na Youtube" class="social-icons__img"/>
+                                    </span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+                            <div class="row">
+                                            <div class="col-md-3">
+                                                            <a href="/cs/kontakty/kontaktni-formular/" class="footer-box">
+                                                                        <span class="footer-box__icon-holder">
+                                                <span class="footer-box__img-holder footer-box__img-holder--default">
+                                                    <img src="/assets2/images/footer/ico_message.svg?8a248c716fe9418088fcbf8adad4bced" alt="Napsat zprávu" class="footer-box__icon" />
+                                                </span>
+                                                <span class="footer-box__img-holder footer-box__img-holder--hover">
+                                                    <img src="/assets2/images/footer/ico_message-hover.svg?be1864877ccc763349681beb23a98473" alt="Napsat zprávu" class="footer-box__icon" />
+                                                </span>
+                                            </span>
+                                <span class="footer-box__text">
+                                                <span class="footer-box__text-item footer-box__text-item--small">Kontaktní formulář</span>
+                                                <span class="footer-box__text-item footer-box__text-item--big" >Napsat zprávu</span>
+                                                                                            </span>
+                                                            </a>
+                                                    </div>
+                                            <div class="col-md-3">
+                                                            <a href="/cs/kontakty/zakaznicka-linka-pre/" class="footer-box">
+                                                                        <span class="footer-box__icon-holder">
+                                                <span class="footer-box__img-holder footer-box__img-holder--default">
+                                                    <img src="/assets2/images/footer/ico_call.svg?8a248c716fe9418088fcbf8adad4bced" alt="800 550 055" class="footer-box__icon" />
+                                                </span>
+                                                <span class="footer-box__img-holder footer-box__img-holder--hover">
+                                                    <img src="/assets2/images/footer/ico_call-hover.svg?be1864877ccc763349681beb23a98473" alt="800 550 055" class="footer-box__icon" />
+                                                </span>
+                                            </span>
+                                <span class="footer-box__text">
+                                                <span class="footer-box__text-item footer-box__text-item--small">Zákaznická linka</span>
+                                                <span class="footer-box__text-item footer-box__text-item--big" >800 550 055</span>
+                                                                                                    <span class="footer-box__text-item footer-box__text-item--small">pondělí-pátek 8:00-18:00</span>
+                                                                                            </span>
+                                                            </a>
+                                                    </div>
+                                            <div class="col-md-3">
+                                                            <a href="/cs/kontakty/zakaznicke-centrum-pre/domluvte-si-schuzku-v-zakaznickem-centru-pre/" class="footer-box">
+                                                                        <span class="footer-box__icon-holder">
+                                                <span class="footer-box__img-holder footer-box__img-holder--default">
+                                                    <img src="/assets2/images/footer/ico_pin.svg?8a248c716fe9418088fcbf8adad4bced" alt="Domluvit schůzku" class="footer-box__icon" />
+                                                </span>
+                                                <span class="footer-box__img-holder footer-box__img-holder--hover">
+                                                    <img src="/assets2/images/footer/ico_pin-hover.svg?be1864877ccc763349681beb23a98473" alt="Domluvit schůzku" class="footer-box__icon" />
+                                                </span>
+                                            </span>
+                                <span class="footer-box__text">
+                                                <span class="footer-box__text-item footer-box__text-item--small">Zákaznické centrum</span>
+                                                <span class="footer-box__text-item footer-box__text-item--big" >Domluvit schůzku</span>
+                                                                                            </span>
+                                                            </a>
+                                                    </div>
+                                            <div class="col-md-3">
+                                                            <a href="/cs/domacnosti/sluzby-zakaznikum/technicke-sluzby-pre/hlaseni-poruchy/" class="footer-box footer-box--last">
+                                                                        <span class="footer-box__icon-holder">
+                                                <span class="footer-box__img-holder footer-box__img-holder--default">
+                                                    <img src="/assets2/images/footer/ico_fault.svg?8a248c716fe9418088fcbf8adad4bced" alt="Ohlásit poruchu" class="footer-box__icon" />
+                                                </span>
+                                                <span class="footer-box__img-holder footer-box__img-holder--hover">
+                                                    <img src="/assets2/images/footer/ico_fault-hover.svg?be1864877ccc763349681beb23a98473" alt="Ohlásit poruchu" class="footer-box__icon" />
+                                                </span>
+                                            </span>
+                                <span class="footer-box__text">
+                                                <span class="footer-box__text-item footer-box__text-item--small">Linka pro hlášení poruch</span>
+                                                <span class="footer-box__text-item footer-box__text-item--big" >Ohlásit poruchu</span>
+                                                                                            </span>
+                                                            </a>
+                                                    </div>
+                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="row">
+                <div class="col-12">
+                    <ul class="footer-services">
+                        <li class="footer-services__item">
+                            <a href="https://www.predistribuce.cz/" class="footer-services__link" target="_blank" title="Otevře se v novém okně">PREdistribuce</a>
+                        </li>
+                        <li class="footer-services__item">
+                            <a href="/preenergo" class="footer-services__link" target="_blank" title="Otevře se v novém okně">PREenergo</a>
+                        </li>
+                        <li class="footer-services__item">
+                            <a href="/preds" class="footer-services__link" target="_blank" title="Otevře se v novém okně">PRE&nbsp;distribuční&nbsp;služby</a>
+                        </li>
+                        <li class="footer-services__item">
+                            <a href="https://www.prezakaznicka.cz/cs/" class="footer-services__link" target="_blank" title="Otevře se v novém okně">PREzákaznická</a>
+                        </li>
+                        <li class="footer-services__item">
+                            <a href="https://www.preservisni.cz/" class="footer-services__link" target="_blank" title="Otevře se v novém okně">PREservisní</a>
+                        </li>
+                        <li class="footer-services__item">
+                            <a href="https://www.kormak.cz/cs/" class="footer-services__link" target="_blank" title="Otevře se v novém okně">KORMAK</a>
+                        </li>
+                        <li class="footer-services__item">
+                            <a href="http://www.voltcom.cz/" class="footer-services__link" target="_blank" title="Otevře se v novém okně">VOLTCOM</a>
+                        </li>
+                        <li class="footer-services__item">
+                            <a href="https://www.yello.cz/cs/domacnost/" class="footer-services__link" target="_blank" title="Otevře se v novém okně">Yello</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row footer-bottom">
+                <div class="col-xl-9">
+                    <ul class="footer-common-list">
+                        <li class="footer-common-list__item">
+                            <a href="https://www.pre.cz/cs/zapati/ochrana-osobnich-udaju-a-internetovych-stranek/" class="footer-common-list__link">Ochrana osobních údajů a internetových stránek</a>
+                        </li>
+                        <li class="footer-common-list__item">
+                            <a href="https://www.pre.cz/cs/zapati/technicka-pomoc/" class="footer-common-list__link">Technická pomoc</a>
+                        </li>
+                        <li class="footer-common-list__item">
+                            <a href="javascript:CookieConsent.renew();" class="footer-common-list__link">Nastavení cookies</a>
+                        </li>
+                        <li class="footer-common-list__item">
+                            <a href="/cs/profil-spolecnosti/o-nas/informace-ze-zakona/legislativa-ceske-republiky/index-zajisteni-obchodnika-s-elektrinou-a-plynem/" class="footer-common-list__link">Index zajištění obchodníka</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-xl-3">
+                    <p class="footer-copyright">&copy; 2026 Pražská energetika, a. s.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+<script src="/assets2/index.js?m=1793612783" defer="defer"></script>
+
+
+
+
+<!-- d22 stop -->
+
+<!-- segmenthandle start -->
+
+<!-- segmenthandle end -->
+
+<!-- page end -->
+
+	</body>
+</html>

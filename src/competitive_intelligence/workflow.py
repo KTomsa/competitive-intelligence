@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import agents, rules
-from .connectors import eru, ote, web
+from .connectors import eru, ote, pricelist, web
 from .connectors.http import FetchError
 
 DATA = Path(__file__).resolve().parent / "data"
@@ -26,16 +26,16 @@ def load_config() -> dict:
     return json.loads((DATA / "suppliers.json").read_text(encoding="utf-8"))
 
 
-def _load_official(connector, format_error, live: bool, warnings: list[str]) -> dict:
+def _load_official(loader, format_error, live: bool, warnings: list[str]) -> dict:
     """Živý zdroj; při selhání nebo změně formátu datovaný snapshot s viditelným varováním."""
     try:
-        data = connector.load(live=live)
+        data = loader(live=live)
     except format_error as exc:
         if not live:
             raise AuditError(str(exc)) from exc
         warnings.append(f"Živý zdroj má neočekávaný formát ({exc}); použit uložený snapshot.")
         try:
-            data = connector.load(live=False)
+            data = loader(live=False)
         except (FetchError, format_error) as inner:
             raise AuditError(str(inner)) from inner
     except FetchError as exc:
@@ -44,6 +44,73 @@ def _load_official(connector, format_error, live: bool, warnings: list[str]) -> 
         warnings.append(f"{data['source']['name']}: {data['source']['warning']}")
     data.pop("_fetched", None)
     return data
+
+
+def _confirm_offer(offer: dict, page: dict | None, price_list_doc: dict | None) -> None:
+    """Doplní do nabídky, zda ji živý zdroj potvrzuje (confirmed_live), vyvrací (stale) a jak (confirmation)."""
+    price_list = offer.get("price_list") or {}
+    if price_list_doc is not None:
+        found = pricelist.contains_all(price_list_doc["text"], price_list.get("markers") or [])
+        if price_list_doc["source"]["origin"] == "live":
+            offer["confirmed_live"], offer["stale"] = found, not found
+            offer["confirmation"] = (
+                "ceník stažen živě a obsahuje cenu i stálý plat" if found
+                else "živě stažený ceník už cenu nebo stálý plat z přípravy neobsahuje"
+            )
+        else:
+            offer["confirmed_live"], offer["stale"] = False, False
+            offer["confirmation"] = f"ceník z uloženého snapshotu ({price_list_doc['source']['fetched_at'][:10]})"
+        return
+    provided = price_list.get("provided_by")
+    suffix = f"; stálý plat z ceníku, který dodal {provided}" if provided else ""
+    marker = offer.get("page_marker")
+    if page is not None and marker:
+        on_page = web.contains(page["text"], marker) and web.contains(page["text"], offer["product"])
+        if page["source"]["origin"] == "live":
+            offer["confirmed_live"], offer["stale"] = on_page, not on_page
+            offer["confirmation"] = (
+                "cena nalezena na živé stránce dodavatele" if on_page
+                else "cena už na živé stránce dodavatele není"
+            ) + suffix
+        else:
+            offer["confirmed_live"], offer["stale"] = False, False
+            offer["confirmation"] = "stránka dodavatele z uloženého snapshotu" + suffix
+        return
+    offer["confirmed_live"], offer["stale"] = False, False
+    offer["confirmation"] = f"jen z přípravy: ceník dodal {provided}" if provided else "jen z přípravy"
+
+
+def _comparison(suppliers: list[dict], ctx: dict) -> list[dict]:
+    """Přehled fixovaných nabídek podle délky fixace, seřazený podle ročního nákladu."""
+    profile = ctx["profile"]
+    groups: dict[int, list[dict]] = {}
+    for supplier in suppliers:
+        for offer in supplier["offers"]:
+            if offer.get("fixation_months") is None or offer.get("stale"):
+                continue
+            bench = rules.benchmark_offer(offer, ctx)
+            price_list = offer.get("price_list") or {}
+            groups.setdefault(offer["fixation_months"], []).append({
+                "supplier": supplier["name"],
+                "product": offer["product"],
+                "price_mwh_excl_vat": offer.get("price_mwh_excl_vat"),
+                "price_mwh_incl_vat": offer.get("price_mwh_incl_vat"),
+                "monthly_fee_incl_vat": offer.get("monthly_fee_incl_vat"),
+                "annual_cost": [rules.annual_cost(offer, mwh) for mwh in profile["annual_mwh"]],
+                "position": bench["position"],
+                "confirmed_live": offer["confirmed_live"],
+                "confirmation": offer["confirmation"],
+                "price_list_url": price_list.get("url"),
+                "effective_from": price_list.get("effective_from"),
+            })
+    out = []
+    for months in sorted(groups, reverse=True):
+        rows = sorted(
+            groups[months],
+            key=lambda r: (r["annual_cost"][0] is None, r["annual_cost"][0] or 0, r["price_mwh_excl_vat"] or 0),
+        )
+        out.append({"fixation_months": months, "annual_mwh": profile["annual_mwh"], "rows": rows})
+    return out
 
 
 def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool | None = None) -> dict:
@@ -59,12 +126,20 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
     started = time.monotonic()
     now = datetime.now(timezone.utc)
     warnings: list[str] = []
+    offers = [(s, o) for s in suppliers for o in s["offers"]]
 
-    with ThreadPoolExecutor(max_workers=6) as pool:
-        eru_future = pool.submit(_load_official, eru, eru.EruFormatError, live, warnings)
-        ote_future = pool.submit(_load_official, ote, ote.OteFormatError, live, warnings)
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        eru_future = pool.submit(_load_official, eru.load, eru.EruFormatError, live, warnings)
+        ote_future = pool.submit(_load_official, ote.load, ote.OteFormatError, live, warnings)
+        gas_future = pool.submit(_load_official, ote.load_gas, ote.OteFormatError, live, warnings)
         page_futures = {s["id"]: pool.submit(web.load, s, live) for s in suppliers}
+        list_futures = {o["id"]: pool.submit(pricelist.load, o, live) for _, o in offers}
         eru_data, ote_data = eru_future.result(), ote_future.result()
+        try:
+            gas_data = gas_future.result()
+        except AuditError as exc:  # plyn je doplňkový zdroj: bez něj audit pokračuje
+            gas_data = None
+            warnings.append(f"Tabulku OTE pro plyn se nepodařilo načíst: {exc}")
         pages = {}
         for sid, future in page_futures.items():
             try:
@@ -73,26 +148,41 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
             except FetchError as exc:
                 pages[sid] = None
                 warnings.append(f"Web dodavatele {sid} se nepodařilo načíst ani ze snapshotu: {exc}")
+        price_lists = {}
+        for supplier, offer in offers:
+            try:
+                price_lists[offer["id"]] = list_futures[offer["id"]].result()
+            except FetchError as exc:
+                price_lists[offer["id"]] = None
+                warnings.append(f"{supplier['name']}: ceník „{offer['product']}“ se nepodařilo načíst: {exc}")
 
-    # nabídky: je cena z přípravy stále na stránce?
+    # nabídky: potvrzuje je živý ceník nebo živá stránka?
+    price_list_sources = []
     for supplier in suppliers:
         page = pages[supplier["id"]]
         for offer in supplier["offers"]:
-            is_live = bool(page and page["source"]["origin"] == "live")
-            on_page = bool(
-                page
-                and web.contains(page["text"], offer["page_marker"])
-                and web.contains(page["text"], offer["product"])
-            )
-            offer["confirmed_live"] = is_live and on_page
-            # živá stránka už cenu nebo produkt neobsahuje: záznam je zastaralý a nesmí rozhodovat
-            offer["stale"] = is_live and not on_page
+            doc = price_lists[offer["id"]]
+            _confirm_offer(offer, page, doc)
             offer["captured_at"] = supplier["captured_at"]
+            if doc is not None:
+                price_list_sources.append({**doc["source"], "supplier": supplier["name"]})
+                if doc["source"]["warning"]:
+                    warnings.append(f"{supplier['name']} – {doc['source']['name']}: {doc['source']['warning']}")
             if offer["stale"]:
                 warnings.append(
-                    f"{supplier['name']}: cena nabídky „{offer['product']}“ zachycená {supplier['captured_at']} "
-                    "už na živé stránce není. Nabídka se do verdiktů nepočítá, je potřeba ji znovu zachytit."
+                    f"{supplier['name']}: nabídka „{offer['product']}“ zachycená {supplier['captured_at']} "
+                    f"už neplatí ({offer['confirmation']}). Do verdiktů se nepočítá, je potřeba ji znovu zachytit."
                 )
+        for proof in supplier.get("green_evidence") or []:
+            marker = proof.get("page_marker")
+            if page is None or not marker:
+                proof["status"] = "z přípravy"
+            elif page["source"]["origin"] != "live":
+                proof["status"] = "ze snapshotu stránky"
+            elif web.contains(page["text"], marker):
+                proof["status"] = "nalezeno na živé stránce"
+            else:
+                proof["status"], proof["stale"] = "na živé stránce už není", True
         if page and page["source"]["warning"]:
             warnings.append(f"{page['source']['name']}: {page['source']['warning']}")
 
@@ -106,6 +196,7 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
         "profile": config["profile"],
         "eru": eru_data,
         "ote": ote_data,
+        "ote_gas": gas_data,
         "offer_month": offer_month,
     }
 
@@ -173,7 +264,8 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
             "page": page["source"] if page else None,
             "extractor": extractor_info,
             "offers": [
-                {**{k: v for k, v in o.items() if k != "page_marker"},
+                {**{k: v for k, v in o.items() if k not in ("page_marker", "price_list")},
+                 "price_list": {k: v for k, v in (o.get("price_list") or {}).items() if k != "markers"},
                  "benchmark": {k: v for k, v in rules.benchmark_offer(o, ctx).items() if k != "band"}}
                 for o in supplier["offers"]
             ],
@@ -184,13 +276,20 @@ def run(supplier_ids: list[str] | None = None, live: bool = True, use_llm: bool 
     all_live = (
         eru_data["source"]["origin"] == "live"
         and ote_data["source"]["origin"] == "live"
+        and gas_data is not None and gas_data["source"]["origin"] == "live"
         and all(s["page"] and s["page"]["origin"] == "live" for s in report_suppliers)
+        and all(src["origin"] == "live" for src in price_list_sources)
     )
+    sources = {"eru": eru_data["source"], "ote": ote_data["source"]}
+    if gas_data is not None:
+        sources["ote_gas"] = gas_data["source"]
     return {
         "generated_at": now.isoformat(timespec="seconds"),
         "mode": "live" if all_live else ("snapshot" if not live else "mixed"),
         "profile": config["profile"],
-        "sources": {"eru": eru_data["source"], "ote": ote_data["source"]},
+        "sources": sources,
+        "price_lists": price_list_sources,
+        "comparison": _comparison(suppliers, ctx),
         "suppliers": report_suppliers,
         "briefing": agents.write_briefing(
             flat, use_llm and time.monotonic() - started < LLM_BUDGET_S

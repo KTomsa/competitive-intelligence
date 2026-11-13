@@ -1,8 +1,9 @@
 {
-  "_note": "Připravené vstupy (ne verdikty). Citáty a ceny byly zachyceny z uvedených URL v uvedený den; při běhu se ověřuje, zda je stránka stále obsahuje. Verdikty počítá kód z živých dat ERÚ/OTE.",
+  "_note": "Připravené vstupy (ne verdikty). Citáty byly zachyceny z uvedených URL v uvedený den, ceny a stálé platy z oficiálních ceníků (PDF) pro distribuční území PRE. Při běhu se ověřuje, zda je stránky a ceníky stále obsahují. Verdikty počítá kód z živých dat ERÚ a OTE.",
   "profile": {
     "commodity": "elektřina",
     "tariff": "D02d",
+    "area": "PREdistribuce",
     "annual_mwh": [
       2,
       4
@@ -47,31 +48,85 @@
           "id": "cez-fix36",
           "product": "Elektřina Fix na 3 roky",
           "tariff": "D02d",
+          "area": "PREdistribuce",
           "fixation_months": 36,
-          "price_mwh_excl_vat": 2686,
-          "price_mwh_incl_vat": 3250,
-          "monthly_fee_incl_vat": null,
-          "page_marker": "3 250 Kč"
+          "price_mwh_excl_vat": 2685.95,
+          "price_mwh_incl_vat": 3250.0,
+          "monthly_fee_incl_vat": 163.35,
+          "price_list": {
+            "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
+            "document": "moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
+            "effective_from": "2026-01-30",
+            "markers": [
+              "Elektřina Fix na 3 roky",
+              "3 250,00",
+              "(2 685,95)",
+              "163,35"
+            ]
+          }
         },
         {
           "id": "cez-online12",
           "product": "Elektřina Online na 1 rok",
           "tariff": "D02d",
+          "area": "PREdistribuce",
           "fixation_months": 12,
-          "price_mwh_excl_vat": 2760,
-          "price_mwh_incl_vat": 3340,
-          "monthly_fee_incl_vat": null,
-          "page_marker": "3 340 Kč"
+          "price_mwh_excl_vat": 2760.33,
+          "price_mwh_incl_vat": 3340.0,
+          "monthly_fee_incl_vat": 163.35,
+          "price_list": {
+            "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
+            "document": "moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
+            "effective_from": "2026-01-30",
+            "markers": [
+              "Elektřina Online na 1 rok",
+              "3 340,00",
+              "(2 760,33)",
+              "163,35"
+            ]
+          }
         },
         {
-          "id": "cez-neurcito",
-          "product": "Elektřina na neurčito",
+          "id": "cez-bezstarosti36",
+          "product": "Elektřina Bez starostí na 3 roky",
           "tariff": "D02d",
-          "fixation_months": null,
-          "price_mwh_excl_vat": 3190,
-          "price_mwh_incl_vat": 3860,
-          "monthly_fee_incl_vat": null,
-          "page_marker": "3 860 Kč"
+          "area": "PREdistribuce",
+          "fixation_months": 36,
+          "price_mwh_excl_vat": 3000.0,
+          "price_mwh_incl_vat": 3630.0,
+          "monthly_fee_incl_vat": 163.35,
+          "price_list": {
+            "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
+            "document": "moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
+            "effective_from": "2026-08-25",
+            "markers": [
+              "Elektřina Bez starostí na 3 roky",
+              "3 630,00",
+              "(3 000,00)",
+              "163,35"
+            ]
+          }
+        },
+        {
+          "id": "cez-bezstarosti24",
+          "product": "Elektřina Bez starostí na 2 roky",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 24,
+          "price_mwh_excl_vat": 3223.14,
+          "price_mwh_incl_vat": 3900.0,
+          "monthly_fee_incl_vat": 163.35,
+          "price_list": {
+            "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
+            "document": "moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
+            "effective_from": "2026-08-25",
+            "markers": [
+              "Elektřina Bez starostí na 2 roky",
+              "3 900,00",
+              "(3 223,14)",
+              "163,35"
+            ]
+          }
         }
       ],
       "green_evidence": []
@@ -113,32 +168,64 @@
           "id": "centropol-fix36",
           "product": "Fixně online pro začátek na 3 roky",
           "tariff": "D02d",
+          "area": "PREdistribuce",
           "fixation_months": 36,
-          "price_mwh_excl_vat": 2817,
-          "price_mwh_incl_vat": 3409,
+          "price_mwh_excl_vat": 2817.0,
+          "price_mwh_incl_vat": 3408.57,
           "monthly_fee_incl_vat": 163.35,
-          "page_marker": "2 817 Kč",
-          "detail_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-cez-01012026.pdf"
+          "price_list": {
+            "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
+            "document": "d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
+            "effective_from": "2026-11-04",
+            "markers": [
+              "FIXNĚ ONLINE PRO ZAČÁTEK na 3 roky",
+              "3 408,57",
+              "(2 817,00)",
+              "163,35"
+            ]
+          }
         },
         {
           "id": "centropol-fix24",
           "product": "Fixně online pro začátek na 2 roky",
-          "tariff": null,
+          "tariff": "D02d",
+          "area": "PREdistribuce",
           "fixation_months": 24,
-          "price_mwh_excl_vat": 3213,
-          "price_mwh_incl_vat": 3888,
-          "monthly_fee_incl_vat": null,
-          "page_marker": "3 213 Kč"
+          "price_mwh_excl_vat": 3213.0,
+          "price_mwh_incl_vat": 3887.73,
+          "monthly_fee_incl_vat": 163.35,
+          "price_list": {
+            "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
+            "document": "d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
+            "effective_from": "2026-11-04",
+            "markers": [
+              "FIXNĚ ONLINE PRO ZAČÁTEK na 2 roky",
+              "3 887,73",
+              "(3 213,00)",
+              "163,35"
+            ]
+          }
         },
         {
           "id": "centropol-fix12",
           "product": "Fixně online pro začátek na 1 rok",
-          "tariff": null,
+          "tariff": "D02d",
+          "area": "PREdistribuce",
           "fixation_months": 12,
-          "price_mwh_excl_vat": 3608,
-          "price_mwh_incl_vat": 4366,
-          "monthly_fee_incl_vat": null,
-          "page_marker": "3 608 Kč"
+          "price_mwh_excl_vat": 3608.0,
+          "price_mwh_incl_vat": 4365.68,
+          "monthly_fee_incl_vat": 163.35,
+          "price_list": {
+            "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
+            "document": "d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
+            "effective_from": "2026-11-04",
+            "markers": [
+              "FIXNĚ ONLINE PRO ZAČÁTEK na 1 rok",
+              "4 365,68",
+              "(3 608,00)",
+              "163,35"
+            ]
+          }
         }
       ],
       "green_evidence": []
@@ -175,17 +262,265 @@
       ],
       "offers": [
         {
-          "id": "eon-variant36",
+          "id": "eon-variantpro36",
           "product": "Variant PRO na 3 roky",
-          "tariff": null,
+          "tariff": "D02d",
+          "area": "PREdistribuce",
           "fixation_months": 36,
-          "price_mwh_excl_vat": null,
-          "price_mwh_incl_vat": null,
-          "price_mwh_unknown_vat": 3387,
-          "monthly_fee_incl_vat": null,
-          "page_marker": "3 387 Kč"
+          "price_mwh_excl_vat": 2799.0,
+          "price_mwh_incl_vat": 3387.0,
+          "monthly_fee_incl_vat": 168.19,
+          "page_marker": "3 387 Kč",
+          "price_list": {
+            "url": null,
+            "document": "cenik--variant--pro--na--3--roky--10_26-----distribucni--uzemi--pre.pdf",
+            "effective_from": "2026-10-10",
+            "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
+          }
+        },
+        {
+          "id": "eon-variantpro24",
+          "product": "Variant PRO na 2 roky",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 24,
+          "price_mwh_excl_vat": 2899.0,
+          "price_mwh_incl_vat": 3508.0,
+          "monthly_fee_incl_vat": 168.19,
+          "price_list": {
+            "url": null,
+            "document": "cenik--variant--pro--na--2--roky--10_26-----distribucni--uzemi--pre.pdf",
+            "effective_from": "2026-10-01",
+            "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
+          }
+        },
+        {
+          "id": "eon-variant36",
+          "product": "Variant na 3 roky",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 36,
+          "price_mwh_excl_vat": 3239.0,
+          "price_mwh_incl_vat": 3919.0,
+          "monthly_fee_incl_vat": 168.19,
+          "price_list": {
+            "url": null,
+            "document": "cenik--variant--na--3--roky--11_26-----distribucni--uzemi--pre.pdf",
+            "effective_from": "2026-11-04",
+            "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
+          }
         }
       ],
+      "green_evidence": []
+    },
+    {
+      "id": "epet",
+      "name": "epet",
+      "ote_name": "epet energie, a.s.",
+      "source_url": "https://epet.cz/elektrina-1",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "epet-1",
+          "quote": "Pro naše zákazníky máme vždy tu nejlepší cenu",
+          "rule_id": "price_rank",
+          "params": {
+            "kind": "superlative"
+          }
+        },
+        {
+          "id": "epet-2",
+          "quote": "90 % našich zákazníků by nás doporučilo ostatním",
+          "rule_id": "soft_trust",
+          "params": {}
+        },
+        {
+          "id": "epet-3",
+          "quote": "Veškerou dodávanou energii od nás můžete mít čistě z obnovitelných zdrojů.",
+          "rule_id": "green_share",
+          "params": {
+            "share_pct": 100
+          }
+        }
+      ],
+      "offers": [
+        {
+          "id": "epet-fix36",
+          "product": "FIX 36 GARANT",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 36,
+          "price_mwh_excl_vat": 3299.0,
+          "price_mwh_incl_vat": 3991.79,
+          "monthly_fee_incl_vat": 157.3,
+          "price_list": {
+            "url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-14-59/EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
+            "document": "EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
+            "effective_from": "2026-11-04",
+            "markers": [
+              "FIX 36",
+              "GARANT",
+              "3 299,00",
+              "3 991,79",
+              "157,30"
+            ]
+          }
+        },
+        {
+          "id": "epet-fix24",
+          "product": "FIX 24 GARANT",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 24,
+          "price_mwh_excl_vat": 3399.0,
+          "price_mwh_incl_vat": 4112.79,
+          "monthly_fee_incl_vat": 157.3,
+          "price_list": {
+            "url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-11-06/EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
+            "document": "EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
+            "effective_from": "2026-11-04",
+            "markers": [
+              "FIX 24",
+              "GARANT",
+              "3 399,00",
+              "4 112,79",
+              "157,30"
+            ]
+          }
+        }
+      ],
+      "green_evidence": []
+    },
+    {
+      "id": "pre",
+      "name": "PRE",
+      "ote_name": "Pražská energetika, a.s.",
+      "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "pre-1",
+          "quote": "Elektřina krytá zárukami původu",
+          "rule_id": "green_share",
+          "params": {
+            "product": "PRE PROUD EKO"
+          }
+        },
+        {
+          "id": "pre-2",
+          "quote": "Spolehlivost, garance, jistota",
+          "rule_id": "soft_trust",
+          "params": {}
+        }
+      ],
+      "offers": [],
+      "green_evidence": [
+        {
+          "label": "PRE PROUD EKO – prohlášení o krytí zárukami původu",
+          "value": "U produktu PRE PROUD EKO zákazník nezískává fyzicky elektřinu z obnovitelných zdrojů, jeho spotřeba je kryta odpovídajícím množstvím záruk původu.",
+          "page_marker": "jeho spotřeba je kryta odpovídajícím množstvím záruk původu"
+        }
+      ]
+    },
+    {
+      "id": "mnd",
+      "name": "MND",
+      "ote_name": "MND Energie a.s.",
+      "source_url": "https://www.mnd.cz/elektrina",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "mnd-1",
+          "quote": "250 tis. zákazníků",
+          "rule_id": "customer_count",
+          "params": {
+            "claimed": 250000
+          }
+        }
+      ],
+      "offers": [],
+      "green_evidence": []
+    },
+    {
+      "id": "dobra",
+      "name": "Dobrá Energie",
+      "ote_name": "Dobrá Energie s.r.o.",
+      "source_url": "https://dobra-energie.eu/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "dobra-1",
+          "quote": "Po sloučení s epet jsme největší alternativní dodavatel energií v ČR",
+          "rule_id": "market_size",
+          "params": {
+            "scope": "qualified",
+            "qualifier": "alternativní",
+            "merged_with": [
+              "epet energie, a.s."
+            ],
+            "exclude": [
+              "ČEZ Prodej, a.s.",
+              "ČEZ ESCO, a.s.",
+              "E.ON Energie, a.s.",
+              "Pražská energetika, a.s.",
+              "innogy Energie, s.r.o.",
+              "Pražská plynárenská, a.s."
+            ]
+          }
+        },
+        {
+          "id": "dobra-2",
+          "quote": "Společně s epet se staráme o více než 185 000 odběrných míst po celé ČR",
+          "rule_id": "customer_count",
+          "params": {
+            "claimed": 185000,
+            "metric": "opm",
+            "merged_with": [
+              "epet energie, a.s."
+            ]
+          }
+        }
+      ],
+      "offers": [],
+      "green_evidence": []
+    },
+    {
+      "id": "spp",
+      "name": "SPP CZ",
+      "ote_name": "SPP CZ, a.s.",
+      "source_url": "https://www.spp.cz/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "spp-1",
+          "quote": "Jsme dodavatel energie pro téměř 1,5 milionu zákazníků v Česku a na Slovensku.",
+          "rule_id": "customer_count",
+          "params": {
+            "claimed": 1500000,
+            "includes_other_markets": "Česko a Slovensko"
+          }
+        }
+      ],
+      "offers": [],
+      "green_evidence": []
+    },
+    {
+      "id": "lama",
+      "name": "LAMA energy",
+      "ote_name": "LAMA energy a.s.",
+      "source_url": "https://www.lamaenergy.cz/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "lama-1",
+          "quote": "Část dodávek navíc pokrývá ze svých vlastních zdrojů v České republice a tak je levnější oproti dominantním dodavatelům.",
+          "rule_id": "price_rank",
+          "params": {
+            "kind": "superlative"
+          }
+        }
+      ],
+      "offers": [],
       "green_evidence": []
     },
     {

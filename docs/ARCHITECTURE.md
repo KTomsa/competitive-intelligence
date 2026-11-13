@@ -13,17 +13,20 @@ flowchart TB
     B[Prohlížeč: výběr dodavatelů] -->|POST /api/v1/analyze| W[workflow.run]
     W --> S[Web Scout: stránky dodavatelů]
     W --> E[Konektor ERÚ: CSV cenových pásem]
-    W --> O[Konektor OTE: tabulka OPM]
+    W --> O[Konektor OTE: OPM elektřiny a plynu]
+    W --> C[Konektor ceníků: PDF dodavatelů]
     P[(suppliers.json: citáty, ceny)] --> W
     S --> X[Claim Extractor]
     X --> R[Pravidla v kódu]
     E --> R
     O --> R
+    C --> R
     R --> T[Strategist: briefing]
     T -->|jedna odpověď JSON| B
     SN[(snapshots: datovaná záloha)] -.při selhání.-> S
     SN -.-> E
     SN -.-> O
+    SN -.-> C
 ```
 
 Vše běží v jednom procesu v rámci jednoho požadavku (typicky několik sekund). Výsledek se nikam neukládá; žije v prohlížeči do obnovení stránky. Uložená ukázka (`example_report.json`) je součástí nasazení.
@@ -34,7 +37,8 @@ Vše běží v jednom procesu v rámci jednoho požadavku (typicky několik seku
 |---|---|---|
 | Web Scout | Stáhne schválenou stránku, převede na text, spočítá otisk | `connectors/web.py` |
 | Claim Extractor | Najde další tvrzení na stránce (model nebo klíčová slova) | `agents.py` |
-| Cenová a tržní pravidla | Počítají čísla a verdikty | `rules.py` |
+| Konektor ceníků | Stáhne PDF ceník, převede na text a ověří cenu a stálý plat | `connectors/pricelist.py` |
+| Cenová a tržní pravidla | Počítají čísla, roční náklad a verdikty | `rules.py` |
 | Strategist | Briefing s nejvýše třemi prioritami (model nebo šablona) | `agents.py` |
 
 Role jsou funkce, ne samostatné služby. Samostatný Judge není; jeho úlohu plní kontroly v kódu.
@@ -44,6 +48,8 @@ Role jsou funkce, ne samostatné služby. Samostatný Judge není; jeho úlohu p
 - Stahuje se jen ze schválených hostitelů přes HTTPS, s limitem času a velikosti; kontroluje se i cíl přesměrování.
 - Rozhraní přijímá jen identifikátory dodavatelů, žádné uživatelské URL.
 - CSV ERÚ musí mít očekávané sloupce a konečné kladné hodnoty; duplicitní řádek je chyba.
+- Nabídka, kterou živě stažený ceník nebo stránka už nepotvrzuje, se z verdiktů i srovnání vyřadí a zpráva na to upozorní.
+- Srovnávají se jen nabídky se stejnou sazbou, distribučním územím a délkou fixace.
 - Pásmo ERÚ se vybírá pro stejnou sazbu, fixaci a měsíc nabídky. Když neexistuje, verdikt se nevydá (žádná náhrada jiným obdobím).
 - Citát od modelu musí doslova existovat ve staženém textu, jinak se zahodí.
 - Briefing od modelu smí odkazovat jen na existující tvrzení, jinak se použije šablona.

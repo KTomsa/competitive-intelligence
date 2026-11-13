@@ -93,6 +93,7 @@
     const meta = el("div", "meta");
     meta.append("Získáno " + fmtTime(src.fetched_at));
     if (src.data_period) meta.append(" · období dat " + src.data_period);
+    if (src.effective_from) meta.append(" · účinnost od " + src.effective_from);
     if (src.unit) meta.append(" · " + src.unit);
     row.append(meta);
     row.append(link(src.page_url || src.source_url, src.page_url || src.source_url));
@@ -123,6 +124,57 @@
     labels.append(bandLabel, priceLabel);
     box.append(track, labels);
     return box;
+  }
+
+  const czNumber = new Intl.NumberFormat("cs-CZ", { maximumFractionDigits: 0 });
+  const czMoney = new Intl.NumberFormat("cs-CZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const POSITION_TEXT = { below: "pod pásmem", within: "v pásmu", above: "nad pásmem", unknown: "nelze určit" };
+
+  function comparisonPanel(r) {
+    if (!r.comparison || !r.comparison.length) return null;
+    const sec = el("section", "panel");
+    sec.append(el("h2", null, "Srovnání fixovaných nabídek"));
+    sec.append(el("p", "meta", "Sazba " + r.profile.tariff + (r.profile.area ? ", distribuční území " + r.profile.area : "") +
+      ". Roční náklad je obchodní část ceny s DPH (12 × stálý plat + spotřeba × cena), bez regulovaných složek. " +
+      "Seřazeno od nejnižšího nákladu. Pásmo ERÚ: pod pásmem = nejlevnější čtvrtina nabídek na trhu."));
+    r.comparison.forEach((g) => {
+      sec.append(el("h3", null, "Fixace " + g.fixation_months + " měsíců"));
+      const wrap = el("div", "matrix-wrap");
+      const table = el("table", "cmp");
+      const head = el("tr");
+      ["Dodavatel a produkt", "Kč/MWh bez DPH", "Stálý plat Kč/měs."]
+        .concat(g.annual_mwh.map((m) => "Ročně při " + m + " MWh"), ["Pásmo ERÚ", "Ověření"])
+        .forEach((t) => head.append(el("th", null, t)));
+      table.append(head);
+      g.rows.forEach((row) => {
+        const tr = el("tr");
+        const first = el("td", "cmp-name");
+        first.append(el("strong", null, row.supplier), el("span", null, " " + row.product));
+        if (row.price_list_url) {
+          first.append(" ");
+          first.append(link(row.price_list_url, "ceník"));
+        }
+        tr.append(first);
+        tr.append(el("td", null, row.price_mwh_excl_vat == null ? "–" : czNumber.format(row.price_mwh_excl_vat)));
+        tr.append(el("td", null, row.monthly_fee_incl_vat == null ? "–" : czMoney.format(row.monthly_fee_incl_vat)));
+        row.annual_cost.forEach((c) => tr.append(el("td", null, c == null ? "–" : czNumber.format(c) + " Kč")));
+        const pos = el("td");
+        pos.append(el("span", "badge pos-" + row.position, POSITION_TEXT[row.position] || row.position));
+        tr.append(pos);
+        const ver = el("td");
+        const badge = el("span", "badge " + (row.confirmed_live ? "origin-live" : "origin-snapshot"),
+          row.confirmed_live ? "živě" : "z přípravy");
+        badge.title = row.confirmation;
+        ver.append(badge);
+        tr.append(ver);
+        table.append(tr);
+      });
+      wrap.append(table);
+      sec.append(wrap);
+    });
+    sec.append(el("p", "meta", "Ověření „živě“ znamená, že při tomto běhu byl stažen ceník nebo stránka dodavatele " +
+      "a cena v nich stále je. „Z přípravy“ jsou údaje z ceníku, který nelze stáhnout automaticky."));
+    return sec;
   }
 
   function claimCard(c) {
@@ -228,10 +280,24 @@
     srcPanel.append(el("h2", null, "Zdroje použité v tomto běhu"));
     const ul = el("ul", "sources");
     ul.append(sourceRow(r.sources.eru), sourceRow(r.sources.ote));
+    if (r.sources.ote_gas) ul.append(sourceRow(r.sources.ote_gas));
     r.suppliers.forEach((s) => { if (s.page) ul.append(sourceRow(s.page)); });
     srcPanel.append(ul);
-    srcPanel.append(el("p", "meta", "Připraveno předem: seznam dodavatelů, citáty s datem zachycení a ceny nabídek. " +
-      "Staženo při běhu: stránky dodavatelů (kontrola, že citát a cena stále platí), pásma ERÚ a počty OPM z OTE."));
+    if (r.price_lists && r.price_lists.length) {
+      const liveCount = r.price_lists.filter((p) => p.origin === "live").length;
+      const det = el("details", "pricelists");
+      det.append(el("summary", null, "Ceníky dodavatelů ve formátu PDF (" + r.price_lists.length +
+        ", z toho živě staženo " + liveCount + ")"));
+      const list = el("ul", "sources");
+      r.price_lists.forEach((p) => list.append(sourceRow(Object.assign({}, p, { name: p.supplier + " – " + p.name }))));
+      det.append(list);
+      srcPanel.append(det);
+    }
+    srcPanel.append(el("p", "meta", "Připraveno předem: seznam dodavatelů, citáty s datem zachycení, ceny a stálé platy z ceníků. " +
+      "Staženo při běhu: stránky dodavatelů a jejich ceníky (kontrola, že citát a cena stále platí), " +
+      "pásma ERÚ a počty OPM elektřiny i plynu z OTE."));
+    const cmp = comparisonPanel(r);
+    if (cmp) reportEl.append(cmp);
     reportEl.append(srcPanel);
 
     r.suppliers.forEach((s) => {
