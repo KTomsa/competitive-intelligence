@@ -9,7 +9,8 @@ def _form_context() -> dict:
     services = current_app.extensions["fact_or_watt"]
     bundle = services.bundle
     return {
-        "suppliers": bundle.suppliers,
+        "fixture_suppliers": bundle.suppliers,
+        "live_suppliers": services.ctx.registry.suppliers,
         "profiles": [
             {"profile_id": pid, "label": bundle.profile_labels[pid]} for pid in bundle.profiles
         ],

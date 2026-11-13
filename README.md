@@ -2,7 +2,7 @@
 
 **Fact or Watt** is a Flask-based web application that helps analysts assess marketing claims made by Czech electricity suppliers against traceable reference evidence. It retrieves approved supplier web pages, extracts literal claims, uses bounded AI agents to select evidence-gathering tools, applies deterministic verification rules, and produces a neutral managerial briefing.
 
-> Project status: Phase 2 implementation. The Flask UI/API now selects Azure SQL persistence when `DATABASE_URL` is configured, with a separate leased worker, bounded retries, versioned fixture results and explicit publication. Offline tests and a local read-only Azure connectivity/schema check pass. Azure write/restart integration and Vercel deployment remain unverified; live fetching and LLM agents are later phases.
+> Project status: Azure audit persistence and live source intake are implemented. With `DATABASE_URL`, the Flask UI/API enqueues fixture or live audits for a separate leased worker, with bounded retries, versioned results and explicit publication. Live intake covers registered ČEZ, E.ON and innogy pages with baseline/snapshot fallback. Claim extraction from changed pages, live reference data and LLM agents remain unfinished. Azure write/restart integration and Vercel deployment remain unverified. See [merge validation](docs/MERGE_VALIDATION.md) for executed checks and limits.
 
 ## Technology
 
@@ -52,7 +52,7 @@ vercel.json
 .env.example
 ```
 
-Connectors and live LLM adapters remain planned. Follow `docs/IMPLEMENTATION_PLAN.md` for the next phase.
+The supplier-page connector and parser are implemented; live LLM adapters remain planned. Follow `docs/IMPLEMENTATION_PLAN.md` for the next phase.
 
 ## Database ownership
 
@@ -90,7 +90,7 @@ uv run fact-or-watt-worker publish AUDIT_ID --approved-by YOUR_OPERATOR_NAME
 uv run fact-or-watt-fixture-audit
 ```
 
-In database mode, POST only enqueues a fixture audit; it stays queued until the worker runs. Startup performs no queries or demo writes. Completion does not publish automatically. See [Phase 2 operations and verification](docs/PHASE_2.md) for storage details and opt-in test instructions.
+In database mode, POST only enqueues an audit; it stays queued until the worker runs. Startup performs no queries or demo writes. Completion does not publish automatically. Live mode accepts supplier IDs `cez`, `eon` and `innogy`; fixture mode uses the fictional IDs shown in the form. Without a database, the process-local demonstration runs audits inline. See [Phase 2 operations and verification](docs/PHASE_2.md) for storage details and opt-in test instructions.
 
 Currently only the production database is available. Default tests stay offline; Azure write/restart tests are optional and require a separate test database. Do not point `TEST_DATABASE_URL` at production. A test database is not required to continue offline development.
 

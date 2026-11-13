@@ -12,29 +12,35 @@ if __name__ == "__main__" and not __package__:
 from dataclasses import dataclass
 from typing import Any
 
-from flask import Flask, request
-from werkzeug.exceptions import HTTPException
+from flask import Flask, Response, request
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.exceptions import HTTPException
 
 from .config import Settings
 from .schemas import AuditCreateRequest, AuditMode
-from .services import AuditRepository, FixtureBundle, load_demo_fixture
+from .services import AuditRepository, FixtureBundle
 from .services.factory import build_repository
+from .services.orchestrator import PipelineContext
 from .services.repository import StoredAuditError
 from .web import api, error_response, pages
 from .web.security import RateLimiter
-from .worker import process_next
+from .worker import build_context, process_next
 
 
 @dataclass
 class Services:
     settings: Settings
     repo: AuditRepository
-    bundle: FixtureBundle
+    ctx: PipelineContext
     limiter: RateLimiter
 
+    @property
+    def bundle(self) -> FixtureBundle:
+        return self.ctx.bundle
 
-def _seed_demo_audit(repo: AuditRepository, bundle: FixtureBundle) -> None:
+
+def _seed_demo_audit(repo: AuditRepository, ctx: PipelineContext) -> None:
+    bundle = ctx.bundle
     audit_id = repo.create_audit(
         AuditCreateRequest(
             supplier_ids=bundle.supplier_ids,
@@ -42,26 +48,31 @@ def _seed_demo_audit(repo: AuditRepository, bundle: FixtureBundle) -> None:
             mode=AuditMode.FIXTURE,
         )
     )
-    process_next(repo, bundle)
+    process_next(repo, ctx)
     if repo.get_result(audit_id) is not None:
         repo.publish(audit_id)
 
 
-def create_app(config: dict[str, Any] | None = None, *, repository: AuditRepository | None = None) -> Flask:
+def create_app(
+    config: dict[str, Any] | None = None,
+    *,
+    repository: AuditRepository | None = None,
+    context: PipelineContext | None = None,
+) -> Flask:
     """Build the app. `config` overrides Settings fields (used by tests).
 
     The factory reads settings, but opens no database connection at startup.
     """
     app = Flask(__name__)
     settings = Settings.from_env().with_overrides(config)
-    bundle = load_demo_fixture()
+    ctx = context if context is not None else build_context()
     repo = repository if repository is not None else build_repository(settings)
     if settings.seed_demo_audit and not repo.durable:
-        _seed_demo_audit(repo, bundle)
+        _seed_demo_audit(repo, ctx)
     app.extensions["fact_or_watt"] = Services(
         settings=settings,
         repo=repo,
-        bundle=bundle,
+        ctx=ctx,
         limiter=RateLimiter(settings.rate_limit_per_minute),
     )
 
@@ -69,11 +80,11 @@ def create_app(config: dict[str, Any] | None = None, *, repository: AuditReposit
     app.register_blueprint(api)
 
     @app.errorhandler(StoredAuditError)
-    def _stored_audit_invalid(_error):
+    def _stored_audit_invalid(_error: StoredAuditError):
         return error_response(503, "STORED_AUDIT_INCOMPATIBLE", "Uložený audit nelze načíst. Kontaktujte správce.")
 
     @app.errorhandler(SQLAlchemyError)
-    def _database_unavailable(_error):
+    def _database_unavailable(_error: SQLAlchemyError):
         # Driver exception text can contain a server name, SQL or credentials.
         if request.path.startswith("/api/"):
             return error_response(503, "DATABASE_UNAVAILABLE", "Databáze není dostupná. Zkuste to znovu později.")
@@ -86,7 +97,7 @@ def create_app(config: dict[str, Any] | None = None, *, repository: AuditReposit
         return error
 
     @app.after_request
-    def _security_headers(response):
+    def _security_headers(response: Response) -> Response:
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
         response.headers.setdefault(

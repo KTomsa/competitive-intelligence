@@ -28,6 +28,8 @@ Implementation is now present for durable fixture jobs, leased worker processing
 
 ## Phase 3 — Web Scout + source evidence
 
+Bounded fetching, HTML canonicalization, the supplier registry, baseline reuse and snapshot fallback are implemented and connected to the durable audit worker. Real fetching of all eight registered pages passed locally on 2026-11-13. Source metadata persists in the versioned audit result; shared SQL/Blob storage for raw captures and fallback/baseline files remains unfinished. See [merge validation](MERGE_VALIDATION.md).
+
 - Safe allowlisted live web fetch, hash of normalized text, immutable source metadata, baseline reuse and snapshot fallback with explicit timestamps and source status.
 - Build parsing and reference data importers without relying on undocumented API endpoints. Large raw bytes use Azure Blob or equivalent external persistence.
 - Acceptance: tests demonstrate three branches (unchanged/changed/unavailable); source URL, hash, origin and dates survive audit restarts and appear in UI.

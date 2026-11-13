@@ -1,4 +1,4 @@
-"""Azure SQL queue, fenced worker transactions and versioned fixture snapshots."""
+"""Azure SQL queue, fenced worker transactions and versioned audit snapshots."""
 
 import json
 from datetime import timedelta
@@ -8,7 +8,7 @@ from pydantic import ValidationError
 from sqlalchemy import and_, func, or_, select
 
 from ..models import AuditEventRow, AuditJob, AuditRun, BriefingRow, Publication
-from ..schemas import AuditCreateRequest, AuditError, AuditEvent, AuditResult, AuditStatus, AuditStatusView
+from ..schemas import AuditCreateRequest, AuditError, AuditEvent, AuditMode, AuditResult, AuditStatus, AuditStatusView
 from .publication import public_result
 from .repository import AuditNotFound, LeaseLost, PROGRESS, StoredAuditError
 
@@ -149,7 +149,8 @@ class SqlAuditRepository:
             run, job, now = self._owned(session, audit_id)
             session.add(BriefingRow(audit_id=run.audit_id, briefing_text=result.briefing.summary,
                 briefing_json=json.dumps({"version": 1, "audit_result": result.model_dump(mode="json")}, ensure_ascii=False),
-                model_name="fixture-deterministic-v1", created_at=now))
+                model_name="fixture-deterministic-v1" if result.mode is AuditMode.FIXTURE
+                    else "web-scout-deterministic-v1", created_at=now))
             run.status, run.progress_percent, run.finished_at = "completed", 100, now
             run.scope_note = result.scope_note[:1000]
             job.status, job.completed_at = "completed", now

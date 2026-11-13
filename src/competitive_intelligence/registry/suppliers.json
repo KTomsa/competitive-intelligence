@@ -1,0 +1,31 @@
+{
+  "note": "Schválené zdroje pro živý sběr. Web Scout načítá výhradně tyto přesné adresy. Stránky ověřeny 13. 11. 2026: odpovídají HTTP 200, robots.txt je nezakazuje a obsah je čitelný bez JavaScriptu. Právnické osoby a IČO zatím nejsou ověřené, proto zde nejsou.",
+  "suppliers": [
+    {
+      "supplier_id": "cez",
+      "name": "ČEZ",
+      "pages": [
+        {"source_id": "cez_home", "url": "https://www.cez.cz/", "page_kind": "homepage"},
+        {"source_id": "cez_elektrina", "url": "https://www.cez.cz/cs/energie/elektrina", "page_kind": "product"}
+      ]
+    },
+    {
+      "supplier_id": "eon",
+      "name": "E.ON",
+      "pages": [
+        {"source_id": "eon_home", "url": "https://www.eon.cz/", "page_kind": "homepage"},
+        {"source_id": "eon_elektrina", "url": "https://www.eon.cz/domacnosti/elektrina/", "page_kind": "product"},
+        {"source_id": "eon_zelena", "url": "https://www.eon.cz/zelena/", "page_kind": "green"}
+      ]
+    },
+    {
+      "supplier_id": "innogy",
+      "name": "innogy",
+      "pages": [
+        {"source_id": "innogy_home", "url": "https://www.innogy.cz/", "page_kind": "homepage"},
+        {"source_id": "innogy_elektrina", "url": "https://www.innogy.cz/elektrina/", "page_kind": "product"},
+        {"source_id": "innogy_cenik_elektrina", "url": "https://www.innogy.cz/ceniky/elektrina/", "page_kind": "pricing"}
+      ]
+    }
+  ]
+}

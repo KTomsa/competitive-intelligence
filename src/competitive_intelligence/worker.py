@@ -7,16 +7,34 @@ import sys
 import threading
 import time
 from contextlib import contextmanager
+from pathlib import Path
 
 from .config import Settings
+from .connectors import SupplierWebClient
 from .db import check_schema
+from .registry import load_registry
 from .schemas import AuditCreateRequest, AuditMode
 from .services import AuditRepository, FixtureBundle, InMemoryAuditRepository, load_demo_fixture
 from .services.factory import build_repository
-from .services.orchestrator import run_fixture_audit
+from .services.orchestrator import PipelineContext, run_fixture_audit, run_live_audit
 from .services.repository import LeaseLost
+from .services.stores import FileBaselineStore, FileSnapshotStore
+from .services.web_scout import WebScout
 
 log = logging.getLogger(__name__)
+
+DATA_DIR = Path(__file__).resolve().parent / "data"
+
+
+def build_context(data_dir: Path = DATA_DIR) -> PipelineContext:
+    """Wire source intake without making network requests."""
+    registry = load_registry()
+    scout = WebScout(
+        SupplierWebClient(registry.allowed_urls),
+        FileSnapshotStore(data_dir / "snapshots"),
+        FileBaselineStore(data_dir / "baseline"),
+    )
+    return PipelineContext(bundle=load_demo_fixture(), registry=registry, scout=scout)
 
 
 @contextmanager
@@ -45,17 +63,19 @@ def keep_lease(repo, audit_id):
             thread.join(timeout=12)
 
 
-def process_next(repo: AuditRepository, bundle: FixtureBundle) -> str | None:
+def process_next(repo: AuditRepository, context: PipelineContext | FixtureBundle) -> str | None:
     """Claim and process one job. Returns its audit ID, or None if the queue is empty."""
     audit_id = repo.claim_next_job()
     if audit_id is None:
         return None
     try:
         with keep_lease(repo, audit_id):
-            if repo.get_request(audit_id).mode is not AuditMode.FIXTURE:
-                repo.fail(audit_id, "LIVE_NOT_IMPLEMENTED", "Živý audit zatím není implementován.")
-                return audit_id
-            run_fixture_audit(repo, audit_id, bundle)
+            if repo.get_request(audit_id).mode is AuditMode.LIVE:
+                ctx = context if isinstance(context, PipelineContext) else build_context()
+                run_live_audit(repo, audit_id, ctx)
+            else:
+                bundle = context.bundle if isinstance(context, PipelineContext) else context
+                run_fixture_audit(repo, audit_id, bundle)
     except LeaseLost:
         log.warning("Audit %s lost its lease; delivery stopped", audit_id)
     except Exception as error:
@@ -70,7 +90,7 @@ def process_next(repo: AuditRepository, bundle: FixtureBundle) -> str | None:
 
 
 def fixture_main() -> None:
-    """Offline smoke run: one fixture audit through the whole pipeline, no network, no keys."""
+    """Offline smoke run through the whole pipeline, no network, no keys."""
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")  # Czech text on a non-UTF-8 console
     bundle = load_demo_fixture()
@@ -90,9 +110,10 @@ def fixture_main() -> None:
             {
                 "audit_id": audit_id,
                 "status": status.status,
-                "events": len(status.events),
-                "warnings": status.warnings,
+                "events": [f"{e.stage}: {e.message}" for e in status.events],
+                "sources": {s.source_id: s.origin for s in result.sources} if result else None,
                 "verdicts": {v.claim_id: v.verdict for v in result.verdicts} if result else None,
+                "error": status.error.message if status.error else None,
             },
             ensure_ascii=False,
             indent=2,
@@ -134,9 +155,9 @@ def main(argv=None) -> int:
             result = repo.publish(args.audit_id, approved_by=args.approved_by)
             print(json.dumps({"audit_id": result.audit_id, "published_at": result.published_at.isoformat()}))
             return 0
-        bundle = load_demo_fixture()
+        ctx = build_context()
         while True:
-            audit_id = process_next(repo, bundle)
+            audit_id = process_next(repo, ctx)
             if audit_id:
                 print(json.dumps({"audit_id": audit_id, "status": repo.get_status(audit_id).status}), flush=True)
             if args.once:

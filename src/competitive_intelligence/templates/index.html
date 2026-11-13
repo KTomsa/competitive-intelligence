@@ -3,11 +3,25 @@
 {% block content %}
 <section class="panel" aria-labelledby="launch-heading">
   <h1 id="launch-heading">Spustit audit</h1>
-  <p class="muted">Zatím je dostupný jen ukázkový režim s fiktivními daty. Živý sběr z webů dodavatelů přibude v další fázi.</p>
+  <p class="muted">Živý sběr načte schválené stránky skutečných dodavatelů. Ukázkový režim běží na fiktivních datech a předvádí celý průchod včetně verdiktů.</p>
   <form id="launch-form" novalidate>
     <fieldset>
+      <legend>Režim</legend>
+      <label class="check"><input type="radio" name="mode" value="live" checked> Živý sběr z webů dodavatelů</label>
+      <label class="check"><input type="radio" name="mode" value="fixture"> Ukázkový režim (fiktivní data)</label>
+    </fieldset>
+    <fieldset data-mode="live">
       <legend>Dodavatelé</legend>
-      {% for supplier in suppliers %}
+      {% for supplier in live_suppliers %}
+      <label class="check">
+        <input type="checkbox" name="supplier_ids" value="{{ supplier.supplier_id }}" checked>
+        {{ supplier.name }} <span class="muted">({{ supplier.pages|length }} stránky)</span>
+      </label>
+      {% endfor %}
+    </fieldset>
+    <fieldset data-mode="fixture" hidden>
+      <legend>Dodavatelé (fiktivní)</legend>
+      {% for supplier in fixture_suppliers %}
       <label class="check">
         <input type="checkbox" name="supplier_ids" value="{{ supplier.supplier_id }}" checked>
         {{ supplier.name }}
@@ -26,7 +40,7 @@
     <label class="field" for="access-code">Přístupový kód
       <input id="access-code" type="password" autocomplete="off" required {% if not launch_enabled %}disabled{% endif %}>
     </label>
-    <button type="submit" {% if not launch_enabled %}disabled{% endif %}>Spustit ukázkový audit</button>
+    <button type="submit" {% if not launch_enabled %}disabled{% endif %}>Spustit audit</button>
     {% if not launch_enabled %}
     <p class="notice warning">Spouštění auditů není na tomto serveru nastaveno (chybí přístupový kód v konfiguraci).</p>
     {% endif %}

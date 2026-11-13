@@ -6,7 +6,7 @@ import pytest
 
 from competitive_intelligence.schemas import AuditCreateRequest, AuditStatus, VerdictValue
 from competitive_intelligence.services import InMemoryAuditRepository, load_demo_fixture
-from competitive_intelligence.services.orchestrator import extract_fixture_claims
+from competitive_intelligence.services.orchestrator import validate_claims
 from competitive_intelligence.worker import process_next
 
 
@@ -19,13 +19,13 @@ def no_network(monkeypatch):
 
 
 @pytest.fixture
-def finished(no_network):
+def finished(no_network, ctx):
     bundle = load_demo_fixture()
     repo = InMemoryAuditRepository()
     audit_id = repo.create_audit(
         AuditCreateRequest(supplier_ids=bundle.supplier_ids, profile_ids=list(bundle.profiles))
     )
-    assert process_next(repo, bundle) == audit_id
+    assert process_next(repo, ctx) == audit_id
     return repo, audit_id, repo.get_result(audit_id)
 
 
@@ -101,13 +101,13 @@ def test_briefing_cites_claims_and_has_no_supplier_score(finished):
     assert "score" not in result.model_dump_json()
 
 
-def test_audit_limited_to_requested_suppliers(no_network):
+def test_audit_limited_to_requested_suppliers(no_network, ctx):
     bundle = load_demo_fixture()
     repo = InMemoryAuditRepository()
     audit_id = repo.create_audit(
         AuditCreateRequest(supplier_ids=["supplier_demo_b"], profile_ids=["d02d_2mwh"])
     )
-    process_next(repo, bundle)
+    process_next(repo, ctx)
     result = repo.get_result(audit_id)
     assert {c.supplier_id for c in result.claims} == {"supplier_demo_b"}
     assert {s.supplier_id for s in result.sources} == {"supplier_demo_b"}
@@ -122,22 +122,18 @@ def test_extractor_coerces_unknown_rule_and_drops_bad_params():
         "source_ref": "h1",
         "claim_type": "price",
     }
-    object.__setattr__(
-        bundle,
-        "raw_claims",
-        [
-            {**template, "id": "unknown_rule", "rule": {"id": "made_up", "params": {}}},
-            {**template, "id": "bad_params", "rule": {"id": "price_rank", "params": {"scope": "moon"}}},
-        ],
-    )
-    claims, dropped = extract_fixture_claims(bundle, [source])
+    raw = [
+        {**template, "id": "unknown_rule", "rule": {"id": "made_up", "params": {}}},
+        {**template, "id": "bad_params", "rule": {"id": "price_rank", "params": {"scope": "moon"}}},
+    ]
+    claims, dropped = validate_claims(raw, [source], bundle.canonical_texts)
     assert [(c.id, c.rule.id) for c in claims] == [("unknown_rule", "other")]
     assert len(dropped) == 1 and "bad_params" in dropped[0]
 
 
-def test_job_is_claimed_only_once(no_network):
+def test_job_is_claimed_only_once(no_network, ctx):
     bundle = load_demo_fixture()
     repo = InMemoryAuditRepository()
     repo.create_audit(AuditCreateRequest(supplier_ids=["supplier_demo_a"], profile_ids=["d02d_2mwh"]))
-    assert process_next(repo, bundle) is not None
-    assert process_next(repo, bundle) is None
+    assert process_next(repo, ctx) is not None
+    assert process_next(repo, ctx) is None

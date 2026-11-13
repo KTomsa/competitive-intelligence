@@ -59,7 +59,13 @@ $env:RUN_AZURE_INTEGRATION = '1'
 uv run pytest tests/test_azure_repository.py -q -rs
 ```
 
-No DDL, migrations, seed data or production write integration tests are included. A separate multi-process worker/restart demonstration and Vercel network/deployment checks remain release acceptance work. `LLM_API_KEY` is configured but intentionally unused by this phase; `mode=live` continues returning 501 until live source intake and bounded agents are implemented.
+No DDL, migrations, seed data or production write integration tests are included. A separate multi-process worker/restart demonstration and Vercel network/deployment checks remain release acceptance work. `LLM_API_KEY` is configured but intentionally unused by this phase.
+
+## Same-branch source-intake integration (2026-11-13)
+
+The incoming source-intake implementation is now connected to the same leased worker. Both `mode=fixture` and `mode=live` enqueue without processing in database-backed HTTP requests. Live mode collects the registered ČEZ, E.ON and innogy pages and preserves source metadata in the versioned result snapshot. The independent worker retains lease fencing, heartbeats, bounded retries and explicit publication for either mode.
+
+Live claims currently come only from a matching approved baseline; changed/new pages produce an explicit extraction warning. Live reference data and LLM extraction remain unfinished. Raw page text, newly saved fallback snapshots and baseline approval files still use the incoming file-store adapters, so shared SQL/Blob source storage remains acceptance work. These files are not cross-worker durable storage on Vercel. See [merge validation](MERGE_VALIDATION.md) for executed checks and remaining limits.
 
 ## Changed files
 

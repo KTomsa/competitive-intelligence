@@ -150,6 +150,8 @@ function renderResult(root, result) {
   root.replaceChildren();
   if (result.mode === "fixture") {
     root.append(el("p", { className: "notice warning", text: `Ukázkový režim. ${result.scope_note}` }));
+  } else {
+    root.append(el("p", { className: "notice warning", text: result.scope_note }));
   }
   const meta = [`Dokončeno: ${formatDateTime(result.completed_at)}`];
   if (result.published_at) meta.push(`Publikováno: ${formatDateTime(result.published_at)}`);
@@ -224,17 +226,29 @@ async function initIndex() {
 
   const form = document.getElementById("launch-form");
   const errorBox = document.getElementById("launch-error");
+  const currentMode = () => form.querySelector('input[name="mode"]:checked').value;
+  const syncMode = () => {
+    for (const group of form.querySelectorAll("fieldset[data-mode]")) group.hidden = group.dataset.mode !== currentMode();
+  };
+  for (const radio of form.querySelectorAll('input[name="mode"]')) radio.addEventListener("change", syncMode);
+  syncMode();
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     errorBox.hidden = true;
-    const checked = (name) => [...form.querySelectorAll(`input[name="${name}"]:checked`)].map((i) => i.value);
+    const mode = currentMode();
+    const scope = form.querySelector(`fieldset[data-mode="${mode}"]`);
+    const checked = (root, name) => [...root.querySelectorAll(`input[name="${name}"]:checked`)].map((i) => i.value);
     const codeInput = document.getElementById("access-code");
-    const payload = { supplier_ids: checked("supplier_ids"), profile_ids: checked("profile_ids"), commodity: "electricity", mode: "fixture" };
+    const button = form.querySelector('button[type="submit"]');
+    const payload = { supplier_ids: checked(scope, "supplier_ids"), profile_ids: checked(form, "profile_ids"), commodity: "electricity", mode };
     if (!payload.supplier_ids.length || !payload.profile_ids.length) {
       errorBox.textContent = "Vyberte alespoň jednoho dodavatele a jeden profil.";
       errorBox.hidden = false;
       return;
     }
+    button.disabled = true;
+    button.textContent = mode === "live" ? "Načítám weby dodavatelů…" : "Spouštím…";
     try {
       // The code travels only in a request header: never in the URL, never in storage.
       const { response, body } = await fetchJson("/api/v1/audits", {
@@ -251,6 +265,8 @@ async function initIndex() {
     } catch {
       errorBox.textContent = "Server není dostupný.";
     }
+    button.disabled = false;
+    button.textContent = "Spustit audit";
     errorBox.hidden = false;
   });
 }

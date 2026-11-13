@@ -13,7 +13,7 @@ from sqlalchemy.exc import OperationalError
 from competitive_intelligence.app import create_app
 from competitive_intelligence.config import Settings
 from competitive_intelligence.db import create_database_engine
-from competitive_intelligence.models import AuditJob, UTCDateTime
+from competitive_intelligence.models import AuditJob, BriefingRow, UTCDateTime
 from competitive_intelligence.schemas import AuditCreateRequest, AuditStatus
 from competitive_intelligence.services import InMemoryAuditRepository, load_demo_fixture
 from competitive_intelligence.services.publication import public_result
@@ -45,6 +45,32 @@ def test_durable_post_queues_without_running_pipeline(payload, auth):
     assert restarted.get("/api/v1/audits/latest").status_code == 404
     repo.publish(created["audit_id"], approved_by="test-operator")
     assert restarted.get("/api/v1/audits/latest").get_json()["published_at"]
+
+
+def test_durable_live_audit_waits_for_worker_and_explicit_publication(ctx, all_pages_ok, auth):
+    repo = QueuedRepository()
+    client = create_app(
+        {"audit_access_code": auth["X-Audit-Access-Code"]}, repository=repo, context=ctx
+    ).test_client()
+    response = client.post("/api/v1/audits", headers=auth, json={
+        "supplier_ids": ["cez"], "profile_ids": ["d02d_2mwh"], "mode": "live",
+    })
+    assert response.status_code == 202
+    created = response.get_json()
+    assert all_pages_ok.requests == []
+    assert client.get(created["status_url"]).get_json()["status"] == "queued"
+    assert client.get(created["results_url"]).status_code == 409
+
+    assert process_next(repo, ctx) == created["audit_id"]
+    restarted = create_app(repository=repo, context=ctx).test_client()
+    result = restarted.get(created["results_url"]).get_json()
+    assert result["mode"] == "live" and len(result["sources"]) == 2
+    assert all(source["origin"] == "live" for source in result["sources"])
+    assert all("cez.cz" in url for url in all_pages_ok.page_requests())
+    assert result["published_at"] is None
+    assert restarted.get("/api/v1/audits/latest").status_code == 404
+    repo.publish(created["audit_id"], approved_by="test-operator")
+    assert restarted.get("/api/v1/audits/latest").get_json()["audit_id"] == created["audit_id"]
 
 
 def test_database_error_is_redacted_and_does_not_fall_back():
@@ -235,6 +261,27 @@ def test_final_retry_is_terminal_and_has_no_public_result(owned_job):
     assert job.status == "dead" and run.status == "failed"
     assert run.finished_at == now and run.error_code == "PIPELINE_ERROR"
     assert job.leased_by is None and audit_id not in repo._leases
+
+
+@pytest.mark.parametrize("mode", ["fixture", "live"])
+def test_sql_completion_preserves_mode_provenance_and_pipeline_metadata(owned_job, ctx, mode):
+    repo, run, job, rows, now, audit_id = owned_job
+    memory = InMemoryAuditRepository()
+    request = AuditCreateRequest(
+        supplier_ids=["cez"] if mode == "live" else ["supplier_demo_a"],
+        profile_ids=["d02d_2mwh"], mode=mode,
+    )
+    temporary_id = memory.create_audit(request)
+    process_next(memory, ctx)
+    result = memory.get_result(temporary_id).model_copy(update={"audit_id": audit_id})
+    repo.complete(audit_id, result)
+    stored = next(row for row in rows if isinstance(row, BriefingRow))
+    restored = decode_result(stored.briefing_json, envelope=True)
+    assert restored.model_dump() == result.model_dump()
+    assert stored.model_name == ("web-scout-deterministic-v1" if mode == "live"
+                                 else "fixture-deterministic-v1")
+    assert run.status == job.status == "completed"
+    assert audit_id not in repo._leases
 
 
 def test_worker_fixture_command_runs_offline(capsys):
