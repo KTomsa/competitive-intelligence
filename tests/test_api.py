@@ -67,10 +67,18 @@ def test_validation_errors(client, auth, payload):
     assert empty.status_code == 422
 
 
-def test_live_mode_is_honestly_not_implemented(client, auth, payload):
+def test_live_audit_runs_against_registered_suppliers(client, auth, payload):
+    live = {**payload, "mode": "live", "supplier_ids": ["cez", "eon", "innogy"]}
+    created = client.post("/api/v1/audits", json=live, headers=auth)
+    assert created.status_code == 202
+    result = client.get(created.get_json()["results_url"]).get_json()
+    assert result["mode"] == "live" and len(result["sources"]) == 8
+    assert {s["origin"] for s in result["sources"]} == {"live"}
+
+
+def test_fixture_supplier_is_rejected_in_live_mode(client, auth, payload):
     response = client.post("/api/v1/audits", json={**payload, "mode": "live"}, headers=auth)
-    assert response.status_code == 501
-    assert response.get_json()["error"]["code"] == "LIVE_NOT_IMPLEMENTED"
+    assert response.status_code == 422
 
 
 def test_unknown_audit_is_404_json(client):

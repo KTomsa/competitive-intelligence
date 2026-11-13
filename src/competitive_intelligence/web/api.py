@@ -64,26 +64,26 @@ def create_audit():
         fields = [{"field": ".".join(map(str, e["loc"])), "problem": e["msg"]} for e in exc.errors()]
         raise ApiError(422, "VALIDATION_ERROR", "Neplatný požadavek.", {"fields": fields}) from None
 
-    bundle = services.bundle
-    unknown_suppliers = sorted(set(payload.supplier_ids) - set(bundle.supplier_ids))
-    unknown_profiles = sorted(set(payload.profile_ids) - set(bundle.profiles))
+    ctx = services.ctx
+    live = payload.mode is AuditMode.LIVE
+    known_suppliers = ctx.registry.supplier_ids if live else ctx.bundle.supplier_ids
+    unknown_suppliers = sorted(set(payload.supplier_ids) - set(known_suppliers))
+    unknown_profiles = sorted(set(payload.profile_ids) - set(ctx.bundle.profiles))
     if unknown_suppliers or unknown_profiles:
         raise ApiError(
             422,
             "VALIDATION_ERROR",
-            "Neznámý dodavatel nebo profil.",
+            "Neznámý dodavatel nebo profil pro zvolený režim.",
             {"supplier_ids": unknown_suppliers, "profile_ids": unknown_profiles},
-        )
-    if payload.mode is AuditMode.LIVE:
-        raise ApiError(
-            501, "LIVE_NOT_IMPLEMENTED", "Živý audit zatím není implementován; použijte mode=fixture."
         )
 
     audit_id = services.repo.create_audit(payload)
     if not getattr(services.repo, "durable", False):
-        # Phase 1 only: the in-memory store cannot be shared with a separate
-        # worker process, and an offline fixture run takes milliseconds.
-        process_next(services.repo, bundle)
+        # Temporary: the in-memory store cannot be shared with a separate worker
+        # process, so the job runs inside this request. A live audit is bounded
+        # to the few registered pages with per-request timeouts. This inline call
+        # goes away with the durable repository and the standalone worker.
+        process_next(services.repo, ctx)
     created = AuditCreated(
         audit_id=audit_id,
         status=AuditStatus.QUEUED,

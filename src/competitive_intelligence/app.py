@@ -8,21 +8,27 @@ from werkzeug.exceptions import HTTPException
 
 from .config import Settings
 from .schemas import AuditCreateRequest, AuditMode
-from .services import AuditRepository, FixtureBundle, InMemoryAuditRepository, load_demo_fixture
+from .services import AuditRepository, FixtureBundle, InMemoryAuditRepository
+from .services.orchestrator import PipelineContext
 from .web import api, error_response, pages
 from .web.security import RateLimiter
-from .worker import process_next
+from .worker import build_context, process_next
 
 
 @dataclass
 class Services:
     settings: Settings
     repo: AuditRepository
-    bundle: FixtureBundle
+    ctx: PipelineContext
     limiter: RateLimiter
 
+    @property
+    def bundle(self) -> FixtureBundle:
+        return self.ctx.bundle
 
-def _seed_demo_audit(repo: AuditRepository, bundle: FixtureBundle) -> None:
+
+def _seed_demo_audit(repo: AuditRepository, ctx: PipelineContext) -> None:
+    bundle = ctx.bundle
     audit_id = repo.create_audit(
         AuditCreateRequest(
             supplier_ids=bundle.supplier_ids,
@@ -30,26 +36,29 @@ def _seed_demo_audit(repo: AuditRepository, bundle: FixtureBundle) -> None:
             mode=AuditMode.FIXTURE,
         )
     )
-    process_next(repo, bundle)
+    process_next(repo, ctx)
     if repo.get_result(audit_id) is not None:
         repo.publish(audit_id)
 
 
-def create_app(config: dict[str, Any] | None = None) -> Flask:
-    """Build the app. `config` overrides Settings fields (used by tests).
+def create_app(
+    config: dict[str, Any] | None = None, context: PipelineContext | None = None
+) -> Flask:
+    """Build the app. `config` overrides Settings fields and `context` replaces the
+    pipeline collaborators (both used by tests).
 
     Nothing here opens a database connection or reads a secret at import time.
     """
     app = Flask(__name__)
     settings = Settings.from_env().with_overrides(config)
-    bundle = load_demo_fixture()
+    ctx = context or build_context()
     repo: AuditRepository = InMemoryAuditRepository()
     if settings.seed_demo_audit:
-        _seed_demo_audit(repo, bundle)
+        _seed_demo_audit(repo, ctx)
     app.extensions["fact_or_watt"] = Services(
         settings=settings,
         repo=repo,
-        bundle=bundle,
+        ctx=ctx,
         limiter=RateLimiter(settings.rate_limit_per_minute),
     )
 
