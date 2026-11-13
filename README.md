@@ -2,7 +2,7 @@
 
 **Fact or Watt** is a Flask-based web application that helps analysts assess marketing claims made by Czech electricity suppliers against traceable reference evidence. It retrieves approved supplier web pages, extracts literal claims, uses bounded AI agents to select evidence-gathering tools, applies deterministic verification rules, and produces a neutral managerial briefing.
 
-> Project status: early implementation. The current repository contains a Flask skeleton and design documents; production database integration, live agents and Vercel deployment must still be implemented and tested.
+> Project status: Phase 1 in progress. Implemented and tested offline: Pydantic contracts, the closed rule catalogue with deterministic verdicts, the Judge downgrade-only invariant, a fixture pipeline over **fictional** demo data, the JSON API, the three-screen UI and the Vercel entry point. **Not implemented yet:** Azure SQL persistence (audits live in process memory and are lost on restart), the separate worker process, live web fetching, LLM agents and any deployment.
 
 ## Technology
 
@@ -57,9 +57,13 @@ The directory list is the **target architecture**, not a claim that each module 
 
 ```bash
 uv sync
-uv run flask --app competitive_intelligence.app:create_app run --debug
+cp .env.example .env            # then set AUDIT_ACCESS_CODE
+uv run --env-file .env flask --app competitive_intelligence.app:create_app run --debug
 uv run pytest
+uv run fact-or-watt-fixture-audit   # one offline fixture audit, printed as JSON
 ```
+
+The home page shows a fictional demo audit that is generated at startup. Launching another fixture audit needs the access code from `.env`; without `AUDIT_ACCESS_CODE` the launch endpoint answers 503.
 
 Use a local `.env` (never commit it). For real DB-backed functionality, set `DATABASE_URL`, `SECRET_KEY` and the relevant audit/LLM credentials. For fixture-mode tests, fake repository adapters are used without production DB credentials.
 

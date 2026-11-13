@@ -1,11 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Fact or Watt</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block page %}index{% endblock %}
+{% block content %}
+<section class="panel" aria-labelledby="launch-heading">
+  <h1 id="launch-heading">Spustit audit</h1>
+  <p class="muted">Zatím je dostupný jen ukázkový režim s fiktivními daty. Živý sběr z webů dodavatelů přibude v další fázi.</p>
+  <form id="launch-form" novalidate>
+    <fieldset>
+      <legend>Dodavatelé</legend>
+      {% for supplier in suppliers %}
+      <label class="check">
+        <input type="checkbox" name="supplier_ids" value="{{ supplier.supplier_id }}" checked>
+        {{ supplier.name }}
+      </label>
+      {% endfor %}
+    </fieldset>
+    <fieldset>
+      <legend>Profil spotřeby</legend>
+      {% for profile in profiles %}
+      <label class="check">
+        <input type="checkbox" name="profile_ids" value="{{ profile.profile_id }}" checked>
+        {{ profile.label }}
+      </label>
+      {% endfor %}
+    </fieldset>
+    <label class="field" for="access-code">Přístupový kód
+      <input id="access-code" type="password" autocomplete="off" required {% if not launch_enabled %}disabled{% endif %}>
+    </label>
+    <button type="submit" {% if not launch_enabled %}disabled{% endif %}>Spustit ukázkový audit</button>
+    {% if not launch_enabled %}
+    <p class="notice warning">Spouštění auditů není na tomto serveru nastaveno (chybí přístupový kód v konfiguraci).</p>
+    {% endif %}
+    <p id="launch-error" class="notice error" role="alert" hidden></p>
+  </form>
+</section>
 
-<h1>Content</h1>
-
-</body>
-</html>
+<section aria-labelledby="latest-heading">
+  <h2 id="latest-heading">Poslední publikovaný audit</h2>
+  <div id="latest" aria-live="polite"><p class="muted">Načítám…</p></div>
+</section>
+{% endblock %}

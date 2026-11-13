@@ -1,14 +1,80 @@
-from flask import Flask, render_template
+"""Flask application factory."""
 
-def create_app():
+from dataclasses import dataclass
+from typing import Any
+
+from flask import Flask, request
+from werkzeug.exceptions import HTTPException
+
+from .config import Settings
+from .schemas import AuditCreateRequest, AuditMode
+from .services import AuditRepository, FixtureBundle, InMemoryAuditRepository, load_demo_fixture
+from .web import api, error_response, pages
+from .web.security import RateLimiter
+from .worker import process_next
+
+
+@dataclass
+class Services:
+    settings: Settings
+    repo: AuditRepository
+    bundle: FixtureBundle
+    limiter: RateLimiter
+
+
+def _seed_demo_audit(repo: AuditRepository, bundle: FixtureBundle) -> None:
+    audit_id = repo.create_audit(
+        AuditCreateRequest(
+            supplier_ids=bundle.supplier_ids,
+            profile_ids=list(bundle.profiles),
+            mode=AuditMode.FIXTURE,
+        )
+    )
+    process_next(repo, bundle)
+    if repo.get_result(audit_id) is not None:
+        repo.publish(audit_id)
+
+
+def create_app(config: dict[str, Any] | None = None) -> Flask:
+    """Build the app. `config` overrides Settings fields (used by tests).
+
+    Nothing here opens a database connection or reads a secret at import time.
+    """
     app = Flask(__name__)
-    
-    @app.route('/')
-    def index():
-        return render_template('index.html')
+    settings = Settings.from_env().with_overrides(config)
+    bundle = load_demo_fixture()
+    repo: AuditRepository = InMemoryAuditRepository()
+    if settings.seed_demo_audit:
+        _seed_demo_audit(repo, bundle)
+    app.extensions["fact_or_watt"] = Services(
+        settings=settings,
+        repo=repo,
+        bundle=bundle,
+        limiter=RateLimiter(settings.rate_limit_per_minute),
+    )
+
+    app.register_blueprint(pages)
+    app.register_blueprint(api)
+
+    @app.errorhandler(HTTPException)
+    def _http_error(error: HTTPException):
+        if request.path.startswith("/api/"):
+            return error_response(error.code or 500, (error.name or "ERROR").upper().replace(" ", "_"), error.description or "")
+        return error
+
+    @app.after_request
+    def _security_headers(response):
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault(
+            "Content-Security-Policy",
+            "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; "
+            "frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        )
+        return response
 
     return app
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+
+if __name__ == "__main__":
+    create_app().run(debug=True)

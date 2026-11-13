@@ -1,0 +1,257 @@
+{
+  "notice": "FIKTIVNÍ UKÁZKOVÁ DATA. Dodavatelé, tvrzení, ceny i zdroje jsou smyšlené a neodpovídají žádné skutečné firmě.",
+  "suppliers": [
+    {"supplier_id": "supplier_demo_a", "name": "Demo Energie A"},
+    {"supplier_id": "supplier_demo_b", "name": "Demo Energie B"},
+    {"supplier_id": "supplier_demo_c", "name": "Demo Energie C"}
+  ],
+  "profiles": [
+    {"profile_id": "d02d_2mwh", "label": "D02d, 2 MWh/rok", "annual_mwh": "2"},
+    {"profile_id": "d02d_4mwh", "label": "D02d, 4 MWh/rok", "annual_mwh": "4"}
+  ],
+  "sources": [
+    {
+      "source_id": "src_demo_a_home",
+      "supplier_id": "supplier_demo_a",
+      "source_url": "https://example.org/demo-a",
+      "origin": "live",
+      "fetch_was_live": true,
+      "captured_at": "2026-11-13T09:00:00Z",
+      "checked_at": "2026-11-13T09:00:00Z",
+      "valid_as_of": "2026-11-13",
+      "parser_version": "fixture-v1",
+      "fallback_reason": null,
+      "baseline_approved_at": null,
+      "canonical_text": "Demo Energie A. Nejlevnější elektřina v ČR. S tarifem Zelená A dodáváme 100 % elektřiny z obnovitelných zdrojů. Jsme o 7 % levnější než Demo Energie C."
+    },
+    {
+      "source_id": "src_demo_b_home",
+      "supplier_id": "supplier_demo_b",
+      "source_url": "https://example.org/demo-b",
+      "origin": "baseline",
+      "fetch_was_live": true,
+      "captured_at": "2026-11-13T09:00:05Z",
+      "checked_at": "2026-11-13T09:00:05Z",
+      "valid_as_of": "2026-11-13",
+      "parser_version": "fixture-v1",
+      "fallback_reason": null,
+      "baseline_approved_at": "2026-11-10T15:30:00Z",
+      "canonical_text": "Demo Energie B. Nejlevnější elektřina na trhu. Naše elektřina je šetrná k přírodě. Důvěřuje nám přes milion zákazníků."
+    },
+    {
+      "source_id": "src_demo_c_home",
+      "supplier_id": "supplier_demo_c",
+      "source_url": "https://example.org/demo-c",
+      "origin": "snapshot",
+      "fetch_was_live": false,
+      "captured_at": "2026-11-09T12:00:00Z",
+      "checked_at": "2026-11-13T09:00:10Z",
+      "valid_as_of": "2026-11-09",
+      "parser_version": "fixture-v1",
+      "fallback_reason": "HTTP timeout (simulováno)",
+      "baseline_approved_at": null,
+      "canonical_text": "Demo Energie C. Garance ceny do konce roku 2028. 100% zelená elektřina pro každou domácnost. Jsme férový a spolehlivý dodavatel."
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim_demo_a_01",
+      "source_id": "src_demo_a_home",
+      "quote": "Nejlevnější elektřina v ČR",
+      "source_ref": "main > h1",
+      "human_reviewed": false,
+      "product_id": null,
+      "claim_type": "price",
+      "rule": {"id": "price_rank", "params": {"scope": "cz_market", "rank": 1}}
+    },
+    {
+      "id": "claim_demo_a_02",
+      "source_id": "src_demo_a_home",
+      "quote": "100 % elektřiny z obnovitelných zdrojů",
+      "source_ref": "main > p:nth-of-type(1)",
+      "human_reviewed": false,
+      "product_id": "zelena_a",
+      "claim_type": "green",
+      "rule": {"id": "green_share", "params": {"share_pct": "100"}}
+    },
+    {
+      "id": "claim_demo_a_03",
+      "source_id": "src_demo_a_home",
+      "quote": "o 7 % levnější než Demo Energie C",
+      "source_ref": "main > p:nth-of-type(2)",
+      "human_reviewed": false,
+      "product_id": null,
+      "claim_type": "price",
+      "rule": {
+        "id": "price_pct_cheaper",
+        "params": {"pct": "7", "baseline_supplier_id": "supplier_demo_c", "basis": "annual_trade_cost"}
+      }
+    },
+    {
+      "id": "claim_demo_a_04",
+      "source_id": "src_demo_a_home",
+      "quote": "Nejlepší zákaznická podpora v zemi",
+      "source_ref": "main > p:nth-of-type(3)",
+      "human_reviewed": false,
+      "product_id": null,
+      "claim_type": "other",
+      "rule": {"id": "soft_trust", "params": {}}
+    },
+    {
+      "id": "claim_demo_b_01",
+      "source_id": "src_demo_b_home",
+      "quote": "Nejlevnější elektřina na trhu",
+      "source_ref": "main > h1",
+      "human_reviewed": true,
+      "product_id": null,
+      "claim_type": "price",
+      "rule": {"id": "price_rank", "params": {"scope": "cz_market", "rank": 1}}
+    },
+    {
+      "id": "claim_demo_b_02",
+      "source_id": "src_demo_b_home",
+      "quote": "šetrná k přírodě",
+      "source_ref": "main > p:nth-of-type(1)",
+      "human_reviewed": true,
+      "product_id": null,
+      "claim_type": "green",
+      "rule": {"id": "green_generic", "params": {}}
+    },
+    {
+      "id": "claim_demo_b_03",
+      "source_id": "src_demo_b_home",
+      "quote": "přes milion zákazníků",
+      "source_ref": "main > p:nth-of-type(2)",
+      "human_reviewed": true,
+      "product_id": null,
+      "claim_type": "customer",
+      "rule": {"id": "customer_count", "params": {"count": 1000000, "metric": "customers"}}
+    },
+    {
+      "id": "claim_demo_c_01",
+      "source_id": "src_demo_c_home",
+      "quote": "Garance ceny do konce roku 2028",
+      "source_ref": "main > h1",
+      "human_reviewed": false,
+      "product_id": "fix_c",
+      "claim_type": "price",
+      "rule": {"id": "price_guarantee", "params": {"until": "2028-12-31"}}
+    },
+    {
+      "id": "claim_demo_c_02",
+      "source_id": "src_demo_c_home",
+      "quote": "100% zelená elektřina",
+      "source_ref": "main > p:nth-of-type(1)",
+      "human_reviewed": false,
+      "product_id": null,
+      "claim_type": "green",
+      "rule": {"id": "green_share", "params": {"share_pct": "100"}}
+    },
+    {
+      "id": "claim_demo_c_03",
+      "source_id": "src_demo_c_home",
+      "quote": "férový a spolehlivý dodavatel",
+      "source_ref": "main > p:nth-of-type(2)",
+      "human_reviewed": false,
+      "product_id": null,
+      "claim_type": "other",
+      "rule": {"id": "soft_trust", "params": {}}
+    }
+  ],
+  "reference": {
+    "offers": [
+      {
+        "offer_id": "offer_demo_a_fix12",
+        "supplier_id": "supplier_demo_a",
+        "product_id": "fix12_a",
+        "monthly_fee": "150.00",
+        "price_mwh": "3200.00",
+        "source_url": "https://example.org/demo-a/cenik",
+        "source_ref": "table:1 row:2",
+        "captured_at": "2026-11-10T09:00:00Z",
+        "valid_as_of": "2026-11-10"
+      },
+      {
+        "offer_id": "offer_demo_b_fix12",
+        "supplier_id": "supplier_demo_b",
+        "product_id": "fix12_b",
+        "monthly_fee": "120.00",
+        "price_mwh": "3100.00",
+        "source_url": "https://example.org/demo-b/cenik",
+        "source_ref": "table:1 row:1",
+        "captured_at": "2026-11-10T09:05:00Z",
+        "valid_as_of": "2026-11-10"
+      },
+      {
+        "offer_id": "offer_demo_c_fix12",
+        "supplier_id": "supplier_demo_c",
+        "product_id": "fix_c",
+        "monthly_fee": "180.00",
+        "price_mwh": "3400.00",
+        "source_url": "https://example.org/demo-c/cenik",
+        "source_ref": "table:2 row:4",
+        "captured_at": "2026-11-10T09:10:00Z",
+        "valid_as_of": "2026-11-10"
+      }
+    ],
+    "terms": [
+      {
+        "supplier_id": "supplier_demo_c",
+        "product_id": "fix_c",
+        "fixed_until": "2028-12-31",
+        "exclusions_unclear": false,
+        "source_url": "https://example.org/demo-c/podminky",
+        "source_ref": "section:3.2",
+        "captured_at": "2026-11-10T09:15:00Z",
+        "valid_as_of": "2026-11-10"
+      }
+    ],
+    "fuel_mix": [
+      {
+        "supplier_id": "supplier_demo_a",
+        "product_id": "zelena_a",
+        "renewable_share": "100",
+        "product_specific": true,
+        "guarantees_documented": true,
+        "source_url": "https://example.org/demo-a/zelena-a/mix",
+        "source_ref": "table:1",
+        "captured_at": "2026-11-08T10:00:00Z",
+        "valid_as_of": "2025-12-31"
+      },
+      {
+        "supplier_id": "supplier_demo_c",
+        "product_id": null,
+        "renewable_share": "14.5",
+        "product_specific": false,
+        "guarantees_documented": false,
+        "source_url": "https://example.org/narodni-zbytkovy-mix",
+        "source_ref": "table:1",
+        "captured_at": "2026-11-08T10:05:00Z",
+        "valid_as_of": "2025-12-31"
+      }
+    ],
+    "ote_opm": [
+      {
+        "supplier_id": "supplier_demo_b",
+        "period": "2024-12",
+        "opm": 1180000,
+        "source_url": "https://example.org/ote/opm-2024",
+        "source_ref": "sheet:1 row:7",
+        "captured_at": "2026-11-08T10:10:00Z",
+        "valid_as_of": "2024-12-31"
+      },
+      {
+        "supplier_id": "supplier_demo_b",
+        "period": "2025-12",
+        "opm": 1240000,
+        "source_url": "https://example.org/ote/opm-2025",
+        "source_ref": "sheet:1 row:7",
+        "captured_at": "2026-11-08T10:12:00Z",
+        "valid_as_of": "2025-12-31"
+      }
+    ]
+  },
+  "judge_flags": {
+    "claim_demo_c_01": "Podmínky fixace se týkají produktu pro stávající zákazníky, tvrzení na webu cílí na nové zákazníky."
+  }
+}

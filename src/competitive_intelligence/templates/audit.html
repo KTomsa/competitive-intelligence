@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Průběh auditu · Fact or Watt{% endblock %}
+{% block page %}audit{% endblock %}
+{% block body_attrs %} data-audit-id="{{ audit_id }}"{% endblock %}
+{% block content %}
+<section class="panel" aria-labelledby="progress-heading">
+  <h1 id="progress-heading">Průběh auditu</h1>
+  <p class="muted">ID auditu: <code>{{ audit_id }}</code></p>
+  <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
+    <div class="progress-bar" id="progress-bar"></div>
+  </div>
+  <p id="status-line" aria-live="polite">Načítám stav…</p>
+  <ol id="events" class="events" aria-label="Záznam průběhu"></ol>
+  <p id="audit-error" class="notice error" role="alert" hidden></p>
+</section>
+
+<section aria-labelledby="results-heading">
+  <h2 id="results-heading">Výsledky</h2>
+  <div id="results" aria-live="polite"><p class="muted">Výsledky se zobrazí po dokončení auditu.</p></div>
+</section>
+{% endblock %}
