@@ -1,5 +1,5 @@
 ---
-applyTo: "src/compatitive_intelligence/templates/**/*.html,src/compatitive_intelligence/static/**/*.js,src/compatitive_intelligence/static/**/*.css"
+applyTo: "src/competitive_intelligence/templates/**/*.html,src/competitive_intelligence/static/**/*.js,src/competitive_intelligence/static/**/*.css"
 ---
 # Frontend — Flask šablony, HTML, JavaScript, Bootstrap
 - Používej přístupné HTML, Jinja2 autoescape, vanilla JS modules (`fetch`), volitelně Bootstrap 5; **žádný Next.js ani frontend framework**.

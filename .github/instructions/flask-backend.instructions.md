@@ -1,5 +1,5 @@
 ---
-applyTo: "src/compatitive_intelligence/**/*.py"
+applyTo: "src/competitive_intelligence/**/*.py"
 ---
 # Backend Python/Flask — architektura v2
 - Implementuj `create_app(config=None)`, Blueprints, Pydantic v2 schémata, oddělený worker a transakční persistenci; nikdy nesvazuj live audit se životností HTTP requestu.

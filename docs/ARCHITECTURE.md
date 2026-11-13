@@ -88,7 +88,7 @@ Specializované LLM evidence agenty mají vlastní instrukce, vstupní schéma a
 .github/
   copilot-instructions.md
   instructions/{flask-backend,evidence-pipeline,frontend,tests}.instructions.md
-src/compatitive_intelligence/
+src/competitive_intelligence/
   __init__.py                  # create_app
   config.py
   web/{pages,api}.py
