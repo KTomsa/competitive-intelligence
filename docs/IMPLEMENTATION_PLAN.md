@@ -13,7 +13,7 @@ This plan replaces outdated SQLite-first steps. The current repository is an ear
 
 - Maintain `src/competitive_intelligence/app.py:create_app` and add `src/index.py:app`; use the existing `src` layout for all code, HTML and JS.
 - Add `vercel.json` (function settings), `.env.example`, configure `uv` dependencies and update lockfile.
-- Implement SQLAlchemy engine + scoped session/repository abstractions. Add audited Azure models and Alembic migrations. No table creation at web import.
+- Implement SQLAlchemy engine + scoped session/repository abstractions. Implement Azure SQL models mapped to the existing `ci` schema, which is manually administered outside the repository. Do not generate migrations, DDL, reference-data seeders or table creation on import/startup.
 - Create Flask route/API skeleton plus offline fake-repository fixture that runs without Azure/LLM. Tests must not point at production DB.
 - Acceptance: the fixture smoke test runs offline, `pytest` tests pass, and Vercel entrypoint import is tested. Azure network test is separately recorded as passed/blocked.
 

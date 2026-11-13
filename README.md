@@ -2,17 +2,17 @@
 
 **Fact or Watt** is a Flask-based web application that helps analysts assess marketing claims made by Czech electricity suppliers against traceable reference evidence. It retrieves approved supplier web pages, extracts literal claims, uses bounded AI agents to select evidence-gathering tools, applies deterministic verification rules, and produces a neutral managerial briefing.
 
-> Project status: Phase 1 in progress. Implemented and tested offline: Pydantic contracts, the closed rule catalogue with deterministic verdicts, the Judge downgrade-only invariant, a fixture pipeline over **fictional** demo data, the JSON API, the three-screen UI and the Vercel entry point. **Not implemented yet:** Azure SQL persistence (audits live in process memory and are lost on restart), the separate worker process, live web fetching, LLM agents and any deployment.
+> Project status: early implementation. The current repository contains a Flask skeleton and design documents; production database integration, live agents and Vercel deployment must still be implemented and tested.
 
 ## Technology
 
-- **Backend:** Python 3.14, Flask, Jinja2, Pydantic v2, SQLAlchemy, Alembic.
+- **Backend:** Python 3.14, Flask, Jinja2, Pydantic v2, SQLAlchemy.
 - **Frontend:** server-rendered HTML, vanilla JavaScript, CSS, optionally Bootstrap 5. No Next.js/React/TypeScript.
 - **Persistent database:** an **Azure-hosted database**, assumed here to be **Azure SQL Database (Microsoft SQL Server)**; use SQLAlchemy 2.1+ with the `mssql+mssqlpython` dialect after validating the actual service and driver compatibility.
 - **Deployment:** Vercel for Flask UI/API; a dedicated Python worker (recommended: Azure Container Apps; optional: Vercel Daemons public beta) for queued audits.
 - **Dependencies:** `uv`, `pyproject.toml`, `uv.lock`.
 
-If the existing Azure service is **Azure Database for PostgreSQL** instead, change the SQLAlchemy URL dialect/driver and database-specific migrations accordingly. The repository does not currently identify which database service was provisioned.
+If the existing Azure service is **Azure Database for PostgreSQL** instead, change the SQLAlchemy URL dialect/driver only after updating the environment assumptions. The current persistence target is MSSQL in Azure SQL Database.
 
 ## Project layout
 
@@ -53,17 +53,17 @@ vercel.json
 
 The directory list is the **target architecture**, not a claim that each module already exists. Follow `docs/IMPLEMENTATION_PLAN.md` instead of generating empty directories.
 
+## Database ownership
+
+The Azure SQL `ci` schema and initial/reference data are prepared **manually outside this repository**. Do not add `.sql` DDL/DML, `database/` seed directories, automatic schema migrations or database bootstrap scripts. The Flask app uses SQLAlchemy to read reference data and persist operational audit data against existing tables. This does not prohibit normal application INSERT/UPDATE/SELECT transactions.
+
 ## Local development
 
 ```bash
 uv sync
-cp .env.example .env            # then set AUDIT_ACCESS_CODE
-uv run --env-file .env flask --app competitive_intelligence.app:create_app run --debug
+uv run flask --app competitive_intelligence.app:create_app run --debug
 uv run pytest
-uv run fact-or-watt-fixture-audit   # one offline fixture audit, printed as JSON
 ```
-
-The home page shows a fictional demo audit that is generated at startup. Launching another fixture audit needs the access code from `.env`; without `AUDIT_ACCESS_CODE` the launch endpoint answers 503.
 
 Use a local `.env` (never commit it). For real DB-backed functionality, set `DATABASE_URL`, `SECRET_KEY` and the relevant audit/LLM credentials. For fixture-mode tests, fake repository adapters are used without production DB credentials.
 
@@ -78,7 +78,7 @@ A **separate worker** processes jobs. Do not run a long-running crawler/LLM pipe
 
 ## Deployment
 
-See **[Vercel deployment](docs/DEPLOYMENT_VERCEL.md)** and **[Azure database](docs/DATABASE_AZURE.md)**. Vercel supports Flask apps with a top-level WSGI `app` in `src/index.py`. Configure secrets through Vercel Project Settings; verify Azure firewall/network access, migrations and worker startup before publishing. No live deployment has been verified from this documentation alone.
+See **[Vercel deployment](docs/DEPLOYMENT_VERCEL.md)** and **[Azure database](docs/DATABASE_AZURE.md)**. Vercel supports Flask apps with a top-level WSGI `app` in `src/index.py`. Configure secrets through Vercel Project Settings; verify Azure firewall/network access, compatibility with the pre-provisioned schema and worker startup before publishing. No live deployment has been verified from this documentation alone.
 
 ## Verification principles
 

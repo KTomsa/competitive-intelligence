@@ -1,8 +1,8 @@
-# Azure persistence — Fact or Watt (repository specification v3)
+# Azure persistence — Fact or Watt (application-side specification v4)
 
 ## What the repository proves and what it does not
 
-The existing Copilot instructions say an Azure database instance has been created, but the repository does not identify whether it is **Azure SQL Database (MSSQL)** or **Azure Database for PostgreSQL**, and it does not implement a working database connection yet. **This guide assumes Azure SQL Database.** Confirm the real Azure resource type before installing a driver or migrating data.
+This project targets **Azure SQL Database (MSSQL)** with a pre-provisioned `ci` schema. The user manages table creation and initial/reference data manually in Azure outside the application repository. This guide covers **only application connectivity and runtime persistence**, not SQL execution or schema deployment.
 
 ## Storage design
 
@@ -14,21 +14,19 @@ Recommended relational models: `suppliers`, `audit_runs`, `audit_jobs`, `audit_e
 
 ## Python database stack (if Azure SQL Database)
 
-- SQLAlchemy **2.1+**, Microsoft's `mssql-python` driver, **`mssql+mssqlpython`** dialect, Alembic.
+- SQLAlchemy **2.1+**, Microsoft's `mssql-python` driver, **`mssql+mssqlpython`** dialect.
 - Set `DATABASE_URL` via environment, e.g. `mssql+mssqlpython://USER:URLENCODED_PASSWORD@SERVER.database.windows.net:1433/DB?encrypt=yes`. This is a **placeholder** not a live credential.
 - Do not disable TLS certificate validation to get around connectivity errors. Passwords containing reserved characters must be URL-encoded or built with SQLAlchemy `URL.create`.
 - If using `pyodbc` instead, it needs a separately installed and verified ODBC Driver 18; do not assume that system driver exists in Vercel's runtime. `mssql-python` avoids that external driver-manager requirement according to Microsoft documentation, but its exact binary/packaging behavior must still be validated in the Vercel deployment.
 - Control connection pools and `pool_pre_ping`; function concurrency can multiply open connections. Sessions are per request/job, never global shared sessions.
 
-If the Azure resource is PostgreSQL, use `postgresql+psycopg`, the PostgreSQL migrations and network/security requirements instead; update this document and the Copilot instructions first.
+## Application connection and data-ownership rules
 
-## Migration and development rules
-
-1. Add relevant dependencies with `uv add 'sqlalchemy[mssql-python]>=2.1' alembic pydantic` (after confirming MSSQL). Run `uv lock` and commit `pyproject.toml`/`uv.lock` together.
-2. Implement `src/competitive_intelligence/db.py` engine/session factory and SQLAlchemy models under `src/competitive_intelligence/models/`.
-3. Configure `alembic` with model metadata and a connection read securely from the environment. Apply migrations explicitly from a controlled runner; **never** at Vercel request startup or a build step.
-4. For unit tests, inject fake repositories and mock external sources. For integration tests use `TEST_DATABASE_URL` pointing only at an isolated disposable test database.
-5. Never use SQLite as the target persistence layer or as an implicit fallback during Azure SQL failures. Fail clearly and preserve public read-only availability where possible.
+- Add the SQLAlchemy/driver dependencies to `pyproject.toml`; implement `src/competitive_intelligence/db.py` and ORM models aligned with the **existing** Azure tables and constraints.
+- The repository must not include SQL DDL/DML, migration scripts, seed modules or a schema initialization command. The Flask factory, Vercel build and worker **must not** create or change tables.
+- Operational runtime writes (audits, events, job leases, captures, claims, evidence and publications) are permitted through authenticated SQLAlchemy repositories. Reference-data imports or changes requiring manual SQL remain external.
+- Unit tests use fake repository adapters. Integration tests use a separately provisioned Azure SQL test database via `TEST_DATABASE_URL`; do not run migrations or bootstrap scripts as part of tests.
+- Never use SQLite as production persistence or silently fall back to it if Azure SQL is unavailable. Fail clearly and preserve safe read-only behavior where possible.
 
 ## Durable audit queue
 

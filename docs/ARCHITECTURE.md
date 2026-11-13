@@ -58,7 +58,7 @@ Four verdicts: `supported`, `partially_supported`, `contradicted`, `unverifiable
 
 ## 5. Persistence and durable worker
 
-Use SQLAlchemy 2.1+ and Alembic. No SQLite as production persistence or implicit test substitute. Define SQLAlchemy `Supplier`, `AuditRun`, `AuditJob`, `AuditEvent`, `Source`, `SourceSnapshot`, `Claim`, `Evidence`, `Verdict`, `Publication` models as needed; enforce relational constraints and provenance. Make HTTP request handlers short: authorized `POST /api/v1/audits` inserts job and returns `202`; `GET /api/v1/audits/{id}` reads durable status/events; results and latest publication endpoints are read-only.
+Use SQLAlchemy 2.1+ against the existing manually provisioned Azure SQL schema. Schema/seed scripts and migrations are external to the app repository. No SQLite as production persistence or implicit test substitute. Define SQLAlchemy `Supplier`, `AuditRun`, `AuditJob`, `AuditEvent`, `Source`, `SourceSnapshot`, `Claim`, `Evidence`, `Verdict`, `Publication` models as needed; enforce relational constraints and provenance. Make HTTP request handlers short: authorized `POST /api/v1/audits` inserts job and returns `202`; `GET /api/v1/audits/{id}` reads durable status/events; results and latest publication endpoints are read-only.
 
 Worker uses atomic job claim, leases, heartbeat, retries, idempotent operations and explicit publish-on-success transaction. Persist stage events so page reloads and transient web instance restarts do not lose audit progress. Store raw PDF/HTML bytes in Blob or bounded external storage when appropriate.
 

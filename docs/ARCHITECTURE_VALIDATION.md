@@ -13,7 +13,7 @@
 | P1 | Worker job lifetime described but deployment location unclear. | Use separate Azure Container Apps worker; Vercel Daemons beta is optional, not the normal Flask Function. |
 | P1 | Firewall/network path from Vercel to Azure unknown. | Confirm Vercel egress IPs and Azure firewall/TLS; no blanket public DB access. |
 | P1 | Raw snapshot persistence cannot depend on Vercel local files. | Azure SQL metadata; Azure Blob for large immutable content. |
-| P1 | `pyproject.toml` has no SQLAlchemy/DB driver/Alembic. | Add dependencies through uv, update lockfile, test imports on deployed Python 3.14. |
+| P1 | `pyproject.toml` has no SQLAlchemy/DB driver. | Add dependencies through uv, update lockfile, test imports on deployed Python 3.14. |
 | P1 | Current README lacks meaningful descriptions. | Restore product overview, current status, layout, local dev and deployment guide. |
 | P2 | Existing `project.scripts` points at nonexistent `competitive_intelligence:main`. | Remove or implement a real CLI entrypoint when adding worker/commands. |
 

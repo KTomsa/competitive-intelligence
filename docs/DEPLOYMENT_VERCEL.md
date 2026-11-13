@@ -12,7 +12,7 @@ from competitive_intelligence.app import create_app
 app = create_app()
 ```
 
-Vercel recognizes top-level `app` in `src/index.py` and supports Flask, `uv`/`pyproject.toml`, and Python 3.14. The repository currently has `.python-version=3.14` and `pyproject.toml` declaring `>=3.14`. Do not introduce Next.js, Node or a second Flask application. The app factory must **not** connect to the database or run migrations unconditionally at module import; fail with a readable configuration error when a DB-dependent endpoint is used without DB configuration.
+Vercel recognizes top-level `app` in `src/index.py` and supports Flask, `uv`/`pyproject.toml`, and Python 3.14. The repository currently has `.python-version=3.14` and `pyproject.toml` declaring `>=3.14`. Do not introduce Next.js, Node or a second Flask application. The app factory must **not** connect to the database or create/alter schema or run SQL seed scripts at module import; fail with a readable configuration error when a DB-dependent endpoint is used without DB configuration.
 
 ## 2. Minimal `vercel.json`
 
@@ -32,10 +32,10 @@ Vercel recognizes top-level `app` in `src/index.py` and supports Flask, `uv`/`py
 
 ## 3. Dependencies and lockfile
 
-Maintain a single `pyproject.toml` + `uv.lock` workflow. Add the Azure SQL driver/SQLAlchemy/Alembic only after confirming the Azure service type:
+Maintain a single `pyproject.toml` + `uv.lock` workflow. Add the Azure SQL driver and SQLAlchemy dependencies:
 
 ```bash
-uv add 'sqlalchemy[mssql-python]>=2.1' alembic pydantic python-dotenv
+uv add 'sqlalchemy[mssql-python]>=2.1' pydantic python-dotenv
 uv sync
 uv run pytest
 ```
@@ -65,9 +65,9 @@ Keep encryption enabled and database permissions least-privileged. Validate driv
 
 Do not run a background thread after an HTTP response, and do not store job state only in `/tmp`, a local SQLite file or process memory. Use persisted Azure job state, retries, leases and idempotent completion.
 
-## 7. Database migrations and production release
+## 7. Existing database compatibility and application release
 
-Run Alembic migrations as an explicit, controlled step from a trusted runner with DB network access, before routing new application code. Do not run `alembic upgrade head` automatically during Vercel build/import. Migrations must support rollback/forward-fix and never target production from test scripts.
+Azure SQL schema and initial reference records are managed separately by the project owner. **Neither Vercel nor Flask runs DDL, seed scripts or migrations.** The deployed application only connects to the existing `ci` tables and uses scoped runtime SQLAlchemy transactions. Before publishing a new version, confirm that its ORM models are compatible with the already provisioned schema and that network, permissions and worker behavior are valid.
 
 ## 8. Deployment smoke checks
 
