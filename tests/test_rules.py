@@ -241,6 +241,16 @@ def test_claimed_number_is_read_from_quote():
     assert rules._claimed_from_quote("jsme tu pro vás") == (None, None)
 
 
+def test_customer_claim_above_every_month_of_the_year_is_flagged_but_not_contradicted():
+    ctx = gas_ctx()
+    ctx["ote"]["table"] = {"year": 2026, "suppliers": {"velky": [1100, 1050, 1000] + [None] * 9}}
+    ctx["ote_gas"]["table"] = {"year": 2026, "suppliers": {"velky": [320, 310, 300] + [None] * 9}}
+    # aktuálně 1300 OPM, nejvíc 1420 v lednu; tvrzeno 1425 (v toleranci 10 %, ale nad každým měsícem)
+    out = rules.customer_count({"params": {"claimed": 1425}}, supplier("velky", []), ctx)
+    assert out["verdict"] == rules.UNVERIFIABLE and out["opportunity"]
+    assert "v každém měsíci roku" in out["finding"] and "klesá" in out["finding"]
+
+
 def test_undefined_qualifier_is_never_a_verdict_but_reports_who_is_bigger():
     ctx = gas_ctx()
     claim = {"params": {"scope": "qualified", "qualifier": "alternativní",

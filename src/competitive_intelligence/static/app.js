@@ -293,14 +293,16 @@
     const table = el("table", "cmp");
     const head = el("tr");
     ["Dodavatel", "Elektřina: změna OPM", "Plyn: změna OPM",
-      "Nejlevnější nabídka" + (m.fixation_months ? " (" + m.fixation_months + " měs., ročně při " + m.annual_mwh + " MWh)" : ""),
+      "Nejlevnější nabídka" + (m.annual_mwh ? " (ročně při " + m.annual_mwh + " MWh)" : ""),
       "Pásmo ERÚ"].forEach((t) => head.append(el("th", null, t)));
     table.append(head);
     m.rows.forEach((row) => {
       const tr = el("tr", "plain-row" + (row.id === ownId ? " own" : ""));
       tr.append(el("td", "cmp-name", row.name + (row.id === ownId ? " (my)" : "")));
       tr.append(changeCell(row.electricity), changeCell(row.gas));
-      tr.append(el("td", null, row.price ? row.price.rank + ". z " + row.price.of + " · " + czNumber.format(row.price.annual_cost) + " Kč" : "bez ceníku"));
+      tr.append(el("td", null, row.price
+        ? row.price.fixation_months + " měs.: " + row.price.rank + ". z " + row.price.of + " · " + czNumber.format(row.price.annual_cost) + " Kč"
+        : "bez ceníku"));
       const pos = el("td");
       if (row.price) pos.append(el("span", "badge pos-" + row.price.position, POSITION_TEXT[row.price.position] || row.price.position));
       else pos.textContent = "–";

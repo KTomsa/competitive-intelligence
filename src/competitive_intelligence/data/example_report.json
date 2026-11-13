@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-13T13:59:57+00:00",
+ "generated_at": "2026-11-13T14:07:48+00:00",
  "mode": "live",
  "profile": {
   "commodity": "elektřina",
@@ -14,7 +14,7 @@
  "sources": {
   "eru": {
    "source_url": "https://eru.gov.cz/sites/default/files/obsah/prilohy/elektrina_6.csv",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "cd2dfc19a2353f86",
@@ -26,7 +26,7 @@
   },
   "ote": {
    "source_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:48+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "2a410f57cd912210",
@@ -37,7 +37,7 @@
   },
   "ote_gas": {
    "source_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:48+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "e39455130be486a2",
@@ -50,7 +50,7 @@
  "price_lists": [
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "e541c3be5e9a5c26",
@@ -61,7 +61,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "6961b7f5bd95cb63",
@@ -72,7 +72,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "f21625b5ac1e7503",
@@ -83,7 +83,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "1987f52ba59a1d94",
@@ -94,7 +94,7 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "d309c4a76dd37b27",
@@ -105,7 +105,7 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "bc3a8475a19746e9",
@@ -116,7 +116,7 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T13:59:58+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "5e8316fd523fb36c",
@@ -127,7 +127,7 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T13:59:59+00:00",
+   "fetched_at": "2026-11-13T14:07:49+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "09ddd13da37cb785",
@@ -138,7 +138,7 @@
   },
   {
    "source_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-14-59/EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
-   "fetched_at": "2026-11-13T14:00:00+00:00",
+   "fetched_at": "2026-11-13T14:07:52+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "8d6a5d6a4770cae4",
@@ -149,7 +149,7 @@
   },
   {
    "source_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-11-06/EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
-   "fetched_at": "2026-11-13T14:00:01+00:00",
+   "fetched_at": "2026-11-13T14:07:52+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "5b0865214b8e599b",
@@ -157,6 +157,28 @@
    "document": "EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
    "effective_from": "2026-11-04",
    "supplier": "epet"
+  },
+  {
+   "source_url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+   "fetched_at": "2026-11-13T14:07:50+00:00",
+   "origin": "live",
+   "warning": null,
+   "sha256": "dfe0a9d0631e2522",
+   "name": "Ceník: OPTIMAL 606 FIX",
+   "document": "X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+   "effective_from": "2026-10-21",
+   "supplier": "ARMEX ENERGY"
+  },
+  {
+   "source_url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+   "fetched_at": "2026-11-13T14:07:50+00:00",
+   "origin": "live",
+   "warning": null,
+   "sha256": "a9bcc2a99df30f84",
+   "name": "Ceník: KLASIK 602 FIX",
+   "document": "XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+   "effective_from": "2026-08-01",
+   "supplier": "ARMEX ENERGY"
   }
  ],
  "comparison": [
@@ -285,6 +307,24 @@
    ],
    "rows": [
     {
+     "supplier_id": "armex",
+     "audience": null,
+     "supplier": "ARMEX ENERGY",
+     "product": "OPTIMAL 606 FIX",
+     "price_mwh_excl_vat": 2990.0,
+     "price_mwh_incl_vat": 3617.9,
+     "monthly_fee_incl_vat": 118.58,
+     "annual_cost": [
+      8658.76,
+      15894.56
+     ],
+     "position": "below",
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "price_list_url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+     "effective_from": "2026-10-21"
+    },
+    {
      "supplier_id": "eon",
      "audience": "new",
      "supplier": "E.ON",
@@ -382,6 +422,24 @@
      "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
      "price_list_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
      "effective_from": "2026-01-30"
+    },
+    {
+     "supplier_id": "armex",
+     "audience": null,
+     "supplier": "ARMEX ENERGY",
+     "product": "KLASIK 602 FIX",
+     "price_mwh_excl_vat": 3250.0,
+     "price_mwh_incl_vat": 3932.5,
+     "monthly_fee_incl_vat": 156.09,
+     "annual_cost": [
+      9738.08,
+      17603.08
+     ],
+     "position": "below",
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "price_list_url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+     "effective_from": "2026-08-01"
     },
     {
      "supplier_id": "cez",
@@ -505,6 +563,7 @@
   "observations": [
    "Nejlevnější nabídku ve vzorku má ČEZ Prodej, přesto odběrná místa elektřiny ztrácí (-4 252, -0,2 %).",
    "Nejdražší nabídku ve vzorku má epet, přesto roste (+5,7 %).",
+   "U fixace na 24 měsíců je nejlevnější ARMEX ENERGY a také ztrácí (-1 263, -2,5 %).",
    "Nejnižší cena tedy sama o sobě zákazníky nepřivádí."
   ],
   "rows": [
@@ -549,6 +608,7 @@
      "to": "2026-09"
     },
     "price": {
+     "fixation_months": 36,
      "rank": 4,
      "of": 4,
      "product": "FIX 36 GARANT",
@@ -576,6 +636,7 @@
      "to": "2026-09"
     },
     "price": {
+     "fixation_months": 36,
      "rank": 2,
      "of": 4,
      "product": "Fixně online pro začátek na 3 roky",
@@ -666,6 +727,7 @@
      "to": "2026-09"
     },
     "price": {
+     "fixation_months": 36,
      "rank": 3,
      "of": 4,
      "product": "Variant PRO na 3 roky",
@@ -693,10 +755,39 @@
      "to": "2026-09"
     },
     "price": {
+     "fixation_months": 36,
      "rank": 1,
      "of": 4,
      "product": "Elektřina Fix na 3 roky",
      "annual_cost": 8460.2,
+     "position": "below"
+    }
+   },
+   {
+    "id": "armex",
+    "name": "ARMEX ENERGY",
+    "electricity": {
+     "first": 51027,
+     "last": 49764,
+     "abs": -1263,
+     "pct": -2.5,
+     "from": "2026-01",
+     "to": "2026-09"
+    },
+    "gas": {
+     "first": 24783,
+     "last": 23596,
+     "abs": -1187,
+     "pct": -4.8,
+     "from": "2026-01",
+     "to": "2026-09"
+    },
+    "price": {
+     "fixation_months": 24,
+     "rank": 1,
+     "of": 5,
+     "product": "OPTIMAL 606 FIX",
+     "annual_cost": 8658.76,
      "position": "below"
     }
    },
@@ -785,10 +876,18 @@
      2,
      4
     ],
-    "rank": 2,
-    "of": 4,
+    "rank": 3,
+    "of": 5,
     "position": "below",
     "cheaper": [
+     {
+      "supplier": "ARMEX ENERGY",
+      "product": "OPTIMAL 606 FIX",
+      "saving": [
+       1076.8999999999996,
+       1616.5599999999995
+      ]
+     },
      {
       "supplier": "E.ON",
       "product": "Variant PRO na 2 roky",
@@ -810,8 +909,8 @@
      2,
      4
     ],
-    "rank": 2,
-    "of": 2,
+    "rank": 3,
+    "of": 3,
     "position": "below",
     "cheaper": [
      {
@@ -820,6 +919,14 @@
       "saving": [
        2051.3599999999988,
        4102.7199999999975
+      ]
+     },
+     {
+      "supplier": "ARMEX ENERGY",
+      "product": "KLASIK 602 FIX",
+      "saving": [
+       953.4799999999996,
+       1819.8399999999965
       ]
      }
     ]
@@ -832,7 +939,7 @@
     "verdict": "unverifiable",
     "verdict_label": "nelze ověřit",
     "finding": "Jde o závazek dorovnat nižší cenu, ne o tvrzení, že ceník je nejnižší. Levnější srovnatelná nabídka veřejně existuje: ČEZ Prodej – Elektřina Online na 1 rok proti Fixně online pro začátek na 1 rok. Roční náklad obchodní části (s DPH) 2 MWh/rok: 10 692 Kč vs. 8 640 Kč; 4 MWh/rok: 19 423 Kč vs. 15 320 Kč.",
-    "limitation": "Srovnání pokrývá jen vzorek (E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou. Zda dodavatel garanci skutečně plní, z veřejných dat ověřit nelze."
+    "limitation": "Srovnání pokrývá jen vzorek (ARMEX ENERGY, E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou. Zda dodavatel garanci skutečně plní, z veřejných dat ověřit nelze."
    },
    {
     "id": "centropol-2",
@@ -893,6 +1000,10 @@
    },
    {
     "kind": "price",
+    "text": "ARMEX ENERGY je levnější než my: fixace 24 měs. o 1 077 Kč, fixace 12 měs. o 953 Kč ročně při 2 MWh."
+   },
+   {
+    "kind": "price",
     "text": "E.ON je levnější než my: fixace 24 měs. o 701 Kč ročně při 2 MWh."
    },
    {
@@ -900,7 +1011,7 @@
     "supplier": "epet",
     "quote": "Pro naše zákazníky máme vždy tu nejlepší cenu",
     "verdict_label": "v rozporu s daty",
-    "text": "Existuje levnější srovnatelná nabídka: ČEZ Prodej – Elektřina Fix na 3 roky proti FIX 36 GARANT. Roční náklad obchodní části (s DPH) 2 MWh/rok: 9 871 Kč vs. 8 460 Kč; 4 MWh/rok: 17 855 Kč vs. 14 960 Kč. Levnější srovnatelnou nabídku ve vzorku mají: Centropol, E.ON, ČEZ Prodej."
+    "text": "Existuje levnější srovnatelná nabídka: ARMEX ENERGY – OPTIMAL 606 FIX proti FIX 24 GARANT. Roční náklad obchodní části (s DPH) 2 MWh/rok: 10 113 Kč vs. 8 659 Kč; 4 MWh/rok: 18 339 Kč vs. 15 895 Kč. Levnější srovnatelnou nabídku ve vzorku mají: ARMEX ENERGY, Centropol, E.ON, ČEZ Prodej."
    },
    {
     "kind": "claim",
@@ -935,10 +1046,10 @@
    "source_url": "https://www.cez.cz/cs/prejdeteknam",
    "page": {
     "source_url": "https://www.cez.cz/cs/prejdeteknam",
-    "fetched_at": "2026-11-13T13:59:57+00:00",
+    "fetched_at": "2026-11-13T14:07:48+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "a528053f1a8431c4",
+    "sha256": "3cfc968b660da12f",
     "name": "Web dodavatele ČEZ Prodej",
     "text_sha256": "14f088b56aae53ee"
    },
@@ -1320,6 +1431,28 @@
      ],
      "possible_regulatory_risk": false,
      "opportunity": 2
+    },
+    {
+     "id": "cez-n2",
+     "supplier": "ČEZ Prodej",
+     "quote": "Zajistíte si tak stabilně nízkou cenu",
+     "rule_id": "other",
+     "rule_label": "Ostatní",
+     "source_url": "https://www.cez.cz/cs/prejdeteknam",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true,
+     "verdict_label": "nelze ověřit",
+     "risk_reason": null,
+     "review_required": false,
+     "verdict": "unverifiable",
+     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
+     "limitation": "Bez pravidla se verdikt nevydává.",
+     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
+     "evidence": [],
+     "subclaims": [],
+     "possible_regulatory_risk": false,
+     "opportunity": false
     }
    ],
    "candidates": []
@@ -1330,12 +1463,12 @@
    "source_url": "https://www.centropol.cz/domacnost/elektrina/",
    "page": {
     "source_url": "https://www.centropol.cz/domacnost/elektrina/",
-    "fetched_at": "2026-11-13T13:59:59+00:00",
+    "fetched_at": "2026-11-13T14:07:50+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "578fc0d44c52539b",
+    "sha256": "bc5e34d7512e2bc1",
     "name": "Web dodavatele Centropol",
-    "text_sha256": "858822af9929cfb3"
+    "text_sha256": "89f49dd582268958"
    },
    "extractor": {
     "method": "model gemini-3.5-flash-lite",
@@ -1446,7 +1579,7 @@
      "review_required": false,
      "verdict": "unverifiable",
      "finding": "Jde o závazek dorovnat nižší cenu, ne o tvrzení, že ceník je nejnižší. Levnější srovnatelná nabídka veřejně existuje: ČEZ Prodej – Elektřina Online na 1 rok proti Fixně online pro začátek na 1 rok. Roční náklad obchodní části (s DPH) 2 MWh/rok: 10 692 Kč vs. 8 640 Kč; 4 MWh/rok: 19 423 Kč vs. 15 320 Kč.",
-     "limitation": "Srovnání pokrývá jen vzorek (E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou. Zda dodavatel garanci skutečně plní, z veřejných dat ověřit nelze.",
+     "limitation": "Srovnání pokrývá jen vzorek (ARMEX ENERGY, E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou. Zda dodavatel garanci skutečně plní, z veřejných dat ověřit nelze.",
      "action": "Příležitost: slogan „Garance nejnižší ceny“ nezaručuje nejnižší ceník; zákazník musí o dorovnání sám požádat a nižší cenu doložit. V komunikaci lze ukázat konkrétní levnější ceníkovou nabídku.",
      "evidence": [
       {
@@ -1490,6 +1623,11 @@
        "source": "web:epet"
       },
       {
+       "label": "Fixace 24 měs.: Centropol – Fixně online pro začátek na 2 roky 3 213 Kč/MWh",
+       "value": "ARMEX ENERGY – OPTIMAL 606 FIX: 2 990 Kč/MWh (rozdíl +223 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 9 736 Kč vs. 8 659 Kč; 4 MWh/rok: 17 511 Kč vs. 15 895 Kč",
+       "source": "web:armex"
+      },
+      {
        "label": "Fixace 12 měs.: Centropol – Fixně online pro začátek na 1 rok 3 608 Kč/MWh",
        "value": "ČEZ Prodej – Elektřina Online na 1 rok: 2 760 Kč/MWh (rozdíl +848 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 10 692 Kč vs. 8 640 Kč; 4 MWh/rok: 19 423 Kč vs. 15 320 Kč",
        "source": "web:cez"
@@ -1498,6 +1636,11 @@
        "label": "Fixace 12 měs.: Centropol – Fixně online pro začátek na 1 rok 3 608 Kč/MWh",
        "value": "ČEZ Prodej – Elektřina Bez starostí na 1 rok: 3 281 Kč/MWh (rozdíl +327 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 10 692 Kč vs. 9 900 Kč; 4 MWh/rok: 19 423 Kč vs. 17 840 Kč",
        "source": "web:cez"
+      },
+      {
+       "label": "Fixace 12 měs.: Centropol – Fixně online pro začátek na 1 rok 3 608 Kč/MWh",
+       "value": "ARMEX ENERGY – KLASIK 602 FIX: 3 250 Kč/MWh (rozdíl +358 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 10 692 Kč vs. 9 738 Kč; 4 MWh/rok: 19 423 Kč vs. 17 603 Kč",
+       "source": "web:armex"
       }
      ],
      "subclaims": [],
@@ -1601,6 +1744,28 @@
      ],
      "possible_regulatory_risk": false,
      "opportunity": false
+    },
+    {
+     "id": "centropol-n1",
+     "supplier": "Centropol",
+     "quote": "Nízké ceny elektřiny v případě změny dodavatele.",
+     "rule_id": "other",
+     "rule_label": "Ostatní",
+     "source_url": "https://www.centropol.cz/domacnost/elektrina/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true,
+     "verdict_label": "nelze ověřit",
+     "risk_reason": null,
+     "review_required": false,
+     "verdict": "unverifiable",
+     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
+     "limitation": "Bez pravidla se verdikt nevydává.",
+     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
+     "evidence": [],
+     "subclaims": [],
+     "possible_regulatory_risk": false,
+     "opportunity": false
     }
    ],
    "candidates": []
@@ -1611,10 +1776,10 @@
    "source_url": "https://www.eon.cz/domacnosti/elektrina/",
    "page": {
     "source_url": "https://www.eon.cz/domacnosti/elektrina/",
-    "fetched_at": "2026-11-13T13:59:59+00:00",
+    "fetched_at": "2026-11-13T14:07:49+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "7cef2f951a098771",
+    "sha256": "2ff9d300df2abec9",
     "name": "Web dodavatele E.ON",
     "text_sha256": "9f0a50a2837d4be5"
    },
@@ -1862,6 +2027,28 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
+    },
+    {
+     "id": "eon-n2",
+     "supplier": "E.ON",
+     "quote": "Platit za elektřinu méně a méně? S námi ano",
+     "rule_id": "other",
+     "rule_label": "Ostatní",
+     "source_url": "https://www.eon.cz/domacnosti/elektrina/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true,
+     "verdict_label": "nelze ověřit",
+     "risk_reason": null,
+     "review_required": false,
+     "verdict": "unverifiable",
+     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
+     "limitation": "Bez pravidla se verdikt nevydává.",
+     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
+     "evidence": [],
+     "subclaims": [],
+     "possible_regulatory_risk": false,
+     "opportunity": false
     }
    ],
    "candidates": []
@@ -1872,12 +2059,12 @@
    "source_url": "https://epet.cz/elektrina-1",
    "page": {
     "source_url": "https://epet.cz/elektrina-1",
-    "fetched_at": "2026-11-13T13:59:58+00:00",
+    "fetched_at": "2026-11-13T14:07:48+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "083f4a0ae7907dc1",
+    "sha256": "b83de48c2becb3cb",
     "name": "Web dodavatele epet",
-    "text_sha256": "700e69f41cb09486"
+    "text_sha256": "b021e8b73871cac7"
    },
    "extractor": {
     "method": "model gemini-3.5-flash-lite",
@@ -1958,8 +2145,8 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "contradicted",
-     "finding": "Existuje levnější srovnatelná nabídka: ČEZ Prodej – Elektřina Fix na 3 roky proti FIX 36 GARANT. Roční náklad obchodní části (s DPH) 2 MWh/rok: 9 871 Kč vs. 8 460 Kč; 4 MWh/rok: 17 855 Kč vs. 14 960 Kč. Levnější srovnatelnou nabídku ve vzorku mají: Centropol, E.ON, ČEZ Prodej.",
-     "limitation": "Srovnání pokrývá jen vzorek (Centropol, E.ON, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou. Jde o obchodní část ceny (komodita a stálý plat), ne o celkový účet. Tvrzení může „nejlepší cenou“ myslet i něco jiného než ceníkovou cenu.",
+     "finding": "Existuje levnější srovnatelná nabídka: ARMEX ENERGY – OPTIMAL 606 FIX proti FIX 24 GARANT. Roční náklad obchodní části (s DPH) 2 MWh/rok: 10 113 Kč vs. 8 659 Kč; 4 MWh/rok: 18 339 Kč vs. 15 895 Kč. Levnější srovnatelnou nabídku ve vzorku mají: ARMEX ENERGY, Centropol, E.ON, ČEZ Prodej.",
+     "limitation": "Srovnání pokrývá jen vzorek (ARMEX ENERGY, Centropol, E.ON, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou. Jde o obchodní část ceny (komodita a stálý plat), ne o celkový účet. Tvrzení může „nejlepší cenou“ myslet i něco jiného než ceníkovou cenu.",
      "action": "Příležitost: tvrzení o nejlepší ceně lze doložitelně zpochybnit konkrétním protipříkladem z veřejných ceníků. Před komunikací znovu ověřit oba ceníky a datum platnosti.",
      "evidence": [
       {
@@ -2001,6 +2188,11 @@
        "label": "Fixace 24 měs.: epet – FIX 24 GARANT 3 399 Kč/MWh",
        "value": "E.ON – Variant PRO na 2 roky: 2 899 Kč/MWh (rozdíl +500 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 10 113 Kč vs. 9 034 Kč; 4 MWh/rok: 18 339 Kč vs. 16 050 Kč",
        "source": "web:eon"
+      },
+      {
+       "label": "Fixace 24 měs.: epet – FIX 24 GARANT 3 399 Kč/MWh",
+       "value": "ARMEX ENERGY – OPTIMAL 606 FIX: 2 990 Kč/MWh (rozdíl +409 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 10 113 Kč vs. 8 659 Kč; 4 MWh/rok: 18 339 Kč vs. 15 895 Kč",
+       "source": "web:armex"
       }
      ],
      "subclaims": [],
@@ -2054,9 +2246,9 @@
     {
      "id": "epet-n1",
      "supplier": "epet",
-     "quote": "Spolehlivý a férový dodavatel elektřiny",
-     "rule_id": "soft_trust",
-     "rule_label": "Důvěra a férovost",
+     "quote": "Elektřina od epet za skvělou cenu",
+     "rule_id": "other",
+     "rule_label": "Ostatní",
      "source_url": "https://epet.cz/elektrina-1",
      "captured_at": "2026-11-13",
      "source_status": "live",
@@ -2065,9 +2257,9 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
-     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
+     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
+     "limitation": "Bez pravidla se verdikt nevydává.",
+     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
      "evidence": [],
      "subclaims": [],
      "possible_regulatory_risk": false,
@@ -2076,7 +2268,7 @@
     {
      "id": "epet-n2",
      "supplier": "epet",
-     "quote": "Zakládáme si na férovosti, lidském přístupu",
+     "quote": "Spolehlivý a férový dodavatel elektřiny",
      "rule_id": "soft_trust",
      "rule_label": "Důvěra a férovost",
      "source_url": "https://epet.cz/elektrina-1",
@@ -2104,10 +2296,10 @@
    "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
    "page": {
     "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
-    "fetched_at": "2026-11-13T13:59:58+00:00",
+    "fetched_at": "2026-11-13T14:07:49+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "4c7e914390652f4d",
+    "sha256": "0e85c27ef48e8615",
     "name": "Web dodavatele PRE",
     "text_sha256": "5cfbba540193fbdf"
    },
@@ -2198,10 +2390,10 @@
    "source_url": "https://www.mnd.cz/elektrina",
    "page": {
     "source_url": "https://www.mnd.cz/elektrina",
-    "fetched_at": "2026-11-13T13:59:58+00:00",
+    "fetched_at": "2026-11-13T14:07:48+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "70d20bc17737eff7",
+    "sha256": "1faee5dd10183d08",
     "name": "Web dodavatele MND",
     "text_sha256": "deb68768e29c55cd"
    },
@@ -2267,12 +2459,12 @@
    "source_url": "https://dobra-energie.eu/",
    "page": {
     "source_url": "https://dobra-energie.eu/",
-    "fetched_at": "2026-11-13T13:59:58+00:00",
+    "fetched_at": "2026-11-13T14:07:48+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "a30497da3b8d6dcd",
+    "sha256": "931d4773374210e1",
     "name": "Web dodavatele Dobrá Energie",
-    "text_sha256": "da03c03721aa952e"
+    "text_sha256": "c4f475a7a1390657"
    },
    "extractor": {
     "method": "model gemini-3.5-flash-lite",
@@ -2349,9 +2541,9 @@
     {
      "id": "dobra-n1",
      "supplier": "Dobrá Energie",
-     "quote": "Spolehlivá dodávka elektřiny s férovými cenami a prvotřídní zákaznickou podporou.",
-     "rule_id": "soft_trust",
-     "rule_label": "Důvěra a férovost",
+     "quote": "90% Klientů by nás doporučilo dál",
+     "rule_id": "other",
+     "rule_label": "Ostatní",
      "source_url": "https://dobra-energie.eu/",
      "captured_at": "2026-11-13",
      "source_status": "live",
@@ -2360,9 +2552,9 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
-     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
+     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
+     "limitation": "Bez pravidla se verdikt nevydává.",
+     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
      "evidence": [],
      "subclaims": [],
      "possible_regulatory_risk": false,
@@ -2377,10 +2569,10 @@
    "source_url": "https://www.spp.cz/",
    "page": {
     "source_url": "https://www.spp.cz/",
-    "fetched_at": "2026-11-13T13:59:57+00:00",
+    "fetched_at": "2026-11-13T14:07:48+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "f951cdf929275e54",
+    "sha256": "3c0586b1263c0206",
     "name": "Web dodavatele SPP CZ",
     "text_sha256": "0c763bfebf9af081"
    },
@@ -2459,10 +2651,10 @@
    "source_url": "https://www.lamaenergy.cz/",
    "page": {
     "source_url": "https://www.lamaenergy.cz/",
-    "fetched_at": "2026-11-13T13:59:58+00:00",
+    "fetched_at": "2026-11-13T14:07:49+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "d6984d684abcb64c",
+    "sha256": "cad63f848690145d",
     "name": "Web dodavatele LAMA energy",
     "text_sha256": "61c5aaefbf34b23f"
    },
@@ -2487,7 +2679,7 @@
      "review_required": false,
      "verdict": "unverifiable",
      "finding": "Pro dodavatele nemáme ceník fixovaného produktu se známou sazbou a cenou, takže ho nelze srovnat (spotový tarif s fixovanými tarify srovnávat nelze vůbec).",
-     "limitation": "Srovnání pokrývá jen vzorek (Centropol, E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou.",
+     "limitation": "Srovnání pokrývá jen vzorek (ARMEX ENERGY, Centropol, E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou.",
      "action": "Doplnit ceník dodavatele pro stejnou sazbu a distribuční území; do té doby tvrzení nehodnotit.",
      "evidence": [],
      "subclaims": [],
@@ -2537,6 +2729,214 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
+    },
+    {
+     "id": "lama-n3",
+     "supplier": "LAMA energy",
+     "quote": "Férové jednání",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
+     "source_url": "https://www.lamaenergy.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true,
+     "verdict_label": "nelze ověřit",
+     "risk_reason": null,
+     "review_required": false,
+     "verdict": "unverifiable",
+     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty.",
+     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek).",
+     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
+     "evidence": [],
+     "subclaims": [],
+     "possible_regulatory_risk": false,
+     "opportunity": false
+    }
+   ],
+   "candidates": []
+  },
+  {
+   "id": "armex",
+   "name": "ARMEX ENERGY",
+   "source_url": "https://www.armexenergy.cz/",
+   "page": {
+    "source_url": "https://www.armexenergy.cz/",
+    "fetched_at": "2026-11-13T14:07:49+00:00",
+    "origin": "live",
+    "warning": null,
+    "sha256": "af61d8abc2cd171e",
+    "name": "Web dodavatele ARMEX ENERGY",
+    "text_sha256": "462107407daea9fc"
+   },
+   "extractor": {
+    "method": "model gemini-3.5-flash-lite",
+    "note": null
+   },
+   "offers": [
+    {
+     "id": "armex-optimal24",
+     "product": "OPTIMAL 606 FIX",
+     "tariff": "D02d",
+     "area": "PREdistribuce",
+     "fixation_months": 24,
+     "price_mwh_excl_vat": 2990.0,
+     "price_mwh_incl_vat": 3617.9,
+     "monthly_fee_incl_vat": 118.58,
+     "confirmed_live": true,
+     "stale": false,
+     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "captured_at": "2026-11-13",
+     "price_list": {
+      "url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+      "document": "X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+      "effective_from": "2026-10-21"
+     },
+     "benchmark": {
+      "offer_id": "armex-optimal24",
+      "product": "OPTIMAL 606 FIX",
+      "position": "below",
+      "not_above": true,
+      "eligible": true,
+      "reason": null,
+      "price": 2990.0,
+      "basis": "bez DPH"
+     }
+    },
+    {
+     "id": "armex-klasik12",
+     "product": "KLASIK 602 FIX",
+     "tariff": "D02d",
+     "area": "PREdistribuce",
+     "fixation_months": 12,
+     "price_mwh_excl_vat": 3250.0,
+     "price_mwh_incl_vat": 3932.5,
+     "monthly_fee_incl_vat": 156.09,
+     "confirmed_live": true,
+     "stale": false,
+     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "captured_at": "2026-11-13",
+     "price_list": {
+      "url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+      "document": "XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+      "effective_from": "2026-08-01"
+     },
+     "benchmark": {
+      "offer_id": "armex-klasik12",
+      "product": "KLASIK 602 FIX",
+      "position": "below",
+      "not_above": true,
+      "eligible": true,
+      "reason": null,
+      "price": 3250.0,
+      "basis": "bez DPH"
+     }
+    }
+   ],
+   "claims": [
+    {
+     "id": "armex-1",
+     "supplier": "ARMEX ENERGY",
+     "quote": "Přidejte se mezi téměř 80 000 našich spokojených zákazníků",
+     "rule_id": "customer_count",
+     "rule_label": "Počet zákazníků",
+     "source_url": "https://www.armexenergy.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": false,
+     "verdict_label": "nelze ověřit",
+     "risk_reason": null,
+     "review_required": false,
+     "verdict": "unverifiable",
+     "finding": "OTE eviduje 49 764 odběrných míst elektřiny a 23 596 plynu, dohromady 73 360. Tvrzených 80 000 zákazníků je nad tímto součtem, rozdíl je ale v toleranci zaokrouhlení, takže to rozpor není. Tvrzený počet převyšuje součet odběrných míst v každém měsíci roku (nejvíc 76 196 v 2026-04) a počet od začátku roku klesá (-3,2 %).",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat i jiné služby než dodávku energií.",
+     "action": "Příležitost: číslo je nejspíš zaokrouhlené nahoru nebo zastaralé. Lze na to upozornit daty OTE; u vlastních tvrzení uvádět aktuální počet a datum.",
+     "evidence": [
+      {
+       "label": "Elektřina – ARMEX ENERGY a.s.: 49 764 OPM (2026-09)",
+       "value": "tvrzeno: 80 000",
+       "source": "ote"
+      },
+      {
+       "label": "Plyn – ARMEX ENERGY a.s.: 23 596 OPM (2026-09)",
+       "value": "druhá komodita téhož dodavatele",
+       "source": "ote_gas"
+      },
+      {
+       "label": "Součet elektřina + plyn: 73 360 OPM",
+       "value": "tvrzeno 80 000 zákazníků",
+       "source": "ote"
+      }
+     ],
+     "subclaims": [],
+     "possible_regulatory_risk": false,
+     "opportunity": 2
+    },
+    {
+     "id": "armex-2",
+     "supplier": "ARMEX ENERGY",
+     "quote": "Získejte levnější energie",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
+     "source_url": "https://www.armexenergy.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": false,
+     "verdict_label": "podloženo",
+     "risk_reason": null,
+     "review_required": false,
+     "verdict": "supported",
+     "finding": "Všechny srovnatelné nabídky jsou pod pásmem ERÚ, tedy podle ERÚ mezi nejlevnější čtvrtinou fixovaných nabídek na trhu (OPTIMAL 606 FIX pod pásmem; KLASIK 602 FIX pod pásmem).",
+     "limitation": "Pásmo ERÚ odpovídá zhruba 25. až 50. percentilu fixovaných nabídek na trhu (dolní mez = hranice nejlevnější čtvrtiny, horní mez = přibližně medián). Je to cena komodity bez stálého měsíčního platu a bez regulovaných složek; neříká nic o celkovém účtu ani o tom, zda je nabídka nejlevnější na trhu. „Výhodná cena“ je zde vyložena jako cena nepřesahující pásmo ERÚ.",
+     "action": "Cenou komodity tohoto konkurenta nepodbízet; odlišit se stálým platem, podmínkami a službami.",
+     "evidence": [
+      {
+       "label": "OPTIMAL 606 FIX: 2 990 Kč/MWh (bez DPH)",
+       "value": "pásmo ERÚ 3 387–3 569 Kč/MWh (bez DPH; D02d, fixace 24 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "source": "eru",
+       "chart": {
+        "low": 3387.3525703324126,
+        "high": 3568.6025703324126,
+        "price": 2990.0,
+        "position": "below"
+       }
+      },
+      {
+       "label": "KLASIK 602 FIX: 3 250 Kč/MWh (bez DPH)",
+       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "source": "eru",
+       "chart": {
+        "low": 3834.1199946102115,
+        "high": 3956.767109994827,
+        "price": 3250.0,
+        "position": "below"
+       }
+      }
+     ],
+     "subclaims": [],
+     "possible_regulatory_risk": false,
+     "opportunity": false
+    },
+    {
+     "id": "armex-n1",
+     "supplier": "ARMEX ENERGY",
+     "quote": "Stálá cena energií po celou dobu úvazku.",
+     "rule_id": "other",
+     "rule_label": "Ostatní",
+     "source_url": "https://www.armexenergy.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true,
+     "verdict_label": "nelze ověřit",
+     "risk_reason": null,
+     "review_required": false,
+     "verdict": "unverifiable",
+     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
+     "limitation": "Bez pravidla se verdikt nevydává.",
+     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
+     "evidence": [],
+     "subclaims": [],
+     "possible_regulatory_risk": false,
+     "opportunity": false
     }
    ],
    "candidates": []
@@ -2547,10 +2947,10 @@
    "source_url": "https://www.bezdodavatele.cz/",
    "page": {
     "source_url": "https://www.bezdodavatele.cz/",
-    "fetched_at": "2026-11-13T13:59:59+00:00",
+    "fetched_at": "2026-11-13T14:07:49+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "d22d7d7c6721f237",
+    "sha256": "686cbd32c4a739e4",
     "name": "Web dodavatele bezDodavatele",
     "text_sha256": "430cceba96d5f324"
    },
@@ -2597,7 +2997,7 @@
      "review_required": false,
      "verdict": "unverifiable",
      "finding": "Pro dodavatele nemáme ceník fixovaného produktu se známou sazbou a cenou, takže ho nelze srovnat (spotový tarif s fixovanými tarify srovnávat nelze vůbec).",
-     "limitation": "Srovnání pokrývá jen vzorek (Centropol, E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou.",
+     "limitation": "Srovnání pokrývá jen vzorek (ARMEX ENERGY, Centropol, E.ON, epet, ČEZ Prodej): sazba D02d, distribuční území PREdistribuce, stejná délka fixace, jen produkty s jednou pevnou cenou.",
      "action": "Doplnit ceník dodavatele pro stejnou sazbu a distribuční území; do té doby tvrzení nehodnotit.",
      "evidence": [],
      "subclaims": [],
@@ -2631,8 +3031,8 @@
   }
  ],
  "briefing": {
-  "headline": "Konkurenční tvrzení na trhu s elektřinou vyžadují opatrnost v komunikaci a ověření dat.",
-  "summary": "Někteří dodavatelé opírají svá marketingová prohlášení o sporná nebo neověřitelná tvrzení týkající se nejnižších cen a velikosti portfolia. Analýza ukázala, že některé cenové sliby lze doložitelně zpochybnit veřejnými ceníky. U ekologických a zelených produktů je vhodné vyžadovat doložení záruk původu. Vedení by mělo věnovat pozornost zejména problematickým cenovým garancím a sporným superlativům.",
+  "headline": "Konkurence často využívá neověřitelná tvrzení a nepřesné definice velikosti.",
+  "summary": "Analýza trhu ukazuje, že někteří dodavatelé operují s neověřitelnými reklamními slogany ohledně nejnižších cen nebo zeleného původu energií. Objevují se také nepřesnosti v počtech zákazníků a odběrných míst ve srovnání s daty OTE. Tyto nedostatky v marketingových sděleních představují příležitost pro naši vlastní transparentní komunikaci.",
   "matrix": {
    "Velikost na trhu": {
     "contradicted": 0,
@@ -2644,12 +3044,18 @@
     "contradicted": 0,
     "partially_supported": 1,
     "unverifiable": 0,
-    "supported": 1
+    "supported": 2
    },
    "Důvěra a férovost": {
     "contradicted": 0,
     "partially_supported": 0,
-    "unverifiable": 7,
+    "unverifiable": 6,
+    "supported": 0
+   },
+   "Ostatní": {
+    "contradicted": 0,
+    "partially_supported": 0,
+    "unverifiable": 10,
     "supported": 0
    },
    "Nejnižší cena / cenové prvenství": {
@@ -2667,14 +3073,8 @@
    "Počet zákazníků": {
     "contradicted": 0,
     "partially_supported": 2,
-    "unverifiable": 1,
+    "unverifiable": 2,
     "supported": 1
-   },
-   "Ostatní": {
-    "contradicted": 0,
-    "partially_supported": 0,
-    "unverifiable": 4,
-    "supported": 0
    },
    "Podíl zelené elektřiny": {
     "contradicted": 0,
@@ -2694,15 +3094,15 @@
     "claim_id": "epet-1",
     "supplier": "epet",
     "quote": "Pro naše zákazníky máme vždy tu nejlepší cenu",
-    "why": "Existuje levnější srovnatelná nabídka: ČEZ Prodej – Elektřina Fix na 3 roky proti FIX 36 GARANT. Roční náklad obchodní části (s DPH) 2 MWh/rok: 9 871 Kč vs. 8 460 Kč; 4 MWh/rok: 17 855 Kč vs. 14 960 Kč. Levnější srovnatelnou nabídku ve vzorku mají: Centropol, E.ON, ČEZ Prodej.",
+    "why": "Existuje levnější srovnatelná nabídka: ARMEX ENERGY – OPTIMAL 606 FIX proti FIX 24 GARANT. Roční náklad obchodní části (s DPH) 2 MWh/rok: 10 113 Kč vs. 8 659 Kč; 4 MWh/rok: 18 339 Kč vs. 15 895 Kč. Levnější srovnatelnou nabídku ve vzorku mají: ARMEX ENERGY, Centropol, E.ON, ČEZ Prodej.",
     "next_step": "Příležitost: tvrzení o nejlepší ceně lze doložitelně zpochybnit konkrétním protipříkladem z veřejných ceníků. Před komunikací znovu ověřit oba ceníky a datum platnosti."
    },
    {
-    "claim_id": "centropol-1",
-    "supplier": "Centropol",
-    "quote": "Ke stabilní dodávce energií dáváme Garanci nejnižší ceny.",
-    "why": "Jde o závazek dorovnat nižší cenu, ne o tvrzení, že ceník je nejnižší. Levnější srovnatelná nabídka veřejně existuje: ČEZ Prodej – Elektřina Online na 1 rok proti Fixně online pro začátek na 1 rok. Roční náklad obchodní části (s DPH) 2 MWh/rok: 10 692 Kč vs. 8 640 Kč; 4 MWh/rok: 19 423 Kč vs. 15 320 Kč.",
-    "next_step": "Příležitost: slogan „Garance nejnižší ceny“ nezaručuje nejnižší ceník; zákazník musí o dorovnání sám požádat a nižší cenu doložit. V komunikaci lze ukázat konkrétní levnější ceníkovou nabídku."
+    "claim_id": "dobra-1",
+    "supplier": "Dobrá Energie",
+    "quote": "Po sloučení s epet jsme největší alternativní dodavatel energií v ČR",
+    "why": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají CENTROPOL ENERGY, a.s. (292 503 OPM), MND Energie a.s. (273 578 OPM). Pojem „alternativní dodavatel“ ani metrika (odběrná místa, objem dodávky) nejsou v tvrzení definovány.",
+    "next_step": "Příležitost: podle počtu odběrných míst tvrzení neplatí a „alternativní“ není definováno. Lze ho zpochybnit čísly OTE s výhradou, že může jít o objem dodávky."
    },
    {
     "claim_id": "spp-1",

@@ -252,7 +252,7 @@ def test_company_perspective_answers_four_questions_from_snapshots():
     by_months = {p["fixation_months"]: p for p in view["price"]}
     assert [c["supplier"] for c in by_months[36]["cheaper"]] == ["ČEZ Prodej"]
     assert round(by_months[36]["cheaper"][0]["saving"][0]) == 317
-    assert [c["supplier"] for c in by_months[24]["cheaper"]] == ["E.ON"]
+    assert [c["supplier"] for c in by_months[24]["cheaper"]] == ["ARMEX ENERGY", "E.ON"]
     # 2. vlastní napadnutelná tvrzení
     assert {c["id"] for c in view["risky"]} == {"centropol-1", "centropol-2"}
     # 3. doložitelná tvrzení mají zdroj a výhradu a neobsahují zanedbatelné rozdíly
@@ -272,7 +272,10 @@ def test_market_overview_and_loyalty_gap_from_price_lists():
     rows = {r["id"]: r for r in market["rows"]}
     assert rows["cez"]["price"]["rank"] == 1 and rows["cez"]["electricity"]["abs"] < 0
     assert rows["epet"]["electricity"]["pct"] > 0
-    assert len(market["observations"]) == 3
+    assert market["observations"][-1].startswith("Nejnižší cena")
+    armex = rows["armex"]  # nemá tříletý produkt: cena se bere z nejdelší fixace, kterou nabízí
+    assert armex["price"]["fixation_months"] == 24 and armex["price"]["rank"] == 1
+    assert armex["electricity"]["abs"] < 0
     gaps = {(g["supplier_id"], g["fixation_months"]): g for g in market["loyalty_gaps"]}
     cez = gaps[("cez", 36)]
     assert (cez["new_price"], cez["existing_price"], cez["pct"]) == (3250.0, 3630.0, 11.7)

@@ -700,6 +700,21 @@ def market_size(claim, supplier, ctx):
     )
 
 
+def _monthly_totals(ctx: dict, supplier: dict) -> list[tuple[str, int]]:
+    """Součet OPM elektřiny a plynu dodavatele po měsících roku: [(RRRR-MM, počet)]."""
+    def series(data):
+        if not data or "table" not in data:
+            return [None] * 12
+        for name, values in data["table"]["suppliers"].items():
+            if ote_connector.same_supplier(name, supplier.get("ote_name") or ""):
+                return values
+        return [None] * 12
+
+    ele, gas = series(ctx["ote"]), series(ctx.get("ote_gas"))
+    year = (ctx["ote"].get("table") or {}).get("year") or "rok"
+    return [(f"{year}-{i + 1:02d}", e + (g or 0)) for i, (e, g) in enumerate(zip(ele, gas)) if e is not None]
+
+
 def _claimed_from_quote(quote: str):
     """Vyčte z citátu tvrzený počet a metriku: (počet, "opm" | None). Pro automaticky nalezená tvrzení."""
     found = re.search(
@@ -806,11 +821,25 @@ def customer_count(claim, supplier, ctx):
                 {"text": "Jde o počet zákazníků, ne odběrných míst", "status": "neověřeno – OTE zákazníky neeviduje"},
             ],
         )
+    months = _monthly_totals(ctx, supplier)
+    trend = ""
+    if len(months) >= 2:
+        peak_month, peak = max(months, key=lambda m: m[1])
+        first, last = months[0][1], months[-1][1]
+        if claimed > peak:
+            trend = (
+                f" Tvrzený počet převyšuje součet odběrných míst v každém měsíci roku (nejvíc {num(peak)} "
+                f"v {peak_month})"
+            )
+            if last < first:
+                change = f"{(last - first) / first * 100:+.1f}".replace(".", ",")
+                trend += f" a počet od začátku roku klesá ({change} %)"
+            trend += "."
     if claimed > total * CUSTOMER_TOLERANCE:
         return result(
             CONTRADICTED,
             f"OTE eviduje {parts}. Tvrzených {num(claimed)} zákazníků je víc než všech odběrných míst "
-            "dodavatele; zákazníků s dodávkou energií nemůže být víc než odběrných míst.",
+            "dodavatele; zákazníků s dodávkou energií nemůže být víc než odběrných míst." + trend,
             limitation,
             "Příležitost: tvrzený počet zákazníků neodpovídá veřejným datům OTE. Před použitím ověřit, "
             "zda dodavatel nepočítá i jiné služby.",
@@ -818,9 +847,12 @@ def customer_count(claim, supplier, ctx):
         )
     return result(
         UNVERIFIABLE,
-        f"OTE eviduje {parts}. Tvrzených {num(claimed)} zákazníků je mírně nad tímto součtem, "
-        "rozdíl je ale v toleranci zaokrouhlení.",
-        limitation, "Bez akce.", evidence,
+        f"OTE eviduje {parts}. Tvrzených {num(claimed)} zákazníků je nad tímto součtem, rozdíl je ale "
+        "v toleranci zaokrouhlení, takže to rozpor není." + trend,
+        limitation,
+        "Příležitost: číslo je nejspíš zaokrouhlené nahoru nebo zastaralé. Lze na to upozornit daty OTE; "
+        "u vlastních tvrzení uvádět aktuální počet a datum." if trend else "Bez akce.",
+        evidence, opportunity=2 if trend else False,
     )
 
 

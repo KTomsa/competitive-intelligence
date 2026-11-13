@@ -563,6 +563,76 @@
       "green_evidence": []
     },
     {
+      "id": "armex",
+      "name": "ARMEX ENERGY",
+      "ote_name": "ARMEX ENERGY a.s.",
+      "source_url": "https://www.armexenergy.cz/",
+      "captured_at": "2026-11-13",
+      "claims": [
+        {
+          "id": "armex-1",
+          "quote": "Přidejte se mezi téměř 80 000 našich spokojených zákazníků",
+          "rule_id": "customer_count",
+          "params": {
+            "claimed": 80000
+          }
+        },
+        {
+          "id": "armex-2",
+          "quote": "Získejte levnější energie",
+          "rule_id": "price_favorable",
+          "params": {}
+        }
+      ],
+      "offers": [
+        {
+          "id": "armex-optimal24",
+          "product": "OPTIMAL 606 FIX",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 24,
+          "price_mwh_excl_vat": 2990.0,
+          "price_mwh_incl_vat": 3617.9,
+          "monthly_fee_incl_vat": 118.58,
+          "price_list": {
+            "url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+            "document": "X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+            "effective_from": "2026-10-21",
+            "markers": [
+              "PRODUKT OPTIMAL 606 FIX",
+              "24 měsíců",
+              "3 617,90",
+              "(2 990,00)",
+              "118,58"
+            ]
+          }
+        },
+        {
+          "id": "armex-klasik12",
+          "product": "KLASIK 602 FIX",
+          "tariff": "D02d",
+          "area": "PREdistribuce",
+          "fixation_months": 12,
+          "price_mwh_excl_vat": 3250.0,
+          "price_mwh_incl_vat": 3932.5,
+          "monthly_fee_incl_vat": 156.09,
+          "price_list": {
+            "url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+            "document": "XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+            "effective_from": "2026-08-01",
+            "markers": [
+              "PRODUKT KLASIK 602 FIX",
+              "12 měsíců",
+              "3 932,50",
+              "(3 250,00)",
+              "156,09"
+            ]
+          }
+        }
+      ],
+      "green_evidence": []
+    },
+    {
       "id": "bezdodavatele",
       "name": "bezDodavatele",
       "ote_name": "bezDodavatele a.s.",

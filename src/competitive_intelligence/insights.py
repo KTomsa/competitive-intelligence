@@ -66,15 +66,17 @@ def _best_by_supplier(group: dict) -> list[dict]:
 def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) -> dict:
     """Cena a růst vedle sebe: kdo získává odběrná místa a za jakou cenu."""
     longest = comparison[0] if comparison else None
-    ranked = _best_by_supplier(longest) if longest else []
-    rank_of = {row["supplier_id"]: (i, row) for i, row in enumerate(ranked, start=1)}
     rows = []
     for supplier in suppliers:
         price = None
-        if supplier["id"] in rank_of:
-            rank, row = rank_of[supplier["id"]]
-            price = {"rank": rank, "of": len(ranked), "product": row["product"],
-                     "annual_cost": row["annual_cost"][0], "position": row["position"]}
+        for group in comparison:  # od nejdelší fixace: první, kterou dodavatel nabízí
+            ranked = _best_by_supplier(group)
+            row = next((r for r in ranked if r["supplier_id"] == supplier["id"]), None)
+            if row is not None:
+                price = {"fixation_months": group["fixation_months"], "rank": ranked.index(row) + 1,
+                         "of": len(ranked), "product": row["product"],
+                         "annual_cost": row["annual_cost"][0], "position": row["position"]}
+                break
         rows.append({
             "id": supplier["id"], "name": supplier["name"],
             "electricity": _series(ctx["ote"], supplier["ote_name"]),
@@ -85,7 +87,11 @@ def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) ->
     period = next((r["electricity"] for r in rows if r["electricity"]), None)
 
     observations = []
-    priced = sorted((r for r in rows if r["price"] and r["electricity"]), key=lambda r: r["price"]["rank"])
+    priced = sorted(
+        (r for r in rows if r["price"] and r["electricity"]
+         and r["price"]["fixation_months"] == longest["fixation_months"]),
+        key=lambda r: r["price"]["rank"],
+    ) if longest else []
     if len(priced) >= 2:
         cheapest, priciest = priced[0], priced[-1]
         if cheapest["electricity"]["abs"] < 0:
@@ -98,8 +104,20 @@ def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) ->
                 f"Nejdražší nabídku ve vzorku má {priciest['name']}, přesto roste "
                 f"({pct_text(priciest['electricity']['pct'])})."
             )
-        if len(observations) == 2:
-            observations.append("Nejnižší cena tedy sama o sobě zákazníky nepřivádí.")
+    for group in comparison[1:]:  # stejný jev u kratších fixací
+        ranked = _best_by_supplier(group)
+        if len(ranked) < 2:
+            continue
+        leader = next((r for r in rows if r["id"] == ranked[0]["supplier_id"]), None)
+        if leader and leader["electricity"] and leader["electricity"]["abs"] < 0 and not any(
+            leader["name"] in text for text in observations
+        ):
+            observations.append(
+                f"U fixace na {group['fixation_months']} měsíců je nejlevnější {leader['name']} a také ztrácí "
+                f"({rules.num(leader['electricity']['abs'])}, {pct_text(leader['electricity']['pct'])})."
+            )
+    if len(observations) >= 2:
+        observations.append("Nejnižší cena tedy sama o sobě zákazníky nepřivádí.")
     gaps = loyalty_gaps(suppliers, ctx["profile"])
     return {
         "loyalty_gaps": gaps,

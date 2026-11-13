@@ -25,6 +25,7 @@ ALLOWED_HOSTS = {
     "dobra-energie.eu",
     "www.spp.cz",
     "www.lamaenergy.cz",
+    "www.armexenergy.cz",
 }
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130 Safari/537.36"
 TIMEOUT_S = 20.0

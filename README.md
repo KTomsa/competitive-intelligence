@@ -6,7 +6,7 @@ Rozsah vychází z revize architektury z 13. 11. 2026 (jedna aplikace, žádná 
 
 ## Co aplikace dělá
 
-1. **Stáhne stránky dodavatelů** a zkontroluje, že připravené citáty na nich stále jsou. Ve vzorku je deset dodavatelů: ČEZ Prodej, Centropol, E.ON, epet, PRE, MND, Dobrá Energie, SPP CZ, LAMA energy a bezDodavatele.
+1. **Stáhne stránky dodavatelů** a zkontroluje, že připravené citáty na nich stále jsou. Ve vzorku je jedenáct dodavatelů: ČEZ Prodej, Centropol, E.ON, epet, PRE, MND, Dobrá Energie, SPP CZ, LAMA energy, ARMEX ENERGY a bezDodavatele.
 2. **Stáhne jejich ceníky (PDF)** a ověří, že obsahují cenu i stálý měsíční plat z přípravy.
 3. **Stáhne úřední data**: indikativní cenová pásma ERÚ (CSV) a počty odběrných míst dodavatelů elektřiny i plynu z OTE.
 4. **Vyhodnotí tvrzení pravidly v kódu** (ne jazykovým modelem) a ke každému vrátí kartu: tvrzení, nález, omezení, doporučený krok, podklady s výpočtem.
