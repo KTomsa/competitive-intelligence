@@ -22,6 +22,7 @@ from ..schemas import (
     Origin,
 )
 from ..registry import SupplierRegistry
+from ..llm.runtime import AgentStep
 from .stores import SourceStorage
 
 PROGRESS = {
@@ -63,6 +64,8 @@ class AuditRepository(Protocol):
     def heartbeat(self, audit_id: str) -> None: ...
 
     def source_storage(self, audit_id: str, registry: SupplierRegistry) -> SourceStorage | None: ...
+
+    def record_agent_step(self, audit_id: str, step: AgentStep) -> None: ...
 
     def retry(self, audit_id: str, code: str, message: str) -> None: ...
 
@@ -116,6 +119,14 @@ class InMemoryAuditRepository:
         self._records: dict[str, _Record] = {}
         self._queue: list[str] = []
         self._latest_published: str | None = None
+        self._agent_steps: dict[str, list[AgentStep]] = {}
+
+    def record_agent_step(self, audit_id: str, step: AgentStep) -> None:
+        with self._lock:
+            self._get(audit_id)
+            self._agent_steps.setdefault(audit_id, []).append(step.model_copy(deep=True))
+        self.add_event(audit_id, "agent_trace", f"{step.role}: {step.kind} {step.status}.",
+                       level="warning" if step.status in ("failed", "rejected") else "info")
 
     def _get(self, audit_id: str) -> _Record:
         try:

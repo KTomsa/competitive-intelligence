@@ -65,7 +65,7 @@ def create_app(
     """
     app = Flask(__name__)
     settings = Settings.from_env().with_overrides(config)
-    ctx = context if context is not None else build_context()
+    ctx = context if context is not None else build_context(settings=settings)
     repo = repository if repository is not None else build_repository(settings)
     if settings.seed_demo_audit and not repo.durable:
         _seed_demo_audit(repo, ctx)

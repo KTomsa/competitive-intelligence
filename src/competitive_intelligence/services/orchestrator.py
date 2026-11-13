@@ -16,6 +16,9 @@ from typing import Any
 from pydantic import ValidationError
 
 from ..agents import FixtureEvidenceAgent
+from ..agents.live import ClaimExtractor, LiveEvidenceAgent
+from ..llm.provider import ModelProvider
+from ..llm.runtime import AuditModelSession
 from ..registry import SupplierRegistry
 from ..rules import apply_judge
 from ..schemas import (
@@ -38,6 +41,7 @@ from ..schemas import (
 from ..tools import ReferenceStore
 from .fixtures import FixtureBundle
 from .repository import AuditRepository, utc_now
+from .reference_bundle import ReviewedReferenceBundle
 from .web_scout import ScoutedSource, ScoutError, WebScout
 
 VERDICT_LABELS = {
@@ -48,9 +52,9 @@ VERDICT_LABELS = {
 }
 
 LIVE_SCOPE_NOTE = (
-    "Živý sběr: stránky dodavatelů byly načteny při tomto běhu. Tvrzení se zatím přebírají jen "
-    "ze schválené baseline; extrakce z nových nebo změněných stránek (LLM) a referenční data "
-    "pro ověření ještě nejsou připojeny."
+    "Živý režim: původ a stáří každého zdroje jsou uvedeny zvlášť. Tvrzení pocházejí ze schválené "
+    "baseline nebo z dostupné LLM extrakce. Verdikty počítá kód pouze z vyžádaných referenčních "
+    "důkazů; chybějící nebo neúplné podklady neprokazují nepravdivost."
 )
 
 
@@ -61,6 +65,12 @@ class PipelineContext:
     bundle: FixtureBundle
     registry: SupplierRegistry
     scout: WebScout
+    model_provider: ModelProvider | None = None
+    references: ReviewedReferenceBundle | None = None
+    llm_max_requests: int = 32
+    llm_max_input_chars: int = 240000
+    llm_max_output_tokens: int = 2000
+    llm_max_claims: int = 20
 
 
 def validate_claims(
@@ -104,7 +114,14 @@ def validate_claims(
             dropped.append(f"Tvrzení {claim_id} zahozeno: citace není doslova v textu stránky.")
             continue
         claims.append(claim)
-    return claims, dropped
+    # Claim IDs are opaque but must be unique across the result's evidence/verdict maps.
+    unique = {}
+    for claim in claims:
+        if claim.id in unique:
+            dropped.append(f"Tvrzení {claim.id} zahozeno: duplicitní identifikátor.")
+        else:
+            unique[claim.id] = claim
+    return list(unique.values()), dropped
 
 
 def build_briefing(claims: list[Claim], verdicts: list[Verdict]) -> Briefing:
@@ -161,11 +178,12 @@ def _verify_and_report(
     store: ReferenceStore,
     sample_supplier_ids: list[str],
     judge_flags: dict[str, str],
+    evidence_agent=None,
 ) -> AuditResult:
     request = repo.get_request(audit_id)
 
     repo.set_stage(audit_id, AuditStatus.VERIFYING, "evidence_agents")
-    agent = FixtureEvidenceAgent(store, sample_supplier_ids)
+    agent = evidence_agent if evidence_agent is not None else FixtureEvidenceAgent(store, sample_supplier_ids)
     evidence: list[Evidence] = []
     outcomes = {}
     for claim in claims:
@@ -328,10 +346,16 @@ def run_live_audit(repo: AuditRepository, audit_id: str, ctx: PipelineContext) -
         repo.add_event(
             audit_id, "claim_extractor", f"Převzato {len(claims)} tvrzení ze schválené baseline."
         )
+    if len(claims) > ctx.llm_max_claims:
+        claims = claims[:ctx.llm_max_claims]
+        repo.add_event(audit_id, "claim_extractor", "Dosažen limit tvrzení ze schválené baseline.", level="warning")
     for message in dropped:
         repo.add_event(audit_id, "claim_extractor", message, level="warning")
     without_baseline = [s.source.source_id for s in scouted if s.baseline_claims is None]
-    if without_baseline:
+    session = (AuditModelSession(ctx.model_provider, lambda step: repo.record_agent_step(audit_id, step),
+                max_requests=ctx.llm_max_requests, max_input_chars=ctx.llm_max_input_chars,
+                max_output_tokens=ctx.llm_max_output_tokens) if ctx.model_provider is not None else None)
+    if without_baseline and session is None:
         repo.add_event(
             audit_id,
             "claim_extractor",
@@ -339,6 +363,36 @@ def run_live_audit(repo: AuditRepository, audit_id: str, ctx: PipelineContext) -
             "není připojena, tyto stránky proto nemají žádná posouzená tvrzení.",
             level="warning",
         )
+    if session is not None:
+        extractor = ClaimExtractor(session)
+        for page in scouted:
+            if page.baseline_claims is not None:
+                continue
+            if len(claims) >= ctx.llm_max_claims:
+                repo.add_event(audit_id, "claim_extractor", "Dosažen limit tvrzení; další stránky nebyly extrahovány.", level="warning")
+                break
+            raw, warnings = extractor.extract(page)
+            extracted, invalid = validate_claims(raw, [page.source], texts, human_reviewed=False)
+            available = ctx.llm_max_claims - len(claims)
+            claims.extend(extracted[:available])
+            if len(extracted) > available:
+                warnings.append("Dosažen limit tvrzení; část extrahovaných kandidátů nebyla posouzena.")
+            for warning in [*warnings, *invalid]:
+                repo.add_event(audit_id, "claim_extractor", warning, level="warning")
+    if ctx.references is None and claims:
+        repo.add_event(audit_id, "evidence_agents", "Není připojen přezkoumaný referenční balíček; chybějící důkazy nelze nahradit odhadem.", level="warning")
+    if session is None and claims:
+        repo.add_event(audit_id, "evidence_agents", "LLM evidence agenti nejsou nakonfigurováni; žádná nová referenční data nebyla vyžádána.", level="warning")
+    unique = {}
+    for claim in claims:
+        if claim.id in unique:
+            repo.add_event(audit_id, "claim_extractor", f"Tvrzení {claim.id} zahozeno: duplicitní identifikátor.", level="warning")
+        else:
+            unique[claim.id] = claim
+    claims = list(unique.values())
+    evidence_agent = (LiveEvidenceAgent(session, request.supplier_ids, ctx.references, ctx.bundle.profiles,
+        lambda message: repo.add_event(audit_id, "evidence_agents", message, level="warning"))
+        if session is not None else None)
 
     return _verify_and_report(
         repo,
@@ -352,4 +406,5 @@ def run_live_audit(repo: AuditRepository, audit_id: str, ctx: PipelineContext) -
         store=ReferenceStore({}, ctx.bundle.profiles),
         sample_supplier_ids=request.supplier_ids,
         judge_flags={},
+        evidence_agent=evidence_agent,
     )

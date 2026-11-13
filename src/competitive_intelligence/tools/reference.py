@@ -24,6 +24,8 @@ class ReferenceRecord(StrictModel):
     captured_at: AwareDatetime
     valid_as_of: date
     source_content_hash: str = ""
+    valid_from: date | None = None
+    valid_to: date | None = None
 
 
 class PriceOffer(ReferenceRecord):
@@ -77,6 +79,16 @@ class ReferenceStore:
         self._terms = _load(ProductTerms, data.get("terms", []))
         self._mix = _load(FuelMix, data.get("fuel_mix", []))
         self._opm = _load(OpmCount, data.get("ote_opm", []))
+
+    @classmethod
+    def from_records(cls, profiles, *, offers=(), terms=(), fuel_mix=(), opm=()):
+        """Use validated records without replacing their original artifact hashes."""
+        store = cls({}, dict(profiles))
+        store._offers = list(offers)
+        store._terms = list(terms)
+        store._mix = list(fuel_mix)
+        store._opm = list(opm)
+        return store
 
     def get_price_offers(self, supplier_ids: list[str]) -> list[PriceOffer]:
         wanted = set(supplier_ids)

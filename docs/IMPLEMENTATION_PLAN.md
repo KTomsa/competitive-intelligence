@@ -36,6 +36,8 @@ Bounded fetching, HTML canonicalization, the supplier registry, baseline reuse a
 
 ## Phase 4 — specialized LLM agents + deterministic verdicts
 
+The agent core is now implemented: literal-quote extraction with code-owned IDs/provenance, native Gemini and optional OpenAI Responses adapters, bounded Price/Green function-calling loops, Pydantic tool inputs, per-audit budgets, private hashed traces, and reviewed reference-bundle imports. The owner selected `gemini-3.5-flash-lite`; native structured extraction and a signed function-call/result round trip passed live smoke checks using the existing key, with no Azure writes. Azure currently blocks read-only inspection from this machine's IP, so database reference-table mappings were not guessed; reviewed file bundles are the implemented reference interface. Reference curation, product binding for new claims and golden-set evaluation remain acceptance work. See [Phase 4 operations](PHASE_4.md) for current test counts.
+
 - Pydantic schemas/closed rule catalog; LLM Claim Extractor produces literal source quotes and valid rule IDs.
 - Price and Green agents make actual bounded read-only tool calls; Python tools calculate costs and retrieve product-specific green evidence. Judge only downgrades to `unverifiable` and Strategist cites claim IDs.
 - Acceptance: entire audit for one supplier completes with real, traceable sources without silently turning source failures into positive verdicts; record each agent/tool call and its source.

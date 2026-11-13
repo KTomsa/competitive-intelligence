@@ -14,11 +14,14 @@ from .config import Settings
 from .connectors import SupplierWebClient
 from .db import check_schema
 from .registry import load_registry
+from .llm.provider import OpenAIResponsesProvider
+from .llm.gemini import GeminiGenerateContentProvider
 from .schemas import AuditCreateRequest, AuditMode
 from .services import AuditRepository, FixtureBundle, InMemoryAuditRepository, load_demo_fixture
 from .services.factory import build_repository
 from .services.orchestrator import PipelineContext, run_fixture_audit, run_live_audit
 from .services.repository import LeaseLost
+from .services.reference_bundle import load_reference_bundle
 from .services.stores import FileBaselineStore, FileSnapshotStore
 from .services.web_scout import WebScout
 
@@ -27,7 +30,7 @@ log = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
-def build_context(data_dir: Path = DATA_DIR) -> PipelineContext:
+def build_context(data_dir: Path = DATA_DIR, *, settings: Settings | None = None) -> PipelineContext:
     """Wire source intake without making network requests."""
     registry = load_registry()
     scout = WebScout(
@@ -35,7 +38,20 @@ def build_context(data_dir: Path = DATA_DIR) -> PipelineContext:
         FileSnapshotStore(data_dir / "snapshots"),
         FileBaselineStore(data_dir / "baseline"),
     )
-    return PipelineContext(bundle=load_demo_fixture(), registry=registry, scout=scout)
+    ctx = PipelineContext(bundle=load_demo_fixture(), registry=registry, scout=scout)
+    if settings is not None:
+        if settings.llm_provider in ("openai", "gemini"):
+            assert settings.llm_api_key is not None and settings.llm_model is not None
+            provider = GeminiGenerateContentProvider if settings.llm_provider == "gemini" else OpenAIResponsesProvider
+            ctx.model_provider = provider(settings.llm_api_key, settings.llm_model,
+                                          timeout=settings.llm_timeout_seconds)
+        if settings.reference_bundle_path:
+            ctx.references = load_reference_bundle(settings.reference_bundle_path)
+        ctx.llm_max_requests = settings.llm_max_requests
+        ctx.llm_max_input_chars = settings.llm_max_input_chars
+        ctx.llm_max_output_tokens = settings.llm_max_output_tokens
+        ctx.llm_max_claims = settings.llm_max_claims
+    return ctx
 
 
 @contextmanager
@@ -132,6 +148,7 @@ def main(argv=None) -> int:
     run.add_argument("--once", action="store_true", help="Process at most one available job")
     run.add_argument("--poll-seconds", type=float, default=2)
     commands.add_parser("check-db", help="Check connectivity and existing schema (read-only)")
+    commands.add_parser("check-llm-config", help="Show non-secret model configuration without contacting a provider")
     publish = commands.add_parser("publish", help="Approve and publish a completed audit")
     publish.add_argument("audit_id")
     publish.add_argument("--approved-by", required=True)
@@ -140,6 +157,18 @@ def main(argv=None) -> int:
     if args.command == "fixture":
         fixture_main()
         return 0
+    if args.command == "check-llm-config":
+        try:
+            settings = Settings.from_env()
+            print(json.dumps({"enabled": settings.llm_provider is not None,
+                "provider": settings.llm_provider, "model": settings.llm_model,
+                "key_configured": bool(settings.llm_api_key), "max_requests": settings.llm_max_requests,
+                "max_output_tokens_per_request": settings.llm_max_output_tokens,
+                "max_input_chars": settings.llm_max_input_chars, "max_claims": settings.llm_max_claims}))
+            return 0
+        except ValueError:
+            print("Invalid LLM configuration; check provider, model and limits.", file=sys.stderr)
+            return 1
     if args.command == "run" and args.poll_seconds <= 0:
         parser.error("--poll-seconds must be positive")
     engine = None
@@ -159,7 +188,7 @@ def main(argv=None) -> int:
             result = repo.publish(args.audit_id, approved_by=args.approved_by)
             print(json.dumps({"audit_id": result.audit_id, "published_at": result.published_at.isoformat()}))
             return 0
-        ctx = build_context()
+        ctx = build_context(settings=settings)
         while True:
             audit_id = process_next(repo, ctx)
             if audit_id:

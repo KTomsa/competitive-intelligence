@@ -9,6 +9,7 @@ from sqlalchemy import and_, func, or_, select
 
 from ..models import AuditEventRow, AuditJob, AuditRun, BriefingRow, Publication
 from ..registry import SupplierRegistry
+from ..llm.runtime import AgentStep
 from ..schemas import AuditCreateRequest, AuditError, AuditEvent, AuditMode, AuditResult, AuditStatus, AuditStatusView
 from .publication import public_result
 from .repository import AuditNotFound, LeaseLost, PROGRESS, StoredAuditError
@@ -56,6 +57,15 @@ class SqlAuditRepository:
     def source_storage(self, audit_id: str, registry: SupplierRegistry) -> SourceStorage:
         from .sql_sources import SqlSourceStorage
         return SqlSourceStorage(self, audit_id, registry, success_status=self.source_capture_success_status)
+
+    def record_agent_step(self, audit_id: str, step: AgentStep) -> None:
+        # Existing event metadata stores a bounded trace independently of result/publication.
+        # Prompts, arguments, response bodies and credentials have no fields in AgentStep.
+        with self.sessions.begin() as session:
+            run, _, now = self._owned(session, audit_id)
+            session.add(AuditEventRow(audit_id=run.audit_id, occurred_at=now, stage="agent_trace",
+                severity="warning" if step.status in ("failed", "rejected") else "info",
+                message=f"{step.role}: {step.kind} {step.status}.", metadata_json=step.model_dump_json()))
 
     @staticmethod
     def _now(session):

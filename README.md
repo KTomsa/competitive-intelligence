@@ -2,7 +2,7 @@
 
 **Fact or Watt** is a Flask-based web application that helps analysts assess marketing claims made by Czech electricity suppliers against traceable reference evidence. It retrieves approved supplier web pages, extracts literal claims, uses bounded AI agents to select evidence-gathering tools, applies deterministic verification rules, and produces a neutral managerial briefing.
 
-> Project status: Azure audit persistence and live source intake are implemented. With `DATABASE_URL`, the Flask UI/API enqueues fixture or live audits for a separate leased worker, with bounded retries, versioned results and explicit publication. Live intake covers registered ČEZ, E.ON and innogy pages with baseline/snapshot fallback. Claim extraction from changed pages, live reference data and LLM agents remain unfinished. Azure write/restart integration and Vercel deployment remain unverified. See [merge validation](docs/MERGE_VALIDATION.md) for executed checks and limits.
+> Project status: Azure audit persistence, live source intake and the bounded Phase 4 agent core are implemented. With `DATABASE_URL`, Flask enqueues audits for the leased worker. The configured `gemini-3.5-flash-lite` model passed live structured-extraction and function-call smoke checks; Python computes verdicts. Database reference-table integration, Azure write/restart behavior and Vercel deployment remain unverified. See [Phase 4 implementation and verification](docs/PHASE_4.md).
 
 Phase 3 now adds shared Azure canonical-text archives, audit-source provenance links and reads of active approved baseline claims. The database owner confirmed `ok` as the success status; it is now the default, so no extra status configuration is required. A separate test database is unavailable; Azure write/restart behavior remains unverified while offline implementation continues. See [Phase 3 source storage](docs/PHASE_3.md) for configuration and verification limits.
 
@@ -54,7 +54,7 @@ vercel.json
 .env.example
 ```
 
-The supplier-page connector and parser are implemented; live LLM adapters remain planned. Follow `docs/IMPLEMENTATION_PLAN.md` for the next phase.
+The supplier-page connector, parser, native Gemini adapter and optional OpenAI Responses adapter are implemented. The project uses `LLM_PROVIDER=gemini`, `LLM_MODEL=gemini-3.5-flash-lite` and the existing `LLM_API_KEY`. Follow `docs/IMPLEMENTATION_PLAN.md` for remaining acceptance work.
 
 ## Database ownership
 
@@ -77,12 +77,13 @@ uv run python src/competitive_intelligence/app.py
 
 Use a local `.env` (never commit it). Set `DATABASE_URL` and `AUDIT_ACCESS_CODE` for database-backed fixture audits. Fixture-mode unit tests use fake repository adapters without database credentials.
 
-The application and worker read the local `.env`; host environment variables take precedence. `DATABASE_URL` activates Azure SQL, and `AUDIT_ACCESS_CODE` authorizes launches. `LLM_API_KEY` is reserved for Phase 4 and is not needed by the fixture pipeline. Unit tests explicitly disable database access even when your local `.env` has credentials.
+The application and worker read the local `.env`; host environment variables take precedence. `DATABASE_URL` activates Azure SQL, and `AUDIT_ACCESS_CODE` authorizes launches. Phase 4 uses an explicit `LLM_PROVIDER`, `LLM_MODEL` and `LLM_API_KEY`; a generic key alone does not identify a provider and is never forwarded automatically. The fixture pipeline needs no model key. Unit tests explicitly disable database/model access even when a local environment has credentials.
 
 Run the worker separately from Flask:
 
 ```bash
 uv run fact-or-watt-worker check-db
+uv run fact-or-watt-worker check-llm-config
 uv run fact-or-watt-worker run
 # Process at most one available job:
 uv run fact-or-watt-worker run --once

@@ -67,6 +67,10 @@ def isolate_database_environment(monkeypatch, request):
     # Even with a developer .env, unit tests must never connect to Azure.
     if request.node.get_closest_marker("azure") is None:
         monkeypatch.setenv("DATABASE_URL", "")
+        monkeypatch.setenv("LLM_PROVIDER", "")
+        monkeypatch.setenv("LLM_MODEL", "")
+        monkeypatch.setenv("LLM_API_KEY", "")
+        monkeypatch.setenv("REFERENCE_BUNDLE_PATH", "")
 
 
 @pytest.fixture

@@ -315,3 +315,20 @@ def test_database_engine_sets_explicit_tls_defaults():
         assert engine.url.query["TrustServerCertificate"] == "no"
     finally:
         engine.dispose()
+
+
+def test_agent_trace_uses_existing_private_event_metadata_and_fences_lease(owned_job):
+    import json
+
+    from competitive_intelligence.llm.runtime import AgentStep
+
+    repo, run, job, rows, now, audit_id = owned_job
+    step = AgentStep(role="price_agent", kind="tool", name="get_price_offers",
+                     status="started", input_hash="a" * 64)
+    repo.record_agent_step(audit_id, step)
+    assert rows[-1].stage == "agent_trace"
+    assert json.loads(rows[-1].metadata_json) == step.model_dump()
+    job.lease_expires_at = now
+    with pytest.raises(LeaseLost):
+        repo.record_agent_step(audit_id, step)
+    assert len(rows) == 1
