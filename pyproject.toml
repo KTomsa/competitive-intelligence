@@ -12,11 +12,17 @@ dependencies = [
     "flask-wtf==1.3.0",
     "pydantic>=2.12",
     "pytest==9.2.0",
+    "python-dotenv>=1.2.4",
+    "sqlalchemy[mssql-python]>=2.1",
 ]
 
 [project.scripts]
-fact-or-watt-fixture-audit = "competitive_intelligence.worker:main"
+fact-or-watt-fixture-audit = "competitive_intelligence.worker:fixture_main"
+fact-or-watt-worker = "competitive_intelligence.worker:main"
 
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
 build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+markers = ["azure: opt-in tests against a separate Azure SQL test database"]

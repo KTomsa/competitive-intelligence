@@ -1,9 +1,8 @@
 """Audit persistence boundary.
 
 `AuditRepository` is the contract the web app, the worker and the pipeline
-depend on. Phase 1 ships only the in-memory implementation, used for the
-offline fixture flow and unit tests. The Azure SQL implementation
-(SQLAlchemy + Alembic) plugs in behind the same protocol in the next phase;
+depend on. The in-memory implementation serves the offline fixture flow and
+unit tests. The Azure SQL implementation plugs in behind the same protocol;
 nothing above this module knows which one it is talking to.
 """
 
@@ -42,12 +41,26 @@ class AuditNotFound(LookupError):
     pass
 
 
+class LeaseLost(RuntimeError):
+    """A delivery must stop writing after losing its worker lease."""
+
+
+class StoredAuditError(RuntimeError):
+    """Persisted data is missing or incompatible with the supported DTO version."""
+
+
 class AuditRepository(Protocol):
+    durable: bool
+
     def create_audit(self, request: AuditCreateRequest) -> str: ...
 
     def get_request(self, audit_id: str) -> AuditCreateRequest: ...
 
     def claim_next_job(self) -> str | None: ...
+
+    def heartbeat(self, audit_id: str) -> None: ...
+
+    def retry(self, audit_id: str, code: str, message: str) -> None: ...
 
     def set_stage(self, audit_id: str, status: AuditStatus, stage: str) -> None: ...
 
@@ -68,7 +81,7 @@ class AuditRepository(Protocol):
 
     def get_result(self, audit_id: str) -> AuditResult | None: ...
 
-    def publish(self, audit_id: str) -> AuditResult: ...
+    def publish(self, audit_id: str, approved_by: str = "authorized-operator") -> AuditResult: ...
 
     def get_latest_published(self) -> AuditResult | None: ...
 
@@ -131,6 +144,14 @@ class InMemoryAuditRepository:
             record.stage = stage
             record.updated_at = utc_now()
 
+    def heartbeat(self, audit_id: str) -> None:
+        with self._lock:
+            self._get(audit_id)
+
+    def retry(self, audit_id: str, code: str, message: str) -> None:
+        # The process-local demo has no cross-process retry queue.
+        self.fail(audit_id, code, message)
+
     def add_event(
         self,
         audit_id: str,
@@ -191,12 +212,18 @@ class InMemoryAuditRepository:
         with self._lock:
             return self._get(audit_id).result
 
-    def publish(self, audit_id: str) -> AuditResult:
+    def publish(self, audit_id: str, approved_by: str = "authorized-operator") -> AuditResult:
+        if not approved_by.strip() or len(approved_by) > 150:
+            raise ValueError("Publication requires an approver of at most 150 characters")
         with self._lock:
             record = self._get(audit_id)
             if record.result is None:
                 raise ValueError("Only a completed audit can be published")
-            record.result = record.result.model_copy(update={"published_at": utc_now()})
+            from .publication import public_result
+
+            if self._latest_published == audit_id:
+                return record.result
+            record.result = public_result(record.result, utc_now())
             self._latest_published = audit_id
             return record.result
 

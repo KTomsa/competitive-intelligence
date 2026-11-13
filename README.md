@@ -2,7 +2,7 @@
 
 **Fact or Watt** is a Flask-based web application that helps analysts assess marketing claims made by Czech electricity suppliers against traceable reference evidence. It retrieves approved supplier web pages, extracts literal claims, uses bounded AI agents to select evidence-gathering tools, applies deterministic verification rules, and produces a neutral managerial briefing.
 
-> Project status: early implementation. The current repository contains a Flask skeleton and design documents; production database integration, live agents and Vercel deployment must still be implemented and tested.
+> Project status: Phase 2 implementation. The Flask UI/API now selects Azure SQL persistence when `DATABASE_URL` is configured, with a separate leased worker, bounded retries, versioned fixture results and explicit publication. Offline tests and a local read-only Azure connectivity/schema check pass. Azure write/restart integration and Vercel deployment remain unverified; live fetching and LLM agents are later phases.
 
 ## Technology
 
@@ -22,17 +22,18 @@ src/
   competitive_intelligence/
     __init__.py
     app.py                     # Flask application factory
-    web/                       # page and API blueprints (planned)
-    models/                    # SQLAlchemy models (planned)
-    schemas/                   # Pydantic DTOs (planned)
-    services/                  # audit orchestration, persistence, publication (planned)
-    agents/                    # LLM agents (planned)
-    tools/                     # allowlisted deterministic tools (planned)
-    rules/                     # deterministic verdict rules (planned)
+    db.py                      # lazy Azure SQL engine, read-only schema check
+    web/                       # page and API blueprints
+    models/                    # existing Phase 2 operational table mappings
+    schemas/                   # Pydantic DTOs
+    services/                  # orchestration, repositories, publication
+    agents/                    # fixture evidence adapter; LLM agents planned
+    tools/                     # deterministic fixture reference tools
+    rules/                     # deterministic verdict rules
     connectors/                # approved data sources (planned)
     templates/                 # Jinja2 HTML
     static/                    # JavaScript and CSS
-    worker.py                  # independent worker CLI (planned)
+    worker.py                  # independent worker/operator CLI
 .github/
   copilot-instructions.md
   instructions/
@@ -51,7 +52,7 @@ vercel.json
 .env.example
 ```
 
-The directory list is the **target architecture**, not a claim that each module already exists. Follow `docs/IMPLEMENTATION_PLAN.md` instead of generating empty directories.
+Connectors and live LLM adapters remain planned. Follow `docs/IMPLEMENTATION_PLAN.md` for the next phase.
 
 ## Database ownership
 
@@ -65,7 +66,33 @@ uv run flask --app competitive_intelligence.app:create_app run --debug
 uv run pytest
 ```
 
-Use a local `.env` (never commit it). For real DB-backed functionality, set `DATABASE_URL`, `SECRET_KEY` and the relevant audit/LLM credentials. For fixture-mode tests, fake repository adapters are used without production DB credentials.
+VS Code's **Run Python File** also supports `src/competitive_intelligence/app.py`.
+From the project root, the equivalent direct command is:
+
+```bash
+uv run python src/competitive_intelligence/app.py
+```
+
+Use a local `.env` (never commit it). Set `DATABASE_URL` and `AUDIT_ACCESS_CODE` for database-backed fixture audits. Fixture-mode unit tests use fake repository adapters without database credentials.
+
+The application and worker read the local `.env`; host environment variables take precedence. `DATABASE_URL` activates Azure SQL, and `AUDIT_ACCESS_CODE` authorizes launches. `LLM_API_KEY` is reserved for Phase 4 and is not needed by the fixture pipeline. Unit tests explicitly disable database access even when your local `.env` has credentials.
+
+Run the worker separately from Flask:
+
+```bash
+uv run fact-or-watt-worker check-db
+uv run fact-or-watt-worker run
+# Process at most one available job:
+uv run fact-or-watt-worker run --once
+# Approve a completed audit for the public homepage:
+uv run fact-or-watt-worker publish AUDIT_ID --approved-by YOUR_OPERATOR_NAME
+# Offline smoke run, regardless of DATABASE_URL:
+uv run fact-or-watt-fixture-audit
+```
+
+In database mode, POST only enqueues a fixture audit; it stays queued until the worker runs. Startup performs no queries or demo writes. Completion does not publish automatically. See [Phase 2 operations and verification](docs/PHASE_2.md) for storage details and opt-in test instructions.
+
+Currently only the production database is available. Default tests stay offline; Azure write/restart tests are optional and require a separate test database. Do not point `TEST_DATABASE_URL` at production. A test database is not required to continue offline development.
 
 ## Audits
 

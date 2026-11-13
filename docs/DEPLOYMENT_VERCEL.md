@@ -59,6 +59,8 @@ Keep encryption enabled and database permissions least-privileged. Validate driv
 
 ## 6. Worker architecture and where it runs
 
+The Phase 2 fixture worker is implemented. Start it in the separately hosted worker environment with `uv run fact-or-watt-worker run`; use `run --once` for a single delivery and `check-db` for a read-only connectivity/column check. Set the same `DATABASE_URL` as the web backend. Optional settings: `WORKER_LEASE_SECONDS=60`, `WORKER_MAX_ATTEMPTS=3`, `WORKER_RETRY_SECONDS=10`. Publish an approved result using `publish AUDIT_ID --approved-by YOUR_OPERATOR_NAME`. Database mode never seeds or publishes demo data on web startup. Live collection/LLM agents remain unimplemented. See [Phase 2 operations](PHASE_2.md).
+
 **Recommended:** deploy the Python worker separately using Azure Container Apps (or another stable always-on/triggered Python process) in an environment allowed to connect to Azure SQL. Flask creates jobs with `status=queued`; the worker claims jobs atomically and updates audit events; browser polls GET status.
 
 **Vercel-only alternative:** Vercel Daemons became available in public beta in October 2026 for long-running pull-based workers. They require container/daemon configuration and are not equivalent to a normal Flask Function. Only adopt after validating product access, pricing, limits, container configuration and your database networking. The exact Daemon configuration is intentionally **not** included in this MVP setup.

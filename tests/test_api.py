@@ -131,3 +131,24 @@ def test_vercel_entrypoint_exposes_flask_app():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     assert module.app.test_client().get("/").status_code == 200
+
+
+def test_app_file_runs_directly_with_package_imports(monkeypatch):
+    import runpy
+
+    from flask import Flask
+
+    started = []
+
+    def capture_run(app, **options):
+        client = app.test_client()
+        started.append((options, client.get("/").status_code,
+                        client.get("/static/js/app.js").status_code))
+
+    monkeypatch.setattr(Flask, "run", capture_run)
+    # Exercise the same __main__/package context as VS Code's Run Python File,
+    # without opening a server socket or contacting the production database.
+    path = Path(__file__).resolve().parents[1] / "src" / "competitive_intelligence" / "app.py"
+    monkeypatch.syspath_prepend(str(path.parents[1]))
+    runpy.run_path(str(path), run_name="__main__")
+    assert started == [({"debug": True}, 200, 200)]

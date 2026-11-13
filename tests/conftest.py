@@ -5,6 +5,13 @@ from competitive_intelligence.app import create_app
 ACCESS_CODE = "test-only-access-code"
 
 
+@pytest.fixture(autouse=True)
+def isolate_database_environment(monkeypatch, request):
+    # Even with a developer .env, unit tests must never connect to Azure.
+    if request.node.get_closest_marker("azure") is None:
+        monkeypatch.setenv("DATABASE_URL", "")
+
+
 @pytest.fixture
 def app():
     return create_app({"audit_access_code": ACCESS_CODE, "rate_limit_per_minute": 100})

@@ -1,14 +1,26 @@
 """Flask application factory."""
 
+# VS Code's Run Python File executes this path without its package context.
+# Keep relative imports working while retaining the canonical src package.
+if __name__ == "__main__" and not __package__:
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    __package__ = "competitive_intelligence"
+
 from dataclasses import dataclass
 from typing import Any
 
 from flask import Flask, request
 from werkzeug.exceptions import HTTPException
+from sqlalchemy.exc import SQLAlchemyError
 
 from .config import Settings
 from .schemas import AuditCreateRequest, AuditMode
-from .services import AuditRepository, FixtureBundle, InMemoryAuditRepository, load_demo_fixture
+from .services import AuditRepository, FixtureBundle, load_demo_fixture
+from .services.factory import build_repository
+from .services.repository import StoredAuditError
 from .web import api, error_response, pages
 from .web.security import RateLimiter
 from .worker import process_next
@@ -35,16 +47,16 @@ def _seed_demo_audit(repo: AuditRepository, bundle: FixtureBundle) -> None:
         repo.publish(audit_id)
 
 
-def create_app(config: dict[str, Any] | None = None) -> Flask:
+def create_app(config: dict[str, Any] | None = None, *, repository: AuditRepository | None = None) -> Flask:
     """Build the app. `config` overrides Settings fields (used by tests).
 
-    Nothing here opens a database connection or reads a secret at import time.
+    The factory reads settings, but opens no database connection at startup.
     """
     app = Flask(__name__)
     settings = Settings.from_env().with_overrides(config)
     bundle = load_demo_fixture()
-    repo: AuditRepository = InMemoryAuditRepository()
-    if settings.seed_demo_audit:
+    repo = repository if repository is not None else build_repository(settings)
+    if settings.seed_demo_audit and not repo.durable:
         _seed_demo_audit(repo, bundle)
     app.extensions["fact_or_watt"] = Services(
         settings=settings,
@@ -55,6 +67,17 @@ def create_app(config: dict[str, Any] | None = None) -> Flask:
 
     app.register_blueprint(pages)
     app.register_blueprint(api)
+
+    @app.errorhandler(StoredAuditError)
+    def _stored_audit_invalid(_error):
+        return error_response(503, "STORED_AUDIT_INCOMPATIBLE", "Uložený audit nelze načíst. Kontaktujte správce.")
+
+    @app.errorhandler(SQLAlchemyError)
+    def _database_unavailable(_error):
+        # Driver exception text can contain a server name, SQL or credentials.
+        if request.path.startswith("/api/"):
+            return error_response(503, "DATABASE_UNAVAILABLE", "Databáze není dostupná. Zkuste to znovu později.")
+        return "Databáze není dostupná.", 503
 
     @app.errorhandler(HTTPException)
     def _http_error(error: HTTPException):

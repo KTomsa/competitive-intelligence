@@ -24,7 +24,7 @@ const HTTP_MESSAGES = {
   401: "Přístupový kód chybí nebo nesouhlasí.",
   403: "K této akci nemáte oprávnění.",
   429: "Příliš mnoho pokusů. Zkuste to za chvíli.",
-  503: "Spouštění auditů není na serveru nastaveno.",
+  503: "Služba není dostupná. Zkuste to prosím později.",
 };
 
 function el(tag, options = {}, children = []) {
@@ -276,7 +276,8 @@ async function initAudit() {
       const { response, body } = await fetchJson(base);
       if (!response.ok) {
         statusLine.textContent = "";
-        showError(response.status === 404 ? "Audit s tímto ID neexistuje. Ukázkové audity se po restartu serveru neuchovávají." : errorText(response, body));
+        showError(response.status === 404 ? "Audit s tímto ID neexistuje." : errorText(response, body));
+        if (response.status >= 500 || response.status === 429) window.setTimeout(tick, 3000);
         return;
       }
       status = body;
@@ -284,6 +285,7 @@ async function initAudit() {
       window.setTimeout(tick, 3000);
       return;
     }
+    errorBox.hidden = true;
     for (const event of status.events) {
       if (event.event_id <= lastEventId) continue;
       lastEventId = event.event_id;
@@ -299,9 +301,17 @@ async function initAudit() {
     statusLine.textContent = STATUSES[status.status] || status.status;
 
     if (status.status === "completed") {
-      const { response, body } = await fetchJson(`${base}/results`);
-      if (response.ok) renderResult(document.getElementById("results"), body);
-      else showError(errorText(response, body));
+      try {
+        const { response, body } = await fetchJson(`${base}/results`);
+        if (response.ok) renderResult(document.getElementById("results"), body);
+        else {
+          showError(errorText(response, body));
+          if (response.status >= 500 || response.status === 429) window.setTimeout(tick, 3000);
+        }
+      } catch {
+        showError("Výsledky se nepodařilo načíst. Zkouším znovu…");
+        window.setTimeout(tick, 3000);
+      }
       return;
     }
     if (status.status === "failed") {

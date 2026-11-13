@@ -19,6 +19,8 @@ This plan replaces outdated SQLite-first steps. The current repository is an ear
 
 ## Phase 2 — durable audit processing and three-screen UI
 
+Implementation is now present for durable fixture jobs, leased worker processing, bounded retries, versioned fixture results and explicit publication. Offline tests and local read-only Azure connectivity/schema checks pass. Only the production database is available, so Azure write/restart acceptance remains pending a separate test database; do not run these tests against production. Offline implementation can continue, but Phase 2 must not yet be considered release-certified. See [Phase 2 operations and verification](PHASE_2.md).
+
 - Implement authorized `POST /api/v1/audits` → 202 and job insert; GET state/events/results/latest, sanitization and publication.
 - Implement a **separately started worker** that claims queued jobs atomically, sets leases, heartbeats, records progress, retries and idempotent completion. Use fake agents first.
 - Jinja2/Bootstrap/vanilla JS: supplier selection, polling progress, results with provenance labels.

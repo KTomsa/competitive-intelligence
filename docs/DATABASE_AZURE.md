@@ -6,6 +6,10 @@ This project targets **Azure SQL Database (MSSQL)** with a pre-provisioned `ci` 
 
 ## Storage design
 
+### Implementation verification (2026-11-13)
+
+Read-only inspection confirmed Azure SQL Database with the existing `ci` schema. The local application driver connected successfully and checked required Phase 2 operational columns. The worker/repository implementation uses those tables without DDL or reference-data writes. Azure write integration and Vercel-to-Azure networking have not been verified. See [Phase 2 operations](PHASE_2.md) for the fixture result representation and exact acceptance limits.
+
 - **Azure SQL:** suppliers, audit runs, job leases, status/events, claim metadata, evidence metadata, rule results, verdicts, sanitized publications, versioned reference manifests.
 - **Azure Blob Storage (optional):** potentially large immutable raw HTML/PDF/XLSX snapshots. Azure SQL stores immutable content IDs, hash, URL, capture time and Blob URI. Avoid local files for persistent Vercel data.
 - **Version-controlled Git files:** documentation, harmless reference/test fixtures, allowlisted suppliers and golden tests. No secrets or production audit state in Git.
