@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Fact or Watt: web",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "--locked", "flask", "--app", "competitive_intelligence.app:create_app", "run", "--no-debugger", "--no-reload"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated"}
+    },
+    {
+      "label": "Fact or Watt: audit worker",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "--locked", "fact-or-watt-worker", "run"],
+      "options": {"cwd": "${workspaceFolder}"},
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {"reveal": "always", "panel": "dedicated"}
+    },
+    {
+      "label": "Fact or Watt: web + worker",
+      "dependsOn": ["Fact or Watt: web", "Fact or Watt: audit worker"],
+      "dependsOrder": "parallel",
+      "problemMatcher": []
+    }
+  ]
+}

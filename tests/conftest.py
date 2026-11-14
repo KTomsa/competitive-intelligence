@@ -66,6 +66,9 @@ def make_context(web: FakeWeb, snapshots=None, baselines=None, resolver=lambda h
 def isolate_database_environment(monkeypatch, request):
     # Even with a developer .env, unit tests must never connect to Azure.
     if request.node.get_closest_marker("azure") is None:
+        monkeypatch.setenv("APP_ENV", "development")
+        monkeypatch.setenv("VERCEL_ENV", "development")
+        monkeypatch.setenv("TRUSTED_HOSTS", "")
         monkeypatch.setenv("DATABASE_URL", "")
         monkeypatch.setenv("LLM_PROVIDER", "")
         monkeypatch.setenv("LLM_MODEL", "")

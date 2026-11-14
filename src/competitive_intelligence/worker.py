@@ -3,9 +3,10 @@
 import argparse
 import json
 import logging
+import math
+import signal
 import sys
 import threading
-import time
 from contextlib import contextmanager
 from dataclasses import replace
 from pathlib import Path
@@ -85,6 +86,7 @@ def process_next(repo: AuditRepository, context: PipelineContext | FixtureBundle
     audit_id = repo.claim_next_job()
     if audit_id is None:
         return None
+    log.info("Audit %s claimed; processing started", audit_id)
     try:
         with keep_lease(repo, audit_id):
             if repo.get_request(audit_id).mode is AuditMode.LIVE:
@@ -169,13 +171,24 @@ def main(argv=None) -> int:
         except ValueError:
             print("Invalid LLM configuration; check provider, model and limits.", file=sys.stderr)
             return 1
-    if args.command == "run" and args.poll_seconds <= 0:
-        parser.error("--poll-seconds must be positive")
+    if args.command == "run" and (not math.isfinite(args.poll_seconds) or not 0 < args.poll_seconds <= 300):
+        parser.error("--poll-seconds must be finite, positive and at most 300")
     engine = None
+    stop = threading.Event()
+    previous_handlers = {}
+    console_handler = None
+    previous_log_level = log.level
+    if args.command == "run":
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+        log.addHandler(console_handler)
+        log.setLevel(logging.INFO)
     try:
         settings = Settings.from_env()
         if not settings.database_url:
             parser.error("DATABASE_URL is required for durable worker commands")
+        if args.command == "run":
+            log.info("Worker starting; checking Azure SQL connectivity and schema")
         repo = build_repository(settings)
         engine = repo.sessions.kw["bind"]
         check_schema(engine)
@@ -189,22 +202,35 @@ def main(argv=None) -> int:
             print(json.dumps({"audit_id": result.audit_id, "published_at": result.published_at.isoformat()}))
             return 0
         ctx = build_context(settings=settings)
-        while True:
+        log.info("Worker ready; waiting for queued audits (poll interval %.1fs)", args.poll_seconds)
+        if threading.current_thread() is threading.main_thread():
+            for sig in (signal.SIGTERM, signal.SIGINT):
+                previous_handlers[sig] = signal.signal(sig, lambda *_args: stop.set())
+        # SIGTERM finishes the current delivery while its heartbeat continues.
+        # Host termination after its grace period is recovered by the SQL lease.
+        while not stop.is_set():
             audit_id = process_next(repo, ctx)
             if audit_id:
                 print(json.dumps({"audit_id": audit_id, "status": repo.get_status(audit_id).status}), flush=True)
             if args.once:
-                return 0
+                return 1 if audit_id and repo.get_status(audit_id).status == "failed" else 0
             if audit_id is None:
-                time.sleep(args.poll_seconds)
+                stop.wait(args.poll_seconds)
+        return 0
     except KeyboardInterrupt:
         return 0
     except Exception as error:
         print(f"Worker command failed ({type(error).__name__}); check configuration, connectivity and schema.", file=sys.stderr)
         return 1
     finally:
+        for sig, handler in previous_handlers.items():
+            signal.signal(sig, handler)
         if engine is not None:
             engine.dispose()
+        if console_handler is not None:
+            log.removeHandler(console_handler)
+            console_handler.close()
+            log.setLevel(previous_log_level)
 
 
 if __name__ == "__main__":

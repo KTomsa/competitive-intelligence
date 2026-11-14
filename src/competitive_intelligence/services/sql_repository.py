@@ -5,7 +5,7 @@ from datetime import timedelta
 from uuid import UUID, uuid4
 
 from pydantic import ValidationError
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, func, or_, select, text
 
 from ..models import AuditEventRow, AuditJob, AuditRun, BriefingRow, Publication
 from ..registry import SupplierRegistry
@@ -14,6 +14,7 @@ from ..schemas import AuditCreateRequest, AuditError, AuditEvent, AuditMode, Aud
 from .publication import public_result
 from .repository import AuditNotFound, LeaseLost, PROGRESS, StoredAuditError
 from .stores import SourceStorage
+from .admission import AdmissionLimits, AdmissionRejected
 
 
 def decode_result(payload, *, envelope=False):
@@ -85,10 +86,37 @@ class SqlAuditRepository:
             message=message[:1000], metadata_json=json.dumps({"origin": origin}) if origin else None,
         ))
 
-    def create_audit(self, request):
+    def check_ready(self):
+        with self.sessions() as session:
+            session.execute(select(1))
+
+    def _admit(self, session, now, limits):
+        # The transaction-owned application lock serializes admission across web
+        # instances, including an empty table. No new table/schema is required.
+        outcome = session.scalar(text(
+            "DECLARE @result int; EXEC @result = sys.sp_getapplock "
+            "@Resource=:resource, @LockMode='Exclusive', @LockOwner='Transaction', "
+            "@LockTimeout=5000; SELECT @result"
+        ), {"resource": "fact-or-watt:audit-admission:v1"})
+        if outcome is None or outcome < 0:
+            raise AdmissionRejected()
+        day = session.scalar(select(func.count()).select_from(AuditRun).where(
+            AuditRun.created_at > now - timedelta(days=1)))
+        if day >= limits.per_day:
+            raise AdmissionRejected(86400)
+        minute = session.scalar(select(func.count()).select_from(AuditRun).where(
+            AuditRun.created_at > now - timedelta(minutes=1)))
+        pending = session.scalar(select(func.count()).select_from(AuditRun).where(
+            AuditRun.status.not_in(("completed", "failed"))))
+        if minute >= limits.per_minute or pending >= limits.max_pending:
+            raise AdmissionRejected()
+
+    def create_audit(self, request, *, limits: AdmissionLimits | None = None):
         audit_id = uuid4()
         with self.sessions.begin() as session:
             now = self._now(session)
+            if limits is not None:
+                self._admit(session, now, limits)
             run = AuditRun(audit_id=audit_id, mode=request.mode.value, status="queued",
                            request_config_json=request.model_dump_json(), progress_percent=0, created_at=now)
             session.add(run)

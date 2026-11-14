@@ -295,7 +295,10 @@ def run_live_audit(repo: AuditRepository, audit_id: str, ctx: PipelineContext) -
         for page in ctx.registry.get(supplier_id).pages
     ]
     # A handful of independent page fetches; all are joined before the stage ends.
-    with ThreadPoolExecutor(max_workers=4) as pool:
+    # The durable engine allows three connections. Reserve one for the lease
+    # heartbeat; each source task may hold a session while waiting for its
+    # fenced write. Four source tasks could exhaust the pool before progressing.
+    with ThreadPoolExecutor(max_workers=2 if repo.durable else 4) as pool:
         outcomes = list(pool.map(lambda job: ctx.scout.collect(*job), jobs))
 
     scouted: list[ScoutedSource] = []
@@ -390,6 +393,9 @@ def run_live_audit(repo: AuditRepository, audit_id: str, ctx: PipelineContext) -
         else:
             unique[claim.id] = claim
     claims = list(unique.values())
+    if ctx.references is not None:
+        by_source = {source.source_id: source for source in sources}
+        claims = [ctx.references.bind_claim(claim, by_source[claim.source_id]) for claim in claims]
     evidence_agent = (LiveEvidenceAgent(session, request.supplier_ids, ctx.references, ctx.bundle.profiles,
         lambda message: repo.add_event(audit_id, "evidence_agents", message, level="warning"))
         if session is not None else None)

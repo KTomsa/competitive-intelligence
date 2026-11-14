@@ -42,6 +42,8 @@ Response:
 
 Status: `queued | collecting | extracting | verifying | judging | reporting | completed | failed`. `progress_percent` je orientační, události mají sekvenční ID. Worker checkpointy nejsou uložené v session prohlížeče.
 
+Implementace release candidate navíc omezuje tělo požadavku na 16 KiB (`413`) a vyžaduje unikátní ID dodavatelů/profilů (`422`). Sdílené limity všech autorizovaných spuštění vrací `429 AUDIT_CAPACITY_REACHED` a `Retry-After`; kontrola kvóty i vložení auditu proběhnou v jedné transakci. API odpovědi používají `Cache-Control: no-store` a serverem generované `X-Request-ID`. Neočekávaná chyba vrací obecné `500 INTERNAL_ERROR`; chyba databáze `503 DATABASE_UNAVAILABLE`. `/health/live` kontroluje webový proces; `/health/ready` kontroluje databázové spojení a označuje úložiště `durable` nebo `demonstration`.
+
 ## 2. Zdroj a Claims
 Povinné pole `source_ref` lokalizuje citát/údaj (CSS selektor, identifikátor odstavce či stránka PDF). `origin` patří ke konkrétnímu zdroji/claimu; audit může míchat zdroje s různým původem.
 
@@ -81,6 +83,8 @@ Claim (výstup Extractoru nebo schválené baseline):
 }
 ```
 Kód **musí** ověřit, že `quote` je v normalizovaném kanonickém textu odpovídajícího snapshotu. `rule.id` jen z katalogu. `params` validovat zvlášť pro každý rule ID.
+
+Volitelná pole `product_binding_ref` a `product_binding_reviewed_at` zachovávají odkaz na ručně schválenou vazbu nového tvrzení na produkt. Vazba musí přesně odpovídat dodavateli, URL, hashi stránky, doslovnému citátu a období platnosti. Neoznačuje celé tvrzení jako `human_reviewed`; to je samostatný stav. Změněný hash vazbu zneplatní. Bez ověřené vazby cenové tvrzení nedostane náhodný tarif.
 
 ## 3. Evidence, deterministické pravidlo, Judge
 `Evidence` agent **vybírá a vyžádá** dostupné skutečnosti pomocí tool call; výpočet je deterministický.

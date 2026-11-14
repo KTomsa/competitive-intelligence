@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from uuid import uuid4, uuid5
 
 from pydantic import ValidationError
-from sqlalchemy import select
+from sqlalchemy import select, true
 from sqlalchemy.orm import Session
 
 from ..models import AuditSourceRow, BaselineClaimRow, BaselineRow, SourceCaptureRow, SourceRow, SupplierRow
@@ -138,6 +138,8 @@ class SqlSourceStorage:
 
     def save_snapshot(self, snapshot: Snapshot) -> None:
         snapshot = checked_snapshot(snapshot)
+        if snapshot.captured_at.microsecond % 1000:
+            raise SourceStorageError("Capture timestamp exceeds the database's millisecond precision")
         binding = self.pages.get(snapshot.source_id)
         if binding is None or snapshot.source_url != binding[1].url:
             raise SourceStorageError("Capture URL differs from its approved source")
@@ -164,7 +166,8 @@ class SqlSourceStorage:
 
     def _baseline(self, session: Session, source: SourceRow, *, for_update=False) -> BaselineRow | None:
         statement = select(BaselineRow).where(
-            BaselineRow.source_id == source.source_id, BaselineRow.is_active.is_(True),
+            # SQL Server BIT predicates require equality, not `IS 1`.
+            BaselineRow.source_id == source.source_id, BaselineRow.is_active == true(),
         ).order_by(BaselineRow.approved_at.desc(), BaselineRow.baseline_id.desc()).limit(1)
         return session.scalar(locked(statement, BaselineRow) if for_update else statement)
 
@@ -189,7 +192,7 @@ class SqlSourceStorage:
             self._snapshot(source_id, source.source_url, capture)
             rows = session.scalars(select(BaselineClaimRow).where(
                 BaselineClaimRow.baseline_id == baseline.baseline_id,
-                BaselineClaimRow.human_reviewed.is_(True),
+                BaselineClaimRow.human_reviewed == true(),
             ).order_by(BaselineClaimRow.baseline_claim_id)).all()
             try:
                 claims = []

@@ -159,4 +159,4 @@ def test_app_file_runs_directly_with_package_imports(monkeypatch):
     path = Path(__file__).resolve().parents[1] / "src" / "competitive_intelligence" / "app.py"
     monkeypatch.syspath_prepend(str(path.parents[1]))
     runpy.run_path(str(path), run_name="__main__")
-    assert started == [({"debug": True}, 200, 200)]
+    assert started == [({"debug": False}, 200, 200)]

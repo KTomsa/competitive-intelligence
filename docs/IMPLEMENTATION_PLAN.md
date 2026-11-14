@@ -44,6 +44,8 @@ The agent core is now implemented: literal-quote extraction with code-owned IDs/
 
 ## Phase 5 — evaluation, hardening, deployment, demo
 
+Application hardening and release tooling are implemented in **1.0.0rc1**: shared SQL launch quotas, fail-closed production settings, safe errors/request bounds, health checks, result integrity validation, reviewed exact-source product bindings, graceful worker termination, CI, an evaluation CLI with exact denominators and reviewed-data gates, and bounded deployed-preview smoke checks. A 24-quotation real-source annotation template and a separate 24-case synthetic price/green regression are available. Human annotation and reference curation have not been fabricated. Azure write/restart/contention and Vercel preview/production acceptance remain pending external infrastructure. See [Phase 5 release runbook](PHASE_5.md) and [annotation workflow](../eval/README.md). Phase 5 is not release-certified until those gates pass.
+
 - Golden set of 20–30 human-annotated claims; calculate extraction precision/recall, rule accuracy and verdict accuracy with exact denominators.
 - Test 3 suppliers, price and green; optional Customer agent and 5 suppliers only after MVP works. Load an approved last audit for public viewing.
 - Deploy a Vercel preview: test Flask entrypoint, package imports, Azure SQL firewall/TLS, public latest, audit auth and worker. Then promote to production.

@@ -11,9 +11,10 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from pydantic import AwareDatetime
+from pydantic import AwareDatetime, field_validator
 
 from ..schemas import StrictModel
+from ..schemas.claim import require_https
 
 
 class ReferenceRecord(StrictModel):
@@ -26,6 +27,8 @@ class ReferenceRecord(StrictModel):
     source_content_hash: str = ""
     valid_from: date | None = None
     valid_to: date | None = None
+
+    _https = field_validator("source_url")(require_https)
 
 
 class PriceOffer(ReferenceRecord):

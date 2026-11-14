@@ -12,6 +12,12 @@ class Settings:
     audit_access_code: str | None = field(default=None, repr=False)
     database_url: str | None = field(default=None, repr=False)
     rate_limit_per_minute: int = 10
+    environment: str = "development"
+    trusted_hosts: tuple[str, ...] = ()
+    max_content_length: int = 16384
+    audit_launches_per_minute: int = 5
+    audit_launches_per_day: int = 30
+    audit_max_pending: int = 10
     worker_lease_seconds: int = 60
     worker_max_attempts: int = 3
     worker_retry_seconds: int = 10
@@ -40,6 +46,12 @@ class Settings:
             audit_access_code=env.get("AUDIT_ACCESS_CODE") or None,
             database_url=env.get("DATABASE_URL") or None,
             rate_limit_per_minute=int(env.get("AUDIT_RATE_LIMIT_PER_MINUTE") or "10"),
+            environment=env.get("APP_ENV") or ("production" if env.get("VERCEL_ENV") in ("production", "preview") else "development"),
+            trusted_hosts=tuple(host.strip() for host in (env.get("TRUSTED_HOSTS") or "").split(",") if host.strip()),
+            max_content_length=int(env.get("MAX_CONTENT_LENGTH") or "16384"),
+            audit_launches_per_minute=int(env.get("AUDIT_LAUNCHES_PER_MINUTE") or "5"),
+            audit_launches_per_day=int(env.get("AUDIT_LAUNCHES_PER_DAY") or "30"),
+            audit_max_pending=int(env.get("AUDIT_MAX_PENDING") or "10"),
             seed_demo_audit=env.get("SEED_DEMO_AUDIT", "1") != "0",
             worker_lease_seconds=int(env.get("WORKER_LEASE_SECONDS") or "60"),
             worker_max_attempts=int(env.get("WORKER_MAX_ATTEMPTS") or "3"),
@@ -57,6 +69,19 @@ class Settings:
         )
 
     def __post_init__(self) -> None:
+        if self.environment not in ("development", "production"):
+            raise ValueError("APP_ENV must be development or production")
+        if not (1 <= self.rate_limit_per_minute <= 1000 and 1024 <= self.max_content_length <= 65536
+                and 1 <= self.audit_launches_per_minute <= 100 and 1 <= self.audit_launches_per_day <= 1000
+                and 1 <= self.audit_max_pending <= 100):
+            raise ValueError("Invalid request or audit admission limits")
+        if self.environment == "production":
+            if not self.database_url:
+                raise ValueError("Production requires DATABASE_URL; process-local storage is demonstration only")
+            if not self.audit_access_code or len(self.audit_access_code) < 16 or self.audit_access_code.casefold() in {"change-me", "change-me-change-me"}:
+                raise ValueError("Production requires a unique AUDIT_ACCESS_CODE of at least 16 characters")
+            if not self.trusted_hosts:
+                raise ValueError("Production requires explicit TRUSTED_HOSTS")
         if self.worker_lease_seconds < 3 or self.worker_max_attempts < 1 or self.worker_retry_seconds < 0:
             raise ValueError("Invalid worker lease, attempts or retry settings")
         if self.source_capture_success_status != "ok":

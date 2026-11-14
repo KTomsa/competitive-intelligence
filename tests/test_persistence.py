@@ -317,6 +317,30 @@ def test_database_engine_sets_explicit_tls_defaults():
         engine.dispose()
 
 
+def test_worker_announces_readiness_and_claim_without_exposing_configuration(monkeypatch, capsys, ctx):
+    import competitive_intelligence.worker as module
+
+    disposed = []
+    engine = SimpleNamespace(dispose=lambda: disposed.append(True))
+    repo = QueuedRepository()
+    repo.sessions = SimpleNamespace(kw={"bind": engine})
+    audit_id = repo.create_audit(AuditCreateRequest(supplier_ids=["supplier_demo_a"], profile_ids=["d02d_2mwh"]))
+    monkeypatch.setenv("DATABASE_URL", "mssql+mssqlpython://user:NEVER_ECHO_CREDENTIAL@invalid.example/db")
+    monkeypatch.setattr(module, "build_repository", lambda _: repo)
+    monkeypatch.setattr(module, "check_schema", lambda _: None)
+    monkeypatch.setattr(module, "build_context", lambda **_: ctx)
+    previous_handlers = list(module.log.handlers)
+    previous_level = module.log.level
+    assert module.main(["run", "--once"]) == 0
+    output = capsys.readouterr()
+    assert "Worker starting" in output.err and "Worker ready" in output.err
+    assert audit_id in output.err and "claimed; processing started" in output.err
+    assert "NEVER_ECHO_CREDENTIAL" not in output.err + output.out
+    assert repo.get_status(audit_id).status is AuditStatus.COMPLETED
+    assert module.log.handlers == previous_handlers and module.log.level == previous_level
+    assert disposed == [True]
+
+
 def test_agent_trace_uses_existing_private_event_metadata_and_fences_lease(owned_job):
     import json
 

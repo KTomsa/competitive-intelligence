@@ -147,3 +147,24 @@ def test_azure_source_capture_reused_by_recreated_worker(sessions):
     assert fallback.origin is Origin.SNAPSHOT and not fallback.fetch_was_live
     assert fallback.captured_at == source.captured_at
     assert fallback.canonical_hash == source.canonical_hash
+
+
+def test_azure_shared_admission_lock_and_atomic_rejection(sessions):
+    from sqlalchemy import func
+
+    from competitive_intelligence.models import AuditRun
+    from competitive_intelligence.services.admission import AdmissionLimits, AdmissionRejected
+
+    repo = SqlAuditRepository(sessions)
+    with sessions() as session:
+        now = repo._now(session)
+        minute = session.scalar(select(func.count()).select_from(AuditRun).where(AuditRun.created_at > now - timedelta(minutes=1)))
+        day = session.scalar(select(func.count()).select_from(AuditRun).where(AuditRun.created_at > now - timedelta(days=1)))
+        pending = session.scalar(select(func.count()).select_from(AuditRun).where(AuditRun.status.not_in(("completed", "failed"))))
+    limits = AdmissionLimits(minute + 1, day + 1, pending + 1)
+    audit_id = repo.create_audit(request(), limits=limits)
+    with pytest.raises(AdmissionRejected):
+        SqlAuditRepository(sessions).create_audit(request(), limits=limits)
+    assert SqlAuditRepository(sessions).get_status(audit_id).status is AuditStatus.QUEUED
+    # The outer fixture rolls all writes back. It uses one connection, so a
+    # separate committed multi-connection contention check remains required.

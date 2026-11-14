@@ -124,6 +124,10 @@ function renderClaim(claim, verdict, evidence) {
       el("p", { className: "limitation", text: `Původní výsledek pravidla: ${VERDICTS[verdict.rule_verdict]}. Důvod změny: ${verdict.judge_reason}` }),
     );
   }
+  if (claim.product_id) {
+    const reviewed = claim.product_binding_reviewed_at ? ` · vazba zkontrolována ${formatDateTime(claim.product_binding_reviewed_at)}` : "";
+    card.append(el("p", { className: "fact-meta", text: `Produkt: ${claim.product_id}${reviewed}` }));
+  }
   if (verdict.possible_regulatory_risk) {
     card.append(el("p", { className: "limitation", text: `Možné riziko (není právní závěr): ${verdict.risk_reason}` }));
   }
@@ -200,14 +204,20 @@ function renderResult(root, result) {
 }
 
 async function fetchJson(url, options) {
-  const response = await fetch(url, options);
-  let body = null;
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 15000);
   try {
-    body = await response.json();
-  } catch {
-    body = null;
+    const response = await fetch(url, { ...options, signal: controller.signal, cache: "no-store" });
+    let body = null;
+    try {
+      body = await response.json();
+    } catch {
+      body = null;
+    }
+    return { response, body };
+  } finally {
+    window.clearTimeout(timeout);
   }
-  return { response, body };
 }
 
 function errorText(response, body) {
@@ -215,15 +225,6 @@ function errorText(response, body) {
 }
 
 async function initIndex() {
-  const latest = document.getElementById("latest");
-  try {
-    const { response, body } = await fetchJson("/api/v1/audits/latest");
-    if (response.ok) renderResult(latest, body);
-    else latest.replaceChildren(el("p", { className: "muted", text: response.status === 404 ? "Zatím nebyl publikován žádný audit." : errorText(response, body) }));
-  } catch {
-    latest.replaceChildren(el("p", { className: "notice error", text: "Výsledky se nepodařilo načíst." }));
-  }
-
   const form = document.getElementById("launch-form");
   const errorBox = document.getElementById("launch-error");
   const currentMode = () => form.querySelector('input[name="mode"]:checked').value;
@@ -248,7 +249,7 @@ async function initIndex() {
       return;
     }
     button.disabled = true;
-    button.textContent = mode === "live" ? "Načítám weby dodavatelů…" : "Spouštím…";
+    button.textContent = "Zařazuji audit…";
     try {
       // The code travels only in a request header: never in the URL, never in storage.
       const { response, body } = await fetchJson("/api/v1/audits", {
@@ -264,11 +265,27 @@ async function initIndex() {
       errorBox.textContent = errorText(response, body);
     } catch {
       errorBox.textContent = "Server není dostupný.";
+    } finally {
+      codeInput.value = "";
     }
     button.disabled = false;
     button.textContent = "Spustit audit";
     errorBox.hidden = false;
   });
+  // Enable submission only once its handler exists. The server keeps the
+  // access input disabled when launches are not configured.
+  form.querySelector('button[type="submit"]').disabled = document.getElementById("access-code").disabled;
+
+  // Launch must be usable before this independent database read finishes.
+  // Otherwise an early submit follows the browser's native GET/reload path.
+  const latest = document.getElementById("latest");
+  try {
+    const { response, body } = await fetchJson("/api/v1/audits/latest");
+    if (response.ok) renderResult(latest, body);
+    else latest.replaceChildren(el("p", { className: "muted", text: response.status === 404 ? "Zatím nebyl publikován žádný audit." : errorText(response, body) }));
+  } catch {
+    latest.replaceChildren(el("p", { className: "notice error", text: "Výsledky se nepodařilo načíst." }));
+  }
 }
 
 async function initAudit() {
@@ -298,6 +315,7 @@ async function initAudit() {
       }
       status = body;
     } catch {
+      showError("Spojení se serverem není dostupné. Zkouším znovu…");
       window.setTimeout(tick, 3000);
       return;
     }

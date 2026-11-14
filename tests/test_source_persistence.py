@@ -171,6 +171,19 @@ def test_baseline_reads_only_active_reviewed_claims_with_matching_provenance(arc
     assert archive.baselines.get(first.source_id) is None
 
 
+@pytest.mark.parametrize("model,column", [(BaselineRow, "is_active"), (BaselineClaimRow, "human_reviewed")])
+def test_baseline_bit_predicates_use_sql_server_equality(archive, boundary, registry, model, column):
+    first = snapshot(registry)
+    archive.snapshots.save(first)
+    approve(archive, boundary)
+    assert archive.baselines.get(first.source_id).claims
+    statements = [statement for statement in boundary.sessions.statements
+                  if statement.column_descriptions[0]["entity"] is model]
+    compiled = "\n".join(str(statement.compile(dialect=mssql.dialect())) for statement in statements)
+    assert f"ci.{model.__tablename__}.{column} = 1" in compiled
+    assert " IS 1" not in compiled
+
+
 @pytest.mark.parametrize("corruption", ["hash", "params", "capture_source"])
 def test_invalid_baseline_provenance_fails_clearly(archive, boundary, registry, corruption):
     archive.snapshots.save(snapshot(registry))
@@ -280,6 +293,28 @@ def test_source_lock_compiles_for_sql_server(archive, boundary, registry):
     archive.snapshots.save(snapshot(registry))
     compiled = [str(statement.compile(dialect=mssql.dialect())) for statement in boundary.sessions.statements]
     assert any("ci.suppliers WITH (UPDLOCK, HOLDLOCK)" in sql for sql in compiled)
+
+
+def test_durable_capture_survives_database_millisecond_precision(archive, boundary, registry, monkeypatch):
+    from .source_fakes import SourceSession
+
+    original_add = SourceSession.add
+
+    def database_add(session, row):
+        if isinstance(row, SourceCaptureRow):
+            row.captured_at = row.captured_at.replace(microsecond=(row.captured_at.microsecond // 1000) * 1000)
+        original_add(session, row)
+
+    monkeypatch.setattr(SourceSession, "add", database_add)
+    page = registry.get("cez").pages[0]
+    ctx, _ = make_context(FakeWeb({page.url: page_html("Captured claim")}))
+    ctx.scout._now = lambda: NOW.replace(microsecond=123456)
+    source = ctx.scout.with_storage(archive).collect("cez", page).source
+    assert source.captured_at.microsecond == 123000
+    assert source.checked_at == source.captured_at
+    restored = archive.snapshots.get(page.source_id)
+    assert restored.captured_at == source.captured_at
+    assert boundary.sessions.rows[AuditSourceRow][0].capture_id == boundary.sessions.rows[SourceCaptureRow][0].capture_id
 
 
 def test_confirmed_success_status_is_the_default_without_environment(tmp_path, monkeypatch, registry):

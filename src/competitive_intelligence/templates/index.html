@@ -40,7 +40,8 @@
     <label class="field" for="access-code">Přístupový kód
       <input id="access-code" type="password" autocomplete="off" required {% if not launch_enabled %}disabled{% endif %}>
     </label>
-    <button type="submit" {% if not launch_enabled %}disabled{% endif %}>Spustit audit</button>
+    <button type="submit" disabled>Spustit audit</button>
+    <noscript><p class="notice warning">Pro spuštění auditu je nutné povolit JavaScript.</p></noscript>
     {% if not launch_enabled %}
     <p class="notice warning">Spouštění auditů není na tomto serveru nastaveno (chybí přístupový kód v konfiguraci).</p>
     {% endif %}

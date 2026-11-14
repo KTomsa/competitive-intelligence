@@ -167,3 +167,32 @@ def test_judge_without_flag_keeps_rule_verdict():
             claim_id="c", outcome=_outcome(rule_verdict), evidence_ids=[], mismatch_reason=None
         )
         assert verdict.verdict is rule_verdict and not verdict.judge_changed
+
+
+def test_unsupported_rank_does_not_use_cheapest_rule():
+    from competitive_intelligence.agents import FixtureEvidenceAgent
+    from competitive_intelligence.schemas import coerce_rule
+    from competitive_intelligence.services import load_demo_fixture
+    from competitive_intelligence.services.orchestrator import validate_claims
+    from competitive_intelligence.tools import ReferenceStore
+
+    bundle = load_demo_fixture()
+    current = validate_claims(bundle.raw_claims[:1], bundle.sources, bundle.canonical_texts)[0][0]
+    current.rule = coerce_rule({"id": "price_rank", "params": {"scope": "sample", "rank": 2}})
+    _, outcome = FixtureEvidenceAgent(ReferenceStore(bundle.reference, bundle.profiles), bundle.supplier_ids).gather(current, list(bundle.profiles))
+    assert outcome.rule_verdict is VerdictValue.UNVERIFIABLE
+
+
+def test_percentage_claim_cannot_compute_an_unselected_profile():
+    from competitive_intelligence.agents import FixtureEvidenceAgent
+    from competitive_intelligence.schemas import coerce_rule
+    from competitive_intelligence.services import load_demo_fixture
+    from competitive_intelligence.services.orchestrator import validate_claims
+    from competitive_intelligence.tools import ReferenceStore
+
+    bundle = load_demo_fixture()
+    current = validate_claims(bundle.raw_claims[:1], bundle.sources, bundle.canonical_texts)[0][0]
+    current.rule = coerce_rule({"id": "price_pct_cheaper", "params": {
+        "pct": "7", "basis": "annual_trade_cost", "baseline_supplier_id": "supplier_demo_c", "profile_id": "d02d_4mwh"}})
+    facts, outcome = FixtureEvidenceAgent(ReferenceStore(bundle.reference, bundle.profiles), bundle.supplier_ids).gather(current, ["d02d_2mwh"])
+    assert outcome.rule_verdict is VerdictValue.UNVERIFIABLE and not facts

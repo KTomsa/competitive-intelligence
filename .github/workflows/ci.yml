@@ -1,0 +1,26 @@
+name: Verify release candidate
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: development
+      DATABASE_URL: ""
+      LLM_PROVIDER: ""
+      LLM_API_KEY: ""
+      LLM_MODEL: ""
+      REFERENCE_BUNDLE_PATH: ""
+      RUN_AZURE_INTEGRATION: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run pytest -q
+      - run: uv run fact-or-watt-fixture-audit
+      - run: uv build

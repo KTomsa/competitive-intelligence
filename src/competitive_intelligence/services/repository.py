@@ -24,6 +24,7 @@ from ..schemas import (
 from ..registry import SupplierRegistry
 from ..llm.runtime import AgentStep
 from .stores import SourceStorage
+from .admission import AdmissionLimits, AdmissionRejected
 
 PROGRESS = {
     AuditStatus.QUEUED: 0,
@@ -55,7 +56,9 @@ class StoredAuditError(RuntimeError):
 class AuditRepository(Protocol):
     durable: bool
 
-    def create_audit(self, request: AuditCreateRequest) -> str: ...
+    def create_audit(self, request: AuditCreateRequest, *, limits: AdmissionLimits | None = None) -> str: ...
+
+    def check_ready(self) -> None: ...
 
     def get_request(self, audit_id: str) -> AuditCreateRequest: ...
 
@@ -104,6 +107,7 @@ class _Record:
     error: AuditError | None = None
     result: AuditResult | None = None
     claimed: bool = False
+    created_at: datetime = field(default_factory=utc_now)
 
 
 class InMemoryAuditRepository:
@@ -134,9 +138,22 @@ class InMemoryAuditRepository:
         except KeyError:
             raise AuditNotFound(audit_id) from None
 
-    def create_audit(self, request: AuditCreateRequest) -> str:
+    def check_ready(self) -> None:
+        pass
+
+    def create_audit(self, request: AuditCreateRequest, *, limits: AdmissionLimits | None = None) -> str:
         audit_id = f"audit_{uuid.uuid4().hex[:12]}"
         with self._lock:
+            if limits is not None:
+                now = utc_now()
+                ages = [(now - record.created_at).total_seconds() for record in self._records.values()]
+                if sum(age < 86400 for age in ages) >= limits.per_day:
+                    raise AdmissionRejected(86400)
+                if sum(age < 60 for age in ages) >= limits.per_minute:
+                    raise AdmissionRejected()
+                if sum(record.status not in (AuditStatus.COMPLETED, AuditStatus.FAILED)
+                       for record in self._records.values()) >= limits.max_pending:
+                    raise AdmissionRejected()
             self._records[audit_id] = _Record(request=request)
             self._queue.append(audit_id)
         return audit_id

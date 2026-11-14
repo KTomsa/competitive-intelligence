@@ -7,6 +7,7 @@ from pydantic import BaseModel, ValidationError
 
 from ..schemas import AuditCreated, AuditCreateRequest, AuditMode, AuditStatus
 from ..services import AuditNotFound
+from ..services.admission import AdmissionLimits, AdmissionRejected
 from ..worker import process_next
 from .security import access_code_matches
 
@@ -77,7 +78,14 @@ def create_audit():
             {"supplier_ids": unknown_suppliers, "profile_ids": unknown_profiles},
         )
 
-    audit_id = services.repo.create_audit(payload)
+    settings = services.settings
+    try:
+        audit_id = services.repo.create_audit(payload, limits=AdmissionLimits(
+            settings.audit_launches_per_minute, settings.audit_launches_per_day, settings.audit_max_pending))
+    except AdmissionRejected as error:
+        response, status = error_response(429, "AUDIT_CAPACITY_REACHED", "Byl dosažen limit auditů. Zkuste to později.")
+        response.headers["Retry-After"] = str(error.retry_after)
+        return response, status
     if not getattr(services.repo, "durable", False):
         # Process-local demonstration only. Azure-backed launches enqueue work
         # for the separate leased worker and return immediately.

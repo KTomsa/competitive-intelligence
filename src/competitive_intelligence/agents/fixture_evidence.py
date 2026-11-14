@@ -9,7 +9,7 @@ the same rule engine, so the verdict logic under test is the real one.
 from decimal import Decimal
 
 from ..rules import RuleOutcome, engine
-from ..schemas import Claim, EvidenceFact
+from ..schemas import Claim, EvidenceFact, VerdictValue
 from ..schemas.claim import (
     CarbonNeutralRule,
     CustomerCountRule,
@@ -127,6 +127,7 @@ class FixtureEvidenceAgent:
         outcome = engine.price_rank(
             supplier_id=claim.supplier_id,
             scope=rule.params.scope,
+            rank=rule.params.rank,
             costs_by_profile={
                 p: {s: cost for s, (cost, _) in by_supplier.items()} for p, by_supplier in costs.items()
             },
@@ -135,6 +136,9 @@ class FixtureEvidenceAgent:
 
     def _price_pct(self, claim: Claim, rule: PricePctCheaperRule, profile_ids: list[str]) -> Gathered:
         params = rule.params
+        if params.profile_id is not None and params.profile_id not in profile_ids:
+            return [], RuleOutcome(VerdictValue.UNVERIFIABLE, "price_pct_cheaper-v2",
+                                   "Profil uvedený v tvrzení není součástí tohoto auditu.", review_required=True)
         baseline_id = params.baseline_supplier_id
         if baseline_id is None or params.basis is None:
             return [], engine.price_pct_cheaper(claimed_pct=params.pct, basis=params.basis, costs=None)

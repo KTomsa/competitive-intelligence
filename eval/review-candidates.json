@@ -1,0 +1,323 @@
+{
+    "version":  1,
+    "dataset_id":  "supplier-review-candidates-2026-11-13",
+    "reviewed_by":  null,
+    "reviewed_at":  null,
+    "sources":  [
+                    {
+                        "source_id":  "cez_elektrina",
+                        "supplier_id":  "cez",
+                        "source_url":  "https://www.cez.cz/cs/energie/elektrina",
+                        "captured_at":  "2026-11-13T11:43:42.724659Z",
+                        "canonical_text":  "Elektřina\nElektřina od ČEZ\nJedna z nejlepších cen\nJsme nejdůvěryhodnějším dodavatelem energií\nMáme jedny z nejnižších cen na trhu\nCeny energií hlídáme za vás a dlouhodobě patříme mezi nejvýhodnější.\nVšechno si vyřídíte online\nV MŮJ ČEZ si upravíte zálohy, zadáte samoodečet, koukněte na vyúčtování nebo třeba změníte kontaktní údaje – na počítači i v mobilu.\nPřechod k nám vyřídíme za vás\nPapírování spojené se změnou dodavatele energií rádi vyřídíme za vás. Postaráme se i o komunikaci s vaším stávajícím dodavatelem.\nUž elektřinu od ČEZ máte?\nV MŮJ ČEZ najdete nabídku pro své odběrné místo.\nPřepis odběrného místa\nStěhujete se, kupujete či prodáváte nemovitost nebo jednoduše potřebujete vyřešit převod elektřiny nebo plynu? S tím vám rádi pomůžeme.\nJeště nejste u ČEZ?\nVyberte si z naší nabídky doporučených produktů elektřiny určených při změně dodavatele na ČEZ.\nOnline bonus\nElektřina Fix na 3 roky\nCena za MWh\n3 250 Kč\n(bez DPH)\n(2 686 Kč)\nSazba\nD02d\nFixace\n3 roky\nSjednat online\nOdkaz se otevře v novém okně\nOnline bonus\nElektřina Online na 1 rok\nCena za MWh\n3 340 Kč\n(bez DPH)\n(2 760 Kč)\nSazba\nD02d\nFixace\n1 rok\nSjednat online\nOdkaz se otevře v novém okně\nElektřina na neurčito\nCena za MWh\n3 860 Kč\n(bez DPH)\n(3 190 Kč)\nSazba\nD02d\nFixace\nNe\nSjednat online\nOdkaz se otevře v novém okně\nPodmínky bonusů\nElektřina Fix na 3 roky\nBonus 2 222 Kč získá každý zákazník, který své odběrné místo převede od jiného dodavatele k ČEZ Prodej, a.s. a uzavře smlouvu na produkt Elektřina Fix na 3 roky prostřednictvím online sjednání.\nSjednaný bonus vám vyplatíme automaticky na váš bankovní účet nejpozději do 30 dnů od zahájení dodávky energií, podmínkou výplaty je uzavření smlouvy v době platnosti nabídky bonusu.\nDetailní podmínky jsou součástí návrhu smlouvy. Bonus není možné kombinovat s jinou akcí (např. poukázkami).\nNabídku bonusů k produktům můžeme jednostranně odvolat, informace o ukončení bude zveřejněna 5 pracovních dní před ukončením.\nElektřina Online\nBonus získá každý zákazník, který své odběrné místo převede od jiného dodavatele k ČEZ Prodej, a.s. a uzavře smlouvu na produkt Elektřina Online na 1 rok přes www.cez.cz/prejdete (zanecháním kontaktu, prostřednictvím volání nebo online sjednáním).\nSjednaný bonus vám vyplatíme automaticky na váš bankovní účet nejpozději do 30 dnů od zahájení dodávky.\nDetailní podmínky jsou součástí návrhu smlouvy. Bonus není možné kombinovat s jinou akcí (např. poukázkami).\nNabídku bonusů k produktům můžeme jednostranně odvolat, informace o ukončení bude zveřejněna 5 pracovních dní před ukončením.\nVýše bonusu se odvíjí od spotřeby odběrného místa a nastavené zálohy:\nBonus\nSpotřeba\nZáloha\n2 000 Kč\n0 až 1,99 MWh\n500 Kč a více\n3 000 Kč\n2 až 7,99 MWh\n1 000 Kč a více\n5 000 Kč\n8 MWh a více\n1 500 Kč a více\nVýběr produktu je snadný\nSpojíme se\nZavoláme vám a společně probereme vaše potřeby.\nVybereme ideální řešení\nPřipravíme nabídku na základě vašich požadavků.\nPodepíšete smlouvu a zbytek vyřídíme za vás\nKvůli podpisu nikam nemusíte chodit, vše zvládnete online. Můžeme za vás vyřešit i výpověď u stávajícího dodavatele energií.\nPřejděte s elektřinou k ČEZ ještě dnes\nVyplňte smlouvu online\nPřipravte si informace z vyúčtování od stávajícího dodavatele a vyplnění smlouvy online máte rychle hotové. Kdybyste formulář nedokončili, zavoláme vám a společně to dotáhneme.\nSjednat online\nOdkaz se otevře v novém okně\nChcete poradit po telefonu?",
+                        "canonical_hash":  "7752c99d26ca58478340bcfde31ebb98a428c07d6e791a1d9918afd9666899b1"
+                    },
+                    {
+                        "source_id":  "eon_elektrina",
+                        "supplier_id":  "eon",
+                        "source_url":  "https://www.eon.cz/domacnosti/elektrina/",
+                        "captured_at":  "2026-11-13T11:43:42.725361Z",
+                        "canonical_text":  "Platit za elektřinu méně a méně? S námi ano\nObjevte náš tarif s klesající cenou na 36 měsíců. S každým dalším rokem odebíráte elektřinu výhodněji a navíc máte v ceně tarifu i příspěvek na pomoc elektrikáře nebo hodinového manžela.\nVýhody elektřiny od E.ONu\nTo důležité vyřídíte online\nDíky portálu\nEnergie24\nnebo\nmobilní aplikaci\nnemusíte chodit na pobočku ani volat. Stačí se přihlásit a hned víte, jakou máte spotřebu, nebo si snadno změníte zálohy.\nZelená od E.ONu i z Česka\nZelenou elektřinu\nvykupujeme přednostně od\nmístních výrobců z\nrůzných koutů Česka. A\nvy ji můžete odebírat se kterýmkoliv z\nnašich tarifů. Stačí si ji v\nkalkulačce zapnout.\nOdebírejte od nás elektřinu i plyn\nStejně výhodně jako elektřinu vám můžeme dodávat i\nplyn\n. Mít energie pod jednou střechou je výhodné, protože obojí pak můžete řešit přes\nEnergii24\n.\nMůžete se na nás spolehnout\nEnergie vám dodáváme už přes 20 let a v Česku se staráme o 1,5 milionu zákazníků. Jsme tu pro vás, kdykoli to budete potřebovat.\nKalkulačka ceny elektřiny\nV naší kalkulačce elektřiny si během pár minut spočítáte, kolik zaplatíte za elektřinu podle své spotřeby. Stačí zadat pár údajů a porovnat si nabídky, které se hodí právě pro vás.\nZvolte možnost Chci porovnat ceny tarifů.\nPrůvodce vás pak už navede k těm nejvýhodnějším nabídkám.\nZískejte výhodnější cenu elektřiny bez papírování\nSrovnejte si ceny elektřiny\nV naší kalkulačce rychle zjistíte, který tarif elektřiny pro vás bude nejvýhodnější. Všechny informace potřebné pro kalkulaci najdete na poslední faktuře.\nSmlouvu spolu uzavřeme online\nJakmile si vyberete ten nejlepší tarif pro svoje odběrné místo, přejdete na online sjednání smlouvy. Tu podepíšete jednoduše myší nebo na dotykové obrazovce.\nPřipojíme podpis za nás a je hotovo!\nSmlouva s vaším podpisem vám přijde do e-mailu a dorazí i k nám. My ji zkontrolujeme, podepíšeme a nakonec vám ji s oběma podpisy pošleme ještě jednou.\nJaká je cena elektřiny v našich tarifech?\nCena za MWh elektřiny u nás začíná na 3 387 Kč, což je 3,387 Kč za kWh. Nejlevněji vás vyjde tarif Variant PRO na 3 roky. Máme ale i výhodný tarif se službami elektrikáře nebo hodinového manžela v ceně.\nZ čeho se vlastně skládá celková cena za elektřinu?\nJejí hlavní součásti jsou tři:\nPlatba za silovou elektřinu:\nTo je částka, kterou zaplatíte za samotnou komoditu, tedy za megawatthodinu odebrané elektřiny. Je daná tarifem, který si vyberete, a určuje ji váš dodavatel. Není nijak regulovaná státem a snadno si ji spočítáte v naší\nkalkulačce\n.\nDistribuční platby:\nTo jsou poplatky za dopravu elektřiny až k vám domů a za související služby. Jde o státem regulovanou část celkové ceny a liší se podle toho, na jakém distribučním území se nachází odběrné místo – třeba dům nebo byt. Jejich výše záleží taky na tom, jakou distribuční sazbu máte.\nDaně:\nSem počítáme daň z elektřiny a DPH.\nAbyste si celkovou cenu uměli lépe představit, připravili jsme pro vás přehledný graf. A podrobnosti o jednotlivých složkách si můžete přečíst v našem\nčlánku\n.\nJsme férovým dodavatelem elektřiny pro každého\nLadislav Bese\nČeské Budějovice\nPři stěhování jsem řešil přepis elektřiny. Myslel jsem, kdovíjak to bude složitý, ale paní na pobočce byla moc ochotná a všechno vyřídila raz dva.\nTereza Staňková\nLitvínovice\nVybrala jsem si tarif Komplet elektřina a v ceně mám i služby elektrikáře. Je super, že ho nebudu muset nikde složitě nahánět, až ho budu potřebovat.\nCo vás často zajímá\nS tarify Komplet získáte jistotu nižší ceny na 3 roky. Cenu energie Vám držíme pod kontrolou a každý rok Vám ji sami od sebe snížíme. Vývojem na trhu už se trápit nemusíte – vždycky předem víte, kolik zaplatíte.\nU tarifu Komplet Elektřina zaplatíte za dodávku:\n2026:\n3 508 Kč/MWh\n2027:\n3 387 Kč/MWh\n2028 a dál:\n3 266 Kč/MWh\nKromě výhodné ceny máte v ceně tarifu také službu\nElektrikář MAX\n, kdy vám každých 12 měsíců přispějeme až 5 000 Kč na práce elektrikáře nebo hodinového manžela.\nPokud od nás chcete začít odebírat elektřinu nebo plyn, máte hned několik možností, jak to jednoduše udělat.\nOnline: Sjednejte si novou smlouvu přes naši kalkulačku a rovnou si spočítejte, jaký tarif je pro vás nejvýhodnější. Tento způsob uzavření smlouvy je nejrychlejší a nejjednodušší.\nE-mailem: Napište nám na\ninfo@eon.cz\na všechno spolu vyřídíme e-mailem.\nOsobně: Navštivte naši pobočku nebo si rovnou sjednejte schůzku s naším obchodním zástupcem.\nPokud k nám přecházíte od jiného dodavatele, musíme při ukončování vaší stávající smlouvy dodržet podmínky, které jsou v ní stanoveny. To se týká i délky výpovědní lhůty. Proto může váš přechod k nám trvat i několik měsíců.\nKonkrétní výši ceny si můžete spočítat v naší\nkalkulačce\n. Nebo nám napište na\ninfo@eon.cz\na my se podíváme, jaký tarif by byl pro vás nejvýhodnější.\nNa konec fixace vás upozorníme dopisem nebo emailem a vy se budete moct rozhodnout, jestli přejdete na jiný tarif. Pokud to neuděláte, smlouvu vám automaticky prodloužíme a dostanete cenu podle aktuálního ceníku.\nCelou změnu dodavatele vyřídíme tak, abyste s tím měli co nejméně práce a starostí.\nBudeme od Vás potřebovat kompletní aktuální vyúčtování od Vašeho současného dodavatele. Musí obsahovat údaje o zákazníkovi, odběrném místě a platnost současné smlouvy. Pokud zatím vyúčtování nemáte, doložte prosím uvítací dopis nebo e-mail s potvrzením termínu zahájení dodávky. Případně můžete doložit plán záloh a současně smlouvu se stávajícím dodavatelem s vyznačením její platnosti.\nKromě smlouvy na energie spolu podepíšeme i plnou moc, díky které vás můžeme v procesu změny dodavatele zastupovat.\nMůžeme tak ukončit váš smluvní vztah se současným dodavatelem a podniknout další nezbytné kroky k tomu, abyste mohli začít odebírat elektřinu od nás. Jakmile bude vše hotovo, napíšeme vám termín, kdy u vás zahájíme dodávku, a vysvětlíme vám způsob úhrady plateb.\nU nás začíná kWh elektřiny na 3,387 Kč v případě tarifu\nVariant PRO na 3 roky\n.\nOblíbená je ale i naše\nKomplet elektřina\n, která je sice o něco dražší, v ceně ale máte každoroční příspěvek 5 000 Kč na práci elektrikáře nebo hodinového manžela.\nAktuální ceník elektřiny pro jednotlivé tarify najdete v našem přehledu.\nObecnější informace o vývoji cen pro rok 2026 se dočtete v našem článku.\nUrčitě si srovnejte cenu tarifů, dívejte se ale i na to, co dalšího vám nabízejí. Naše tarify staví na výhodách, které ocení různí zákazníci. Tady je přehled jejich klíčových parametrů, který vám s výběrem pomůže:\nKomplet elektřina:\nJeden z našich nejoblíbenějších tarifů v sobě spojuje výhodnou cenu za dodávku a každoroční příspěvek 5 000 Kč na práci elektrikáře nebo hodinového manžela. A to se hodí třeba na porouchanou pračku nebo na smontování nábytku, který jste si právě koupili.\nVariant:\nHledáte prostě jen výhodnou cenu elektřiny? Variant může být to pravé právě pro vás – s plnohodnotnou obsluhou a smlouvou na\n24 měsíců\nnebo na\n36 měsíců\n.\nV naší\nkalkulačce\nsnadno zjistíte, kolik s jednotlivými tarify zaplatíte.\nPokud uvažujete o přechodu, rádi s vámi probereme, jaké výhodnější podmínky vám můžeme nabídnout. Ozvěte se nám na\ninfo@eon.cz\nnebo si sami projděte\nnaši kalkulačku tarifů\n.\nZásadní informace vždycky najdete v aplikaci nebo v portálu\nEnergie24\n.\nNa konec fixace vás upozorníme dopisem nebo e-mailem a vy se budete moct rozhodnout, jestli přejdete na jiný tarif. Pokud to neuděláte, smlouvu vám automaticky prodloužíme a dostanete cenu podle aktuálního ceníku.\nPokud vám v příštím půl roce má skončit smlouva s fixní cenou elektřiny nebo plynu, už teď si můžete vybrat nový tarif:\nJděte do naší kalkulačky\na vyberte si tarif, který vám nejvíc vyhovuje.\nNa konci kalkulace máte možnost rovnou uzavřít smlouvu na dodávku energií,takzvané online sjednání. Je to nejrychlejší způsob, jak si zajistit výhodnou cenu i na další období.\nV případě online sjednání pak vaše současná smlouva skončí a hned ji nahradí smlouva na nový tarif.\nTento postup je úplně v pořádku a neznamená pro vás žádné riziko sankce za předčasné vypovězení současné smlouvy.\nČlánky\n11 tipů, se kterými okamžitě ušetříte za energie\nNejvíce energie v domácnostech spotřebuje vytápění, následuje ohřev vody. Pokuste se je v rámci možností optimalizovat.\nVíc najdete tady\nPraktické tipy, jak šetřit v kuchyni energiemi\nSprávným používáním rychlovarné konvice můžete snížit její spotřebu i o 60 %.\nVíc najdete tady\nZ čeho se skládají ceny elektřiny a plynu\nCeny elektřiny a plynu se skládají z regulované a neregulované složky.\nVíc najdete tady\nZobrazit všechny články",
+                        "canonical_hash":  "a68d2d2974989d23faa0915d6177515dfb397c39a1cec51bb95f70574b4caeb9"
+                    },
+                    {
+                        "source_id":  "eon_home",
+                        "supplier_id":  "eon",
+                        "source_url":  "https://www.eon.cz/",
+                        "captured_at":  "2026-11-13T11:43:42.725123Z",
+                        "canonical_text":  "Každý rok levnější jistá cena a klid na tři zimy\nUžijte si nadcházející sezóny bez obav ze zdražování. Získejte náš výhodný tarif se službami v ceně – zvládnete to online z gauče a za pár minut.\nMám zájem\nNejlepší energie pro naše zákazníky\nChci šetřit\nTepelné čerpadlo se slevou až 35 000 Kč\nTo chci\nJen teď: 2 500 Kč za doporučení a soutěž o Apple\nChci doporučit\nEnergie vám dodáváme už přes 20 let a v Česku se staráme o 1,5 milionu zákazníků.\nPřečtu si víc\nJeště přehlednější webový portál Energie24\nTeď máte všechna místa i služby pod jedním účtem. A vždycky máte přehled o spotřebě i o odhadu vyúčtování.\nTo chci vidět\nNové odběrné místo? Zařídíme online!\nChci Nové připojení\nInkaso vám ušetří práci\nChci inkaso\nVýhody přechodu na chytré měření\nChci vědět víc\nRočně vykoupíme nejvíc zelené elektřiny v Česku\nZelená od E.ONu\nServis tepelných čerpadel\nKaždý rok zkontrolujeme stav čerpadla a pohlídáme jeho provoz. Díky tomu vám pomůžeme předejít zbytečně drahým opravám. Na termín kontroly myslíme za vás.\nTo mě zajímá\nTepelné čerpadlo levnější i bez dotace\nChci čerpadlo se slevou\nFotovoltaika se slevou až 77 700 Kč\nTo mě zajímá\nKotel na výhodné splátky od Essoxu\nChci kondenzační kotel",
+                        "canonical_hash":  "18b4c1ef52339f0979607a5e2a1452777728363b4d47889c1595010cefc09054"
+                    },
+                    {
+                        "source_id":  "eon_zelena",
+                        "supplier_id":  "eon",
+                        "source_url":  "https://www.eon.cz/zelena/",
+                        "captured_at":  "2026-11-13T11:43:42.950524Z",
+                        "canonical_text":  "Zelená elektřina z obnovitelných zdrojů\nOdebírejte elektřinu ze slunce, větru, vody nebo biomasy – a to za příplatek jen 46 Kč za MWh. Běžnou domácnost to vyjde asi na 100 Kč ročně a původ elektřiny vám potvrdí certifikát od Operátora trhu.\nSpočítejte si, na kolik vás tarif se Zelenou vyjde\nChci do kalkulačky\nProč odebírat Zelenou od E.ONu\nStojí vás pár korun\nZa naši Zelenou si připlatíte jen 46\nKč za MWh. U běžné domácnosti se spotřebou 2\nMWh, která elektřinu používá na svícení a k provozu spotřebičů, je to tedy 92\nKč ročně.\nPodpoříte malé výrobce\nVaši elektřinu nakoupíme mimo jiné od lokálních výrobců v Česku a pošleme vám certifikát o tom, z jakého zdroje pochází.\nPomůžete přírodě\nI díky vám budeme dýchat čistší vzduch a ochráníme krajinu pro naše děti. A to stojí za těch pár korun navíc.\nSpočítejte si, o jak málo je Zelená dražší\nJak si Zelenou od E.ONu sjednáte\nSpočítejte si svou cenu v naší kalkulačce\nAbyste měli všechny informace potřebné pro kalkulaci, vezměte si k ruce poslední fakturu za elektřinu. Kalkulačka vám pak nabídne hned několik výhodných tarifů se Zelenou, ze kterých si můžete vybrat.\nUzavřeme spolu smlouvu\nSmlouvu na vybraný tarif spolu buď rovnou sjednáme online, nebo nám na sebe necháte kontakt. My se vám pak brzy ozveme a všechno spolu probereme.\nZačnete odebírat zelenou\nJestli k nám přecházíte, zařídíme veškerou administrativu, která je k tomu potřeba. V případě, že už u E.ONu jste, nový, zelený tarif vám začne platit hned.\nSe Zelenou od E.ONu pomáháte přírodě\nZnečištěné ovzduší a změna klimatu, to jsou dvě významná témata současnosti, ke kterým přispívá i energetika. Elektřina z obnovitelných zdrojů má tu výhodu, že s její výrobou jsou přímo spojené jen minimální emise znečišťujících plynů a látek. A čím víc z nás ji bude využívat, tím větší pomoc to bude nejen pro českou přírodu.\nCo vás často zajímá\nJako náš zákazník od nás můžete odebírat elektřinu z obnovitelných zdrojů, jako je slunce, vítr, voda a biomasa. Tím nám pomáháte snižovat uhlíkovou stopu. Čím víc domácností a firem zvolí Zelenou energii, tím víc jí vykoupíme a dodáme do sítě. Tuto elektřinu navíc vykupujeme především od lokálních výrobců. Protože je ale její výroba o něco dražší, připočítáme vám k ceně dodávky 46 Kč za odebranou megawatthodinu Zelené elektřiny.\nZnečištění ovzduší v posledních letech způsobuje změny klimatu. Energetika k tomu některými zdroji elektřiny přispívá. Když ale začnete odebírat elektřinu z udržitelných zdrojů, omezíte i vy znečištění způsobené její výrobou na minimum. Možná namítnete, že jeden odběratel nic nezmění. Ale když takových rozhodnutí bude hodně, můžeme dohromady změnit mnoho.\nZelenou elektřinu vykupujeme od lokálních výrobců, a to ze všech dostupných zdrojů – slunce, voda, vítr, biomasa. Můžete si vybrat jeden konkrétní zdroj, nebo vám je sami namixujeme. Že je vaše Zelená elektřina opravdu zelená, hlídá Operátor trhu s elektřinou a my vám to doložíme naším certifikátem. A naše výhody?\nSmlouvu spolu uzavřeme online, a to včetně digitálního podpisu. Tedy úplně bez papírů.\nI vyúčtování vám posíláme elektronicky.\nZelenou si můžete objednat k jakémukoli tarifu. Kdykoli.\nCertifikát slouží jako potvrzení, že námi vykoupené množství obnovitelné elektřiny pokryje celou vaši spotřebu.\nElektřinu v síti si můžete představit jako vodu v jezeře, která do něj přitéká z různých zdrojů. Také do vaší zásuvky proudí energie z tradičních i přírodních zdrojů. Rozsvícená žárovka svítí stále stejně, ale důležitý je zdroj, odkud elektřina pochází. Čím víc domácností a firem zvolí Zelenou elektřinu, tím víc jí do sítě dodáme. Ačkoli se tedy vaše spotřebiče budou rozsvěcet smíšenými zdroji, celá síť bude o něco zelenější.\nPoplatek za podporované zdroje energie (POZE) je státem regulovaná složka ceny, kterou stanovuje Energetický regulační úřad. Má podpořit některé provozovatele solárních, větrných nebo vodních elektráren, kterým stát garantuje výši výkupní ceny energií. Motivuje tak investory k výstavbě a provozu elektráren a zajišťuje povinný podíl energie získávané z obnovitelných zdrojů. S naším nákupem šetrné energie tento poplatek nijak nesouvisí. Příplatek za Zelenou je daný tím, že výroba elektřiny z obnovitelných zdrojů je o něco dražší.\nAktuálně je příplatek za zelenou elektřinu 46 Kč za megawatthodinu. Celková částka závisí na vaší spotřebě – použijte kalkulačku na této stránce a hned zjistíte, kolik za zelenou elektřinu zaplatíte. Pokud už u nás máte zelenou elektřinu sjednanou, přesnou výši příplatku najdete v ceníku, který je součástí vaší smlouvy.\nFixovaný tarif automaticky znamená smlouvu na dobu určitou. Abyste si mohli Zelenou elektřinu sjednat, museli byste s námi uzavřít smlouvu novou, což by znamenalo porušení podmínek té stávající. Pokud o Zelenou hodně stojíte, napište nám prosím na\ninfo@eon.cz\na zkusíme to spolu nějak vymyslet. Děkujeme!\nVeškerá komunikace u nás probíhá elektronicky, proto od vás potřebujeme e-mailovou adresu.\nZelená od E.ONu má oproti konkurenci hned několik výhod:\nMůžete si ji přiobjednat k jakémukoli našemu tarifu.\nJejí cena je jasně daná – nikam ji neschováváme.\nRočně za ni zaplatíte pár desítek korun – jen 46 Kč za MWh, a to včetně DPH.\nSami si vyberete zdroj elektřiny – na výběr máte slunce, vodu, vítr, nebo biomasu.\nPůvod vaší Zelené elektřiny hlídá Operátor trhu. Máte proto jistotu, že opravdu pochází z obnovitelných zdrojů.\nZelenou elektřinu vykupujeme od lokálních výrobců z celé ČR. Konkrétně jde o:\n10 713 fotovoltaických elektráren,\n62 větrných elektráren,\n824 vodních elektráren,\n161 bioplynových stanic,\n7 výrobních zdrojů spalujících biomasu.\nKromě toho máme i vlastní vodní elektrárnu ve Vranově nad Dyjí a dalších 10 malých vodních elektráren.\nZelená elektřina ve vaší zásuvce se od té běžné odlišit nedá. Funguje to tak, že nakoupíme určitý objem elektřiny z obnovitelných zdrojů a stejné množství energie pak rozdělujeme koncovým zákazníkům. Celý tento proces a původ elektřiny hlídá Operátor trhu s elektřinou. Díky tomu vám můžeme vystavit certifikát původu.\nMůžete si zvolit MIX, ale nedokážeme říct, v jakém poměru to bude. Přesto budete mít jistotu, že vaše energie pochází výhradně z obnovitelných zdrojů. Pokud preferujete konkrétní zdroj, můžeme vám nabídnout 100 % energie právě z něj.\nZatím jí vykupujeme pro všechny naše zákazníky dostatek, tedy asi 3 TWh ročně. Jestliže v budoucnu výrazně poroste poptávka po Zelené elektřině, pak jí samozřejmě nakoupíme víc.\nPokud máte zájem o Zelenou od E.ONu, máte na výběr ze 3 možností:\nSjednejte si novou smlouvu přes naši kalkulačku a rovnou si spočítejte, jaký tarif je pro vás nejvýhodnější. Tento způsob uzavření smlouvy je nejrychlejší a nejjednodušší.\nNapište e-mail na\ninfo@eon.cz\n.\nZavolejte na bezplatnou zákaznickou linku\n800 77 33 22\n. Nečekejte žádné papírování. Od nabídky až po podpis smlouvy spolu všechno vyřídíme po telefonu a přes e-mail.\nTo znamená, že u nás aktuálně využíváte fixovaný tarif. Abyste si mohli Zelenou sjednat, museli byste tarif změnit, což by automaticky znamenalo porušení podmínek stávající smlouvy. Jestli Zelenou opravdu chcete, ozvěte se nám prosím na\ninfo@eon.cz\na zkusíme to spolu vyřešit. Děkujeme!\nČlánky\nObnovitelné zdroje a cena elektřiny: co elektřinu skutečně zdražuje a proč?\nObnovitelné zdroje energie (OZE) jsou nejlevnějším výrobním zdrojem elektřiny – pokud bychom teoreticky dokázali uspokojit poptávku pouze z nich, bude cena elektřiny velmi nízká.\nVíc najdete zde\nJaký reálný potenciál mají obnovitelné zdroje v energetickém mixu\nObnovitelné zdroje energie (zejména slunce a vítr) by v České republice mohly v nejlepším případě pokrývat přibližně 50–60 % roční spotřeby elektřiny.\nVíc najdete zde\nJaké budou ceny elektřiny v roce 2027?\nCeny elektřiny se skládají z regulované a neregulované složky. Výši regulované složky (u domácností tvoří přibližně polovinu z celkové ceny elektřiny) pro rok 2027 zatím neznáme – ERÚ ji vyhlásí až koncem listopadu 2026.\nVíc najdete zde\nZobrazit všechny články\nLáska k přírodě prochází zásuvkou\nChci Zelenou od E.ONu",
+                        "canonical_hash":  "59bded7695dc22341c9d9165e187565bb8f056dffaa9c65d093793b9f9f775d3"
+                    },
+                    {
+                        "source_id":  "innogy_elektrina",
+                        "supplier_id":  "innogy",
+                        "source_url":  "https://www.innogy.cz/elektrina/",
+                        "captured_at":  "2026-11-13T11:43:43.098309Z",
+                        "canonical_text":  "Elektřina od innogy\nHledáte nového dodavatele elektřiny? Vyberte si tarif s fixovanou nebo dynamicky určenou cenou. Přechod k innogy vyřídíme za vás — bez papírování, bez výpadku dodávek.\nelektřina Optimal 36\nFixovaná cena na 36 měsíců s garantovaným postupným poklesem\nNaše nejlepší cena\n11% sleva k nové smlouvě\npojištění innogy Protect zdarma\nDetail produktu\nSpočítat si cenu\nelektřina Benefit 24\nFixovaná cena na 24 měsíců\nVýhodná cena s jistotou na 2 roky\n11% sleva k nové smlouvě\npojištění innogy Protect zdarma\nDetail produktu\nSpočítat si cenu\nelektřina Benefit 12\nFixovaná cena na 12 měsíců\nKrátkodobý závazek, ideální řešení na 1 rok\n11% sleva k nové smlouvě\npojištění innogy Protect zdarma\nDetail produktu\nSpočítat si cenu\nelektřina Dynamik\nSmlouva na dobu neurčitou\nCena dle vývoje trhu\nProdukt pro zákazníky s průběhovým měřením\nDetail produktu\nBližší informace ke slevě najdete v\npodmínkách akce\n.\nUpozorňujeme, že innogy nemůže ovlivnit dopad případného zvýšení daní, poplatků, regulovaných složek ceny a příp. jiných obdobných peněžitých plnění spojených s dodávkou do celkové ceny dodávky. Cenová garance platí pro cenu za odebranou energii v MWh a stálý měsíční plat (základní cena zveřejněná v ceníku).\nBližší informace ke slevě najdete v\npodmínkách akce\n.\nUpozorňujeme, že innogy nemůže ovlivnit dopad případného zvýšení daní, poplatků, regulovaných složek ceny a\npříp. jiných obdobných peněžitých plnění spojených s\ndodávkou do\ncelkové ceny dodávky. Cenová garance platí pro\ncenu za\nodebranou energii\nv\nMWh a\nstálý měsíční plat (základní cena zveřejněná v\nceníku).\nBezplatné pojištění innogy Protect\nNedílnou součástí každé smlouvy i dodatku je bezplatné pojištění rizik spojených s dodávkou elektřiny. Pokud by náhodou došlo\nke škodě na majetku či zdraví, pomůžeme vám.\nZjistit více\nBezplatné pojištění innogy Protect\nNedílnou součástí každé smlouvy i dodatku je bezplatné pojištění rizik spojených s dodávkou elektřiny. Pokud by náhodou došlo\nke škodě na majetku či zdraví, pomůžeme vám.\nZjistit více\nStěhujete se nebo potřebujete nové připojení?\nPřepis energií online\nVám ušetří čas při stěhování\nnebo pokud řešíte dědictví\nChci přepsat energie\nPřipojení nového místa\nMáte novostavbu a řešíte nové připojení? Rádi vám pomůžeme i s montáží měřidla\nChci nový odběr\nProč být u innogy\nVýhodné ceny\nUšetříte tisíce\nnejen letos, ale další 3 zimy\nVíce k cenám\nSnadný přechod\nVeškeré papírování vyřešíme za vás od A do Z. Postaráme se o vás od první minuty\nVíce k procesu\nJsme vám blíž\nV aplikaci innosvět vyřešíte vše online a naše pobočky najdete v každém větším městě\nVíce o innosvětě\nHrajeme fér\nKomunikujeme jasně a srozumitelně. Žádné skryté kličky u nás nehledejte\nCo vás nejčastěji zajímá\nCo se stane s mým elektroměrem při změně dodavatele?\nNic. Změnou dodavatele nedochází k žádným technickým zásahům a nemění se ani termín odečtu elektroměru.\nJak dlouho trvá přechod k innogy s elektřinou?\nPokud k nám přecházíte od jiného dodavatele, musíme při ukončování vaší stávající smlouvy dodržet podmínky, které jsou v ní stanoveny. To se týká i délky výpovědní lhůty. Proto může váš přechod k nám trvat i několik měsíců. Pokud máte ve stávající smlouvě sjednanou lhůtu na dobu neurčitou, převedeme vás nejpozději do 3 měsíců od podpisu smlouvy.\nMusím sám podávat výpověď u stávajícího dodavatele elektřiny?\nNemusíte, stačí, když nám dáte plnou moc a my vše vyřídíme za vás. Pokud jste si již výpověd podal sám, nevadí, stačí, když nás budet informovat k jakému datu je výpověd učinná.\nChci zjistit, kolik můžu ušetřit\nSpočítat cenu\nJiž jste naším zákazníkem a hledáte něco jiného?\nVše vyřídíte nejrychleji v innosvětě\nV innosvětě můžete spravovat své energie pohodlně a kdykoli\nPřihlásit\nVíce informací\nAktuální ceníky\nHledáte svůj ceník?\nPřejít na ceníky elektřiny\nVýkup elektřiny\nVykupujeme elektřinu u zákazníků s vlastní výrobnou za bezkonkurenční cenu.\nPřejít na nabídku\nSdílení elektřiny\nChcete začít sdílet přebytky elektřiny, kterou sami vyrobíte?\nVíce ke sdílení\nZměna sazby\nPřecházíte na jiný styl vytápění a potřebujete změnit distribuční sazbu?\nZměna sazby\nMůžete si také vybrat ze služeb innogy+\nDomácí asistence\njiž od 59 Kč\nVíce informací\nFotovoltaika\nuž za 199 000 Kč\nVíce informací\nPojištění domácnosti\njiž od 220 Kč\nVíce informací\nDalší služby\ndalší\nChci nabídku na míru se slevou 11 %\nCo o nás říkají zákazníci\nJosef B.\nPříjemné jednání, rychlé připojení, aplikace innosvět\nHodnocení 10/10, březen 2026, zdroj\nMedallia\nLucie F.\nDobrá komunikace a nabídka snížení ceny i stávajícím zákazníkům\nHodnocení 10/10, březen 2026, zdroj\nMedallia\nBohdana P.\nJsem spokojena s rychlým a seriozním jednáním\nHodnocení 9/10, březen 2026, zdroj\nMedallia\nIvana J.\nPřehledná aplikace, ochota personálu na pobočce, cena komodity\nHodnocení 10/10, březen 2026, zdroj\nMedallia\nEnergetický rádce\nDalší články\nVýpadek elektřiny\nCo dělat při výpadku elektřiny: Praktický návod krok za krokem\nPřečíst článek\npřečíst článek\nŽrouti elektřiny\nCo je největší žrout elektřiny v domácnosti?\nPřečíst článek\npřečíst článek\nCeny elektřiny ve 2026\nZa kolik si rozsvítíte v roce 2026? Průvodce cenami elektřiny\nPřečíst článek\npřečíst článek\nRádi vám pomůžeme, smlouvu vyřídíme i online\nZavoláme vám, jakmile to bude možné\nOnline\nRádi vám pomůžeme, smlouvu vyřídíme i online\nZavoláme vám, jakmile to bude možné\nOffline\nDěkujeme za kontakt\nZavoláme vám\nPožadavek nebyl odeslán\nSelhalo odeslání požadavku na zpětné volání. Kontaktujte prosím zákaznickou linku 800 11 33 55.\nPro uvedené telefonní číslo již bylo požádáno o zpětné zavolání. Vyčkejte prosím na zavolání od operátora.",
+                        "canonical_hash":  "1e6b24cc2823d651693e660bda1e17c374b7c97f843f960ba1264ec5bc4c5c28"
+                    },
+                    {
+                        "source_id":  "innogy_home",
+                        "supplier_id":  "innogy",
+                        "source_url":  "https://www.innogy.cz/",
+                        "captured_at":  "2026-11-13T11:43:42.951307Z",
+                        "canonical_text":  "Listopadová sleva 11 %\npro nové smlouvy na plyn a elektřinu\nChci slevu\nZnáte innosvět?\nZákaznický portál, kde vyřešíte své požadavky spojené s odběrem energií rychle a pohodlně online\nVíce o innosvětě\ninnogy Protect\nBezplatné pojištění rizik spojených s dodávkou energií.\nExkluzivní benefit\nke každé nové smlouvě\njen u nás\nZjistit více\nListopadová sleva 11 %\npro nové smlouvy na plyn a elektřinu\nChci slevu\nPlyn\nChci\npřejít k innogy\nod jiného dodavatele a\nušetřit\nSpočítat cenu\nElektřina\nChci\npřejít k innogy\nod jiného dodavatele a\nušetřit\nSpočítat cenu\nChci přejít k innogy\nod jiného dodavatele energií\ninnogy Protect\nBezplatné pojištění\nrizik spojených s dodávkou energií\njen u innogy\nZjistit více\nPodzimní soutež\nHrajte o TV Samsung\nv portále innogy ‍Games\nChci soutěžit\nAž 3 000 Kč za doporučení\ndoporučte nás svým známým\na my vás za to odměníme\nTo mě zajímá\nV innosvětě\nvyřešíte své požadavky spojené s odběrem energií rychle a pohodlně online\nTo chci\nPřepis energií online\nS námi ušetříte čas při stěhování nebo pokud řešíte dědictví\nChci přepsat energie\nPřepis energií online\nS námi ušetříte čas při stěhování nebo pokud řešíte dědictví\nChci přepsat energie\nPřipojení nového místa\nMáte novostavbu a řešíte nové připojení? Rádi vám pomůžeme i s montáží měřidla\nChci nový odběr\nPřipojení nového místa\nMáte novostavbu a řešíte nové připojení? Rádi vám pomůžeme i s montáží měřidla\nChci nový odběr\nSlužby\nVšechny služby\nFotovoltaika Sigen\nAkční nabídka:\nSleva 25 %\nk nové fotovoltaice Sigen, jen do\n31. 12. 2026\nChci fotovoltaiku\nDomácí asistence\nOpravíme nejen domácí spotřebiče od 59 Kč měsíčně\nChci domácí asistenci\nServis plynového kotle\nProdlužte životnost svého plynového kotle a snižte jeho spotřebu jen za 245 Kč měsíčně\nChci servis kotle\nFotovoltaika Sigen\nModerní řešení fotovoltaiky\nVenkovní balíček\nvše v jednom\nChci fotovoltaiku\nDomácí asistence\nOpravíme nejen domácí spotřebiče od 59 Kč měsíčně\nChci domácí asistenci\nServis plynového kotle\nProdlužte životnost svého plynového kotle a snižte jeho spotřebu jen za 245 Kč měsíčně\nChci servis kotle\nVýběr z energetického rádce\nVšechny články\nČím topit nejlevněji ve 2026?\nVelké srovnání zaměřené na pořizovací náklady, provoz a návratnost\nPřečíst článek\npřečíst článek\nFixovat nebo nefixovat?\nCeny energií v posledních letech výrazně kolísají. Rozhodnutí, zda fixovat nebo nefixovat elektřinu či plyn, řeší miliony domácností\nPřečíst článek\nKolik stojí plyn v roce 2026?\nPřehled cen za kWh, vliv emisních povolenek a tipy, jak ušetřit na vytápění\nPřečíst článek\npřečíst článek\nAktuality a tiskové zprávy\nArchiv aktualit\nNabijte svůj účet energií - innogy a UniCredit Bank spouštějí společný program s pravidelnou měsíční odměnou\nPřečíst\ninnogy modernizovala komunikaci s energetickým trhem\nPřečíst\ninnogy vstupuje na trh s bateriovými úložišti, první projekt spouští v Berouně\nPřečíst\nKontakty\nVšechny kontakty\nPobočky\nHledáte pobočku ve vašem městě?\nNávštěvu si můžete\nnaplánovat předem\nZobrazit pobočky\nZákaznická linka\nJsme tu pro vás 24 hodin denně 7 dní v týdnu\nZavolejte nám zdarma\n800 11 33 55\nMáme vám zavolat?\nRádi vám pomůžeme, smlouvu vyřídíme i online\nZavoláme vám, jakmile to bude možné\nOnline\nRádi vám pomůžeme, smlouvu vyřídíme i online\nZavoláme vám, jakmile to bude možné\nOffline\nDěkujeme za kontakt\nZavoláme vám\nPožadavek nebyl odeslán\nSelhalo odeslání požadavku na zpětné volání. Kontaktujte prosím zákaznickou linku 800 11 33 55.\nPro uvedené telefonní číslo již bylo požádáno o zpětné zavolání. Vyčkejte prosím na zavolání od operátora.",
+                        "canonical_hash":  "0a8b3acd6b3040a7541cde16353dab8f1275632c118425725e9ef8d84287f3d7"
+                    }
+                ],
+    "claims":  [
+                   {
+                       "source_id":  "cez_elektrina",
+                       "quote":  "Jedna z nejlepších cen",
+                       "source_ref":  "canonical-normalized-chars:27:22",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "cez_elektrina",
+                       "quote":  "Jsme nejdůvěryhodnějším dodavatelem energií",
+                       "source_ref":  "canonical-normalized-chars:50:43",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "cez_elektrina",
+                       "quote":  "Máme jedny z nejnižších cen na trhu",
+                       "source_ref":  "canonical-normalized-chars:94:35",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "cez_elektrina",
+                       "quote":  "Ceny energií hlídáme za vás a dlouhodobě patříme mezi nejvýhodnější.",
+                       "source_ref":  "canonical-normalized-chars:130:68",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "cez_elektrina",
+                       "quote":  "Elektřina Fix na 3 roky",
+                       "source_ref":  "canonical-normalized-chars:882:23",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "cez_elektrina",
+                       "quote":  "Elektřina Online na 1 rok",
+                       "source_ref":  "canonical-normalized-chars:1030:25",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_elektrina",
+                       "quote":  "Získejte výhodnější cenu elektřiny bez papírování",
+                       "source_ref":  "canonical-normalized-chars:1300:49",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_home",
+                       "quote":  "Každý rok levnější jistá cena a klid na tři zimy",
+                       "source_ref":  "canonical-normalized-chars:0:48",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_home",
+                       "quote":  "Ročně vykoupíme nejvíc zelené elektřiny v Česku",
+                       "source_ref":  "canonical-normalized-chars:766:47",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_home",
+                       "quote":  "Zelená od E.ONu",
+                       "source_ref":  "canonical-normalized-chars:814:15",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_zelena",
+                       "quote":  "Zelená elektřina z obnovitelných zdrojů",
+                       "source_ref":  "canonical-normalized-chars:0:39",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_zelena",
+                       "quote":  "Se Zelenou od E.ONu pomáháte přírodě",
+                       "source_ref":  "canonical-normalized-chars:1473:36",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_zelena",
+                       "quote":  "Zelenou si můžete objednat k jakémukoli tarifu. Kdykoli.",
+                       "source_ref":  "canonical-normalized-chars:3093:56",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_zelena",
+                       "quote":  "Certifikát slouží jako potvrzení, že námi vykoupené množství obnovitelné elektřiny pokryje celou vaši spotřebu.",
+                       "source_ref":  "canonical-normalized-chars:3150:111",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_zelena",
+                       "quote":  "Odebírejte elektřinu ze slunce, větru, vody nebo biomasy – a to za příplatek jen 46 Kč za MWh.",
+                       "source_ref":  "canonical-normalized-chars:40:94",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "eon_elektrina",
+                       "quote":  "S tarify Komplet získáte jistotu nižší ceny na 3 roky.",
+                       "source_ref":  "canonical-normalized-chars:3424:54",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_elektrina",
+                       "quote":  "Fixovaná cena na 36 měsíců s garantovaným postupným poklesem",
+                       "source_ref":  "canonical-normalized-chars:209:60",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_elektrina",
+                       "quote":  "Naše nejlepší cena",
+                       "source_ref":  "canonical-normalized-chars:270:18",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_elektrina",
+                       "quote":  "Fixovaná cena na 24 měsíců",
+                       "source_ref":  "canonical-normalized-chars:400:26",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_elektrina",
+                       "quote":  "Fixovaná cena na 12 měsíců",
+                       "source_ref":  "canonical-normalized-chars:572:26",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_elektrina",
+                       "quote":  "Výhodné ceny",
+                       "source_ref":  "canonical-normalized-chars:2304:12",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_elektrina",
+                       "quote":  "Ušetříte tisíce",
+                       "source_ref":  "canonical-normalized-chars:2317:15",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_elektrina",
+                       "quote":  "Přechod k innogy vyřídíme za vás — bez papírování, bez výpadku dodávek.",
+                       "source_ref":  "canonical-normalized-chars:116:71",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   },
+                   {
+                       "source_id":  "innogy_home",
+                       "quote":  "S námi ušetříte čas při stěhování nebo pokud řešíte dědictví",
+                       "source_ref":  "canonical-normalized-chars:979:60",
+                       "rule":  null,
+                       "verdict":  null,
+                       "rationale":  null,
+                       "reference_facts":  [
+
+                                           ]
+                   }
+               ],
+    "kind":  "review_candidate"
+}

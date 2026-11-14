@@ -2,6 +2,8 @@
 
 **Deployment target:** Vercel serves the Flask HTML UI and short HTTP API. Persistent state lives in Azure SQL Database (MSSQL assumed; confirm the actual Azure DB type). A separate Python worker processes live audits; it does not run as a detached HTTP-request thread. This is a **deployment specification**, not proof the current project is deployed.
 
+**Release candidate:** follow the [Phase 5 runbook](PHASE_5.md) for current commands and release gates. Set `APP_ENV=production`, `DATABASE_URL`, a unique `AUDIT_ACCESS_CODE` of at least 16 characters, and `TRUSTED_HOSTS` to the exact deployment domains (comma-separated). Preview/production Vercel environments default to production checks when `APP_ENV` is absent. Add an edge/WAF rate rule for audit POST attempts. Application quotas are shared across instances for authorized launches. Verify `/health/live`, `/health/ready` and `uv run fact-or-watt-check-preview https://ACTUAL-PREVIEW.vercel.app`; no real deployment is asserted by local tests. `SECRET_KEY` is not used by the current header-authenticated app and does not replace `AUDIT_ACCESS_CODE`.
+
 ## 1. Supported project structure and entry point
 
 Keep the factory in `src/competitive_intelligence/app.py` and create the thin, recognized Vercel WSGI entrypoint `src/index.py`:

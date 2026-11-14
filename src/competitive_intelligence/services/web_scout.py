@@ -60,7 +60,13 @@ class WebScout:
 
     def with_storage(self, storage: SourceStorage) -> "WebScout":
         """Retain the approved client/clock while substituting durable storage."""
-        return WebScout(self._client, storage.snapshots, storage.baselines, self._now,
+        def capture_time() -> datetime:
+            value = self._now()
+            # The existing Azure capture/link columns are datetime2(3). Choose
+            # the same instant precision before creating either DTO or row.
+            return value.replace(microsecond=(value.microsecond // 1000) * 1000)
+
+        return WebScout(self._client, storage.snapshots, storage.baselines, capture_time,
                         record_source=storage.record)
 
     def collect(self, supplier_id: str, page: RegisteredPage) -> ScoutedSource | ScoutError:

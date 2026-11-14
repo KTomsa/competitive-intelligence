@@ -37,9 +37,14 @@ def price_rank(
     supplier_id: str,
     scope: str,
     costs_by_profile: dict[str, dict[str, Decimal]],
+    rank: int = 1,
 ) -> RuleOutcome:
     """`costs_by_profile[profile_id][supplier_id]` is the comparable annual trade cost."""
     version = "price_rank-v2"
+    if rank != 1:
+        return RuleOutcome(UNVERIFIABLE, version,
+                           "Pravidlo ověřuje pouze nejnižší cenu; jiné pořadí vyžaduje samostatnou metodiku.",
+                           review_required=True)
     profiles = {p: c for p, c in costs_by_profile.items() if supplier_id in c and len(c) > 1}
     if not profiles:
         return RuleOutcome(

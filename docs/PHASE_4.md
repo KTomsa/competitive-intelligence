@@ -57,6 +57,8 @@ The in-memory repository keeps steps privately. The Azure repository writes them
 
 ## Reviewed reference imports
 
+Phase 5 adds optional reviewed exact-source product bindings to this bundle. See the [release runbook](PHASE_5.md); the earlier “not implemented” statements below describe the Phase 4 checkpoint. Production reference curation remains pending.
+
 The implemented reference interface is a bounded, read-only [reviewed JSON bundle](../src/competitive_intelligence/services/reference_bundle.py):
 
 ```text

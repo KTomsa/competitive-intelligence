@@ -4,8 +4,9 @@ import re
 from datetime import date
 from decimal import Decimal
 from typing import Annotated, Any, Literal
+from urllib.parse import urlsplit
 
-from pydantic import AwareDatetime, Field, TypeAdapter, field_validator
+from pydantic import AwareDatetime, Field, TypeAdapter, field_validator, model_validator
 
 from .common import ClaimType, Origin, StrictModel
 
@@ -13,8 +14,14 @@ SHA256_PATTERN = r"^[0-9a-f]{64}$"
 
 
 def require_https(value: str) -> str:
-    if not value.startswith("https://"):
-        raise ValueError("URL must start with https://")
+    try:
+        parsed = urlsplit(value)
+        if (parsed.scheme != "https" or not parsed.hostname or parsed.username is not None
+                or parsed.password is not None or parsed.port not in (None, 443)
+                or any(char.isspace() or ord(char) < 32 for char in value) or "\\" in value):
+            raise ValueError
+    except ValueError:
+        raise ValueError("URL must be an HTTPS URL without credentials or a nonstandard port") from None
     return value
 
 
@@ -196,10 +203,20 @@ class Claim(StrictModel):
     origin: Origin
     human_reviewed: bool = False
     product_id: str | None = None
+    product_binding_ref: str | None = None
+    product_binding_reviewed_at: AwareDatetime | None = None
     claim_type: ClaimType
     rule: Rule
 
     _https = field_validator("source_url")(require_https)
+
+    @model_validator(mode="after")
+    def reviewed_product_binding(self):
+        if (self.product_binding_ref is None) != (self.product_binding_reviewed_at is None):
+            raise ValueError("Product binding requires both reference and review timestamp")
+        if self.product_binding_ref is not None and self.product_id is None:
+            raise ValueError("Product binding requires a product")
+        return self
 
 
 _WHITESPACE = re.compile(r"\s+")
