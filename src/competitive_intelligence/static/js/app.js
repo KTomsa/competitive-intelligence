@@ -78,7 +78,7 @@ function renderMatrix(matrix) {
   const rows = types.map((type) =>
     el("tr", {}, [
       el("th", { text: CLAIM_TYPES[type], attrs: { scope: "row" } }),
-      ...VERDICT_ORDER.map((v) => el("td", { text: String(matrix[type][v] || 0) })),
+      ...VERDICT_ORDER.map((v) => el("td", { text: String(matrix[type][v] || 0), className: matrix[type][v] ? "has-count" : "" })),
     ]),
   );
   return el("div", { className: "table-scroll" }, [
@@ -150,57 +150,137 @@ function renderClaim(claim, verdict, evidence) {
   return card;
 }
 
-function renderResult(root, result) {
-  root.replaceChildren();
-  if (result.mode === "fixture") {
-    root.append(el("p", { className: "notice warning", text: `Ukázkový režim. ${result.scope_note}` }));
-  } else {
-    root.append(el("p", { className: "notice warning", text: result.scope_note }));
-  }
-  const meta = [`Dokončeno: ${formatDateTime(result.completed_at)}`];
-  if (result.published_at) meta.push(`Publikováno: ${formatDateTime(result.published_at)}`);
-  meta.push(`Profily: ${result.profile_ids.join(", ")}`);
-  root.append(el("p", { className: "muted", text: meta.join(" · ") }));
+function renderMetrics(result) {
+  const count = (value) => result.verdicts.filter((v) => v.verdict === value).length;
+  const metrics = [
+    ["Analyzovaná tvrzení", result.claims.length, "tvrzení nalezených ve zdrojích", "metric-dark"],
+    ["Sledovaní dodavatelé", result.suppliers.length, `${result.sources.length} zdrojových stránek`, ""],
+    ["Podložená tvrzení", count("supported"), "podloženo dostupnými důkazy", ""],
+    ["Nelze ověřit", count("unverifiable"), "dostupná data nestačí k závěru", ""],
+  ];
+  return el("div", { className: "metrics" }, metrics.map(([label, value, note, kind]) =>
+    el("div", { className: `metric ${kind}` }, [
+      el("span", { className: "metric-label" }, [el("span", { className: "metric-dot", attrs: { "aria-hidden": "true" } }), el("span", { text: label })]),
+      el("strong", { className: "metric-value", text: String(value) }),
+      el("span", { className: "metric-note", text: note }),
+    ]),
+  ));
+}
 
-  const briefing = el("section", { className: "panel" }, [
-    el("h3", { text: "Briefing pro manažera" }),
+function renderFilters(root, result, groups) {
+  const prefix = root.id;
+  const search = el("input", { attrs: { id: `${prefix}-search`, type: "search", placeholder: "Hledat v tvrzeních…", autocomplete: "off" } });
+  const supplier = el("select", { attrs: { id: `${prefix}-supplier` } }, [
+    el("option", { text: "Všichni dodavatelé", attrs: { value: "" } }),
+    ...result.suppliers.map((s) => el("option", { text: s.name, attrs: { value: s.supplier_id } })),
+  ]);
+  const verdict = el("select", { attrs: { id: `${prefix}-verdict` } }, [
+    el("option", { text: "Všechny verdikty", attrs: { value: "" } }),
+    ...VERDICT_ORDER.map((v) => el("option", { text: VERDICTS[v], attrs: { value: v } })),
+  ]);
+  const field = (label, input) => el("label", { className: "filter-field" }, [el("span", { className: "sr-only", text: label }), input]);
+  const toolbar = el("div", { className: "claims-toolbar" }, [
+    el("h3", { text: "Tvrzení pod lupou" }), field("Hledat v tvrzeních", search), field("Filtrovat podle dodavatele", supplier), field("Filtrovat podle verdiktu", verdict),
+  ]);
+  const count = el("p", { className: "filter-count", attrs: { role: "status" } });
+  const empty = el("div", { className: "empty-state panel", attrs: { hidden: "" } }, [
+    el("h3", { text: result.claims.length ? "Žádná odpovídající tvrzení" : "Audit neobsahuje žádná tvrzení" }),
+    el("p", { text: result.claims.length ? "Upravte hledání nebo vyberte jiný filtr." : "Podrobnosti o načtených zdrojích najdete u jednotlivých dodavatelů." }),
+  ]);
+  const update = () => {
+    let total = 0;
+    const query = search.value.trim().toLocaleLowerCase("cs-CZ");
+    for (const group of groups) {
+      let visible = 0;
+      for (const item of group.cards) {
+        const matches = (!supplier.value || supplier.value === group.supplierId)
+          && (!verdict.value || verdict.value === item.verdict)
+          && (!query || item.searchText.includes(query));
+        item.card.hidden = !matches;
+        if (matches) visible++;
+      }
+      group.section.hidden = visible === 0 && (group.cards.length > 0 || Boolean(query || supplier.value || verdict.value));
+      group.count.textContent = `${visible} / ${group.cards.length} tvrzení`;
+      total += visible;
+    }
+    count.textContent = `Zobrazeno ${total} z ${result.claims.length} tvrzení`;
+    empty.hidden = total !== 0;
+  };
+  for (const input of [search, supplier, verdict]) input.addEventListener(input === search ? "input" : "change", update);
+  update();
+  return [toolbar, count, empty];
+}
+
+function renderResult(root, result) {
+  root.replaceChildren(renderMetrics(result));
+  const meta = [el("span", { text: `Dokončeno ${formatDateTime(result.completed_at)}` })];
+  if (result.published_at) meta.push(el("span", { text: `Publikováno ${formatDateTime(result.published_at)}` }));
+  meta.push(el("span", { text: `Profily: ${result.profile_ids.join(", ")}` }));
+  root.append(el("div", { className: "result-meta" }, [badge(result.mode === "fixture" ? "Ukázkový audit" : "Živý sběr", "mode"), ...meta]));
+  if (result.mode === "fixture") {
+    root.append(el("p", { className: "notice warning scope-note", text: `Ukázkový režim. ${result.scope_note}` }));
+  } else {
+    root.append(el("p", { className: "notice warning scope-note", text: result.scope_note }));
+  }
+
+  const briefingCopy = el("div", { className: "briefing-copy" }, [
+    el("div", { className: "briefing-heading" }, [el("h3", { text: "Briefing pro manažera" }), badge("SOUHRN AUDITU", "neutral")]),
     el("p", { text: result.briefing.summary }),
   ]);
+  const briefing = el("section", { className: "panel briefing" }, [briefingCopy]);
   if (result.briefing.items.length) {
-    briefing.append(
+    briefingCopy.append(el("details", { className: "briefing-items" }, [
+      el("summary", { text: `Podrobnosti souhrnu (${result.briefing.items.length})` }),
       el("ul", {}, result.briefing.items.map((item) =>
         el("li", {}, [el("span", { text: item.text }), el("span", { className: "muted", text: ` (${item.claim_id})` })]),
       )),
-    );
+    ]));
   }
   const matrix = renderMatrix(result.briefing.matrix);
   if (matrix) briefing.append(matrix);
   root.append(briefing);
 
-  for (const warning of result.warnings || []) {
-    root.append(el("p", { className: "notice warning", text: warning }));
+  if (result.warnings?.length) {
+    root.append(el("details", { className: "warnings" }, [
+      el("summary", { text: `Upozornění a omezení auditu (${result.warnings.length})` }),
+      el("div", { className: "warning-list" }, result.warnings.map((warning) => el("p", { text: warning }))),
+    ]));
   }
 
   const verdicts = new Map(result.verdicts.map((v) => [v.claim_id, v]));
   const evidence = new Map(result.evidence.map((e) => [e.claim_id, e]));
+  const groups = [];
   for (const supplier of result.suppliers) {
-    const section = el("section", { className: "supplier" }, [el("h3", { text: supplier.name })]);
-    for (const source of result.sources.filter((s) => s.supplier_id === supplier.supplier_id)) {
-      section.append(
+    const count = el("span", { className: "count-badge" });
+    const section = el("section", { className: "supplier" }, [el("div", { className: "supplier-heading" }, [
+      el("span", { className: "supplier-monogram", text: supplier.name.slice(0, 1), attrs: { "aria-hidden": "true" } }),
+      el("h3", { text: supplier.name }), count,
+    ])]);
+    const sources = result.sources.filter((s) => s.supplier_id === supplier.supplier_id);
+    const sourceDetails = el("details", { className: "source-details" }, [el("summary", { text: `Zdroje a původ dat (${sources.length})` })]);
+    for (const source of sources) {
+      sourceDetails.append(
         el("p", { className: `origin origin-${source.origin}` }, [
           el("span", { text: `${originLabel(source)} · ` }),
           safeLink(source.source_url),
         ]),
       );
     }
+    section.append(sourceDetails);
     const claims = result.claims.filter((c) => c.supplier_id === supplier.supplier_id);
     if (!claims.length) section.append(el("p", { className: "muted", text: "Žádná ověřitelná tvrzení." }));
+    const cards = [];
     for (const claim of claims) {
       const verdict = verdicts.get(claim.id);
-      if (verdict) section.append(renderClaim(claim, verdict, evidence.get(claim.id)));
+      if (verdict) {
+        const card = renderClaim(claim, verdict, evidence.get(claim.id));
+        section.append(card);
+        cards.push({ card, verdict: verdict.verdict, searchText: `${supplier.name} ${claim.quote} ${verdict.reasoning}`.toLocaleLowerCase("cs-CZ") });
+      }
     }
-    root.append(section);
+    groups.push({ section, count, cards, supplierId: supplier.supplier_id });
   }
+  root.append(...renderFilters(root, result, groups), ...groups.map((group) => group.section));
 }
 
 async function fetchJson(url, options) {
@@ -243,6 +323,12 @@ async function initIndex() {
     const codeInput = document.getElementById("access-code");
     const button = form.querySelector('button[type="submit"]');
     const payload = { supplier_ids: checked(scope, "supplier_ids"), profile_ids: checked(form, "profile_ids"), commodity: "electricity", mode };
+    if (!codeInput.value.trim()) {
+      errorBox.textContent = "Pro spuštění auditu zadejte přístupový kód.";
+      errorBox.hidden = false;
+      codeInput.focus();
+      return;
+    }
     if (!payload.supplier_ids.length || !payload.profile_ids.length) {
       errorBox.textContent = "Vyberte alespoň jednoho dodavatele a jeden profil.";
       errorBox.hidden = false;
@@ -282,7 +368,10 @@ async function initIndex() {
   try {
     const { response, body } = await fetchJson("/api/v1/audits/latest");
     if (response.ok) renderResult(latest, body);
-    else latest.replaceChildren(el("p", { className: "muted", text: response.status === 404 ? "Zatím nebyl publikován žádný audit." : errorText(response, body) }));
+    else latest.replaceChildren(el("div", { className: "empty-state panel" }, [
+      el("h3", { text: response.status === 404 ? "Zatím nebyl publikován žádný audit" : "Audit se nepodařilo načíst" }),
+      el("p", { text: response.status === 404 ? "Schválené výsledky se zde zobrazí po publikování operátorem." : errorText(response, body) }),
+    ]));
   } catch {
     latest.replaceChildren(el("p", { className: "notice error", text: "Výsledky se nepodařilo načíst." }));
   }
@@ -333,6 +422,17 @@ async function initAudit() {
     bar.style.width = `${status.progress_percent}%`;
     progress.setAttribute("aria-valuenow", String(status.progress_percent));
     statusLine.textContent = STATUSES[status.status] || status.status;
+    statusLine.dataset.status = status.status;
+    document.getElementById("progress-label").textContent = `${status.progress_percent} % dokončeno`;
+    document.getElementById("event-count").textContent = String(events.children.length);
+    const stages = [...document.querySelectorAll(".pipeline [data-stage]")];
+    const current = stages.findIndex((stage) => stage.dataset.stage === status.status);
+    for (const [index, stage] of stages.entries()) {
+      stage.classList.toggle("is-complete", status.status === "completed" || (current >= 0 && index < current));
+      stage.classList.toggle("is-current", index === current);
+      if (index === current) stage.setAttribute("aria-current", "step");
+      else stage.removeAttribute("aria-current");
+    }
 
     if (status.status === "completed") {
       try {
@@ -350,6 +450,10 @@ async function initAudit() {
     }
     if (status.status === "failed") {
       showError(status.error ? status.error.message : "Audit selhal.");
+      document.getElementById("results").replaceChildren(el("div", { className: "empty-state panel" }, [
+        el("h3", { text: "Audit nebyl dokončen" }),
+        el("p", { text: "Podrobnosti najdete v záznamu průběhu. Nový audit můžete spustit z přehledu." }),
+      ]));
       return;
     }
     window.setTimeout(tick, 1500);
@@ -358,5 +462,8 @@ async function initAudit() {
 }
 
 const page = document.body.dataset.page;
+for (const link of document.querySelectorAll('a[href="#methodology"]')) {
+  link.addEventListener("click", () => { document.getElementById("methodology").open = true; });
+}
 if (page === "index") initIndex();
 if (page === "audit") initAudit();

@@ -1,25 +1,59 @@
+{% from "_icons.html" import icon %}
 <!DOCTYPE html>
 <html lang="cs">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Fact or Watt{% endblock %}</title>
+  <meta name="theme-color" content="#153f38">
+  <title>{% block title %}Fact or Watt · Přehled{% endblock %}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body data-page="{% block page %}{% endblock %}"{% block body_attrs %}{% endblock %}>
-  <header class="site-header">
-    <div class="wrap">
-      <a class="brand" href="{{ url_for('pages.index') }}">Fact or Watt</a>
-      <p class="tagline">Ověřování marketingových tvrzení dodavatelů elektřiny proti dohledatelným datům</p>
+  <a class="skip-link" href="#main-content">Přejít k obsahu</a>
+  <aside class="sidebar" aria-label="Hlavní navigace">
+    <a class="brand" href="{{ url_for('pages.index') }}" aria-label="Fact or Watt – úvodní stránka">
+      <span class="brand-mark"><img src="{{ url_for('static', filename='images/logo.png') }}" width="54" height="36" alt=""></span>
+      <span>Fact or Watt<span class="brand-caption">COMPETITIVE INTELLIGENCE</span></span>
+    </a>
+    <p class="nav-caption">PRACOVNÍ PROSTOR</p>
+    <nav class="main-nav">
+      <a href="{{ url_for('pages.index') }}" {% if request.endpoint == 'pages.index' %}class="active" aria-current="page"{% endif %}>{{ icon('grid') }} Přehled <span class="nav-arrow">↗</span></a>
+      {% if request.endpoint == 'pages.audit' %}
+      <a href="#progress-heading" class="active" aria-current="page">{{ icon('activity') }} Průběh auditu <span class="nav-dot"></span></a>
+      <a href="#results-heading">{{ icon('document') }} Výsledky auditu</a>
+      {% else %}
+      <a href="#latest-heading">{{ icon('document') }} Publikovaný audit</a>
+      {% endif %}
+      <a href="#methodology">{{ icon('shield') }} Jak ověřujeme</a>
+    </nav>
+    <div class="sidebar-note">
+      <span class="sidebar-note-icon">{{ icon('leaf') }}</span>
+      <h2>Energie pod lupou.</h2>
+      <p>Méně dojmů.<br>Více dohledatelných faktů.</p>
+      <span class="note-rule"></span>
+      <span class="note-caption">OD TVRZENÍ K DŮKAZŮM</span>
     </div>
-  </header>
-  <main class="wrap">
-    {% block content %}{% endblock %}
-  </main>
-  <footer class="wrap site-footer">
-    <p>Interní nástroj Competitive Intelligence. Nejde o právní posouzení ani o žebříček dodavatelů.
-       Chybějící důkaz není důkazem nepravdivosti.</p>
-  </footer>
+    <div class="sidebar-bottom"><span class="workspace-avatar">FW</span><span>Interní workspace<small>Fact or Watt</small></span>{{ icon('lock') }}</div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <div class="breadcrumb"><span>Workspace</span><span class="breadcrumb-divider">/</span><strong>{% block breadcrumb %}Přehled{% endblock %}</strong></div>
+      <div class="topbar-actions"><span class="workspace-label"><span class="small-dot"></span> Interní nástroj</span><a class="button button-small button-outline" href="{{ url_for('pages.index') }}#launch-heading">{{ icon('plus') }} Nový audit</a></div>
+    </header>
+    <main class="content" id="main-content" tabindex="-1">
+      {% block content %}{% endblock %}
+      <details class="methodology" id="methodology">
+        <summary>{{ icon('shield') }} Transparentní postup. Dohledatelné důkazy. {{ icon('chevron') }}</summary>
+        <div class="methodology-grid">
+          <div><span class="step-kicker">01 / ZDROJE</span><h3>Začínáme u tvrzení</h3><p>Načítáme registrované stránky dodavatelů a zachováváme původ i datum každého zdroje.</p></div>
+          <div><span class="step-kicker">02 / OVĚŘENÍ</span><h3>Porovnáváme s daty</h3><p>Tvrzení posuzujeme podle ověřovacích pravidel a dostupných referenčních důkazů.</p></div>
+          <div><span class="step-kicker">03 / KONTEXT</span><h3>Přiznáváme omezení</h3><p>Chybějící důkaz není důkazem nepravdivosti. Výsledek není právní posouzení ani žebříček dodavatelů.</p></div>
+        </div>
+      </details>
+    </main>
+    <footer class="site-footer"><span>© Fact or Watt <span class="footer-divider">/</span> Competitive Intelligence</span><span>Za každým verdiktem stojí zdroj.</span></footer>
+  </div>
   <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

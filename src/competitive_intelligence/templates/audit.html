@@ -1,21 +1,28 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}Průběh auditu · Fact or Watt{% endblock %}
+{% block breadcrumb %}Detail auditu{% endblock %}
 {% block page %}audit{% endblock %}
 {% block body_attrs %} data-audit-id="{{ audit_id }}"{% endblock %}
 {% block content %}
-<section class="panel" aria-labelledby="progress-heading">
-  <h1 id="progress-heading">Průběh auditu</h1>
-  <p class="muted">ID auditu: <code>{{ audit_id }}</code></p>
-  <div class="progress" role="progressbar" aria-label="Průběh auditu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress">
-    <div class="progress-bar" id="progress-bar"></div>
-  </div>
-  <p id="status-line" aria-live="polite">Načítám stav…</p>
-  <ol id="events" class="events" aria-label="Záznam průběhu"></ol>
+<div class="page-heading">
+  <div><p class="eyebrow">DODAVATELÉ ELEKTŘINY <span>/</span> AUDIT</p><h1 id="progress-heading">Od tvrzení k faktům<span class="gold-text">.</span></h1><p class="page-description">Průběh ověřování, důkazy a výsledky na jednom místě.</p></div>
+  <a class="text-link" href="#results-heading">Přejít k výsledkům {{ icon('arrow') }}</a>
+</div>
+<section class="panel progress-panel" aria-labelledby="run-heading">
+  <div class="panel-heading"><div class="panel-title">{{ icon('activity') }}<h2 id="run-heading">Průběh auditu</h2></div><span id="status-line" class="status-pill" aria-live="polite">Načítám stav…</span></div>
+  <div class="run-meta"><span>ID auditu <code>{{ audit_id }}</code></span><span id="progress-label">Čekáme na stav auditu</span></div>
+  <div class="progress" role="progressbar" aria-label="Průběh auditu" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><div class="progress-bar" id="progress-bar"></div></div>
+  <ol class="pipeline" aria-label="Fáze auditu">
+    {% for state, label in [('queued', 'Zařazení'), ('collecting', 'Sběr zdrojů'), ('extracting', 'Extrakce tvrzení'), ('verifying', 'Ověření dat'), ('judging', 'Kontrola důkazů'), ('reporting', 'Briefing')] %}
+    <li data-stage="{{ state }}"><span class="pipeline-number">{{ '%02d'|format(loop.index) }}</span><span>{{ label }}</span></li>
+    {% endfor %}
+  </ol>
+  <details class="event-details"><summary>{{ icon('clock') }} Záznam průběhu <span id="event-count" class="count-badge">0</span>{{ icon('chevron') }}</summary><ol id="events" class="events" aria-label="Záznam průběhu"></ol></details>
   <p id="audit-error" class="notice error" role="alert" hidden></p>
 </section>
-
-<section aria-labelledby="results-heading">
-  <h2 id="results-heading">Výsledky</h2>
-  <div id="results" aria-live="polite"><p class="muted">Výsledky se zobrazí po dokončení auditu.</p></div>
+<section class="results-section" aria-labelledby="results-heading">
+  <div class="section-heading"><div><p class="eyebrow">VÝSTUP AUDITU</p><h2 id="results-heading">Co říkají data</h2></div><span class="section-note">Každé tvrzení má svůj kontext.</span></div>
+  <div id="results" aria-live="polite"><div class="empty-state panel">{{ icon('document') }}<h3>Připravujeme výsledky</h3><p>Po dokončení auditu zde najdete souhrn i důkazy ke každému tvrzení.</p></div></div>
 </section>
 {% endblock %}

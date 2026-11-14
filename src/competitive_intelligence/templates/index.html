@@ -1,56 +1,36 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block page %}index{% endblock %}
 {% block content %}
-<section class="panel" aria-labelledby="launch-heading">
-  <h1 id="launch-heading">Spustit audit</h1>
-  <p class="muted">Živý sběr načte schválené stránky skutečných dodavatelů. Ukázkový režim běží na fiktivních datech a předvádí celý průchod včetně verdiktů.</p>
-  <form id="launch-form" novalidate>
-    <fieldset>
-      <legend>Režim</legend>
-      <label class="check"><input type="radio" name="mode" value="live" checked> Živý sběr z webů dodavatelů</label>
-      <label class="check"><input type="radio" name="mode" value="fixture"> Ukázkový režim (fiktivní data)</label>
-    </fieldset>
-    <fieldset data-mode="live">
-      <legend>Dodavatelé</legend>
-      {% for supplier in live_suppliers %}
-      <label class="check">
-        <input type="checkbox" name="supplier_ids" value="{{ supplier.supplier_id }}" checked>
-        {{ supplier.name }} <span class="muted">({{ supplier.pages|length }} stránky)</span>
-      </label>
-      {% endfor %}
-    </fieldset>
-    <fieldset data-mode="fixture" hidden>
-      <legend>Dodavatelé (fiktivní)</legend>
-      {% for supplier in fixture_suppliers %}
-      <label class="check">
-        <input type="checkbox" name="supplier_ids" value="{{ supplier.supplier_id }}" checked>
-        {{ supplier.name }}
-      </label>
-      {% endfor %}
-    </fieldset>
-    <fieldset>
-      <legend>Profil spotřeby</legend>
-      {% for profile in profiles %}
-      <label class="check">
-        <input type="checkbox" name="profile_ids" value="{{ profile.profile_id }}" checked>
-        {{ profile.label }}
-      </label>
-      {% endfor %}
-    </fieldset>
-    <label class="field" for="access-code">Přístupový kód
-      <input id="access-code" type="password" autocomplete="off" required {% if not launch_enabled %}disabled{% endif %}>
-    </label>
-    <button type="submit" disabled>Spustit audit</button>
-    <noscript><p class="notice warning">Pro spuštění auditu je nutné povolit JavaScript.</p></noscript>
-    {% if not launch_enabled %}
-    <p class="notice warning">Spouštění auditů není na tomto serveru nastaveno (chybí přístupový kód v konfiguraci).</p>
-    {% endif %}
-    <p id="launch-error" class="notice error" role="alert" hidden></p>
-  </form>
-</section>
-
-<section aria-labelledby="latest-heading">
-  <h2 id="latest-heading">Poslední publikovaný audit</h2>
-  <div id="latest" aria-live="polite"><p class="muted">Načítám…</p></div>
-</section>
+<div class="page-heading"><div><p class="eyebrow">COMPETITIVE INTELLIGENCE <span>/</span> ENERGETIKA</p><h1>Dobrá rozhodnutí začínají fakty<span class="gold-text">.</span></h1><p class="page-description">Ověřte, co dodavatelé elektřiny slibují. A čím to dokládají.</p></div></div>
+<div class="launch-layout">
+  <section class="panel launch-panel" aria-labelledby="launch-heading">
+    <div class="panel-heading"><div class="panel-title"><span class="heading-icon">{{ icon('bolt') }}</span><h2 id="launch-heading">Nový audit</h2></div><span class="subtle-label">NASTAVENÍ AUDITU</span></div>
+    <form id="launch-form" novalidate>
+      <fieldset><legend><span class="form-step">01</span> Zvolte režim</legend><div class="mode-options">
+        <label class="mode-option"><input type="radio" name="mode" value="live" checked><span>{{ icon('globe') }}<strong>Živý sběr</strong><small>Registrované weby dodavatelů</small></span></label>
+        <label class="mode-option"><input type="radio" name="mode" value="fixture"><span>{{ icon('document') }}<strong>Ukázkový audit</strong><small>Celý průchod na fiktivních datech</small></span></label>
+      </div></fieldset>
+      <fieldset data-mode="live"><legend><span class="form-step">02</span> Vyberte dodavatele</legend><div class="supplier-options">
+        {% for supplier in live_suppliers %}<label class="check supplier-option"><input type="checkbox" name="supplier_ids" value="{{ supplier.supplier_id }}" checked><span class="supplier-monogram">{{ supplier.name[:1] }}</span><span><strong>{{ supplier.name }}</strong><small>{{ supplier.pages|length }} zdrojové stránky</small></span></label>{% endfor %}
+      </div></fieldset>
+      <fieldset data-mode="fixture" hidden><legend><span class="form-step">02</span> Vyberte fiktivní dodavatele</legend><div class="supplier-options">
+        {% for supplier in fixture_suppliers %}<label class="check supplier-option"><input type="checkbox" name="supplier_ids" value="{{ supplier.supplier_id }}" checked><span><strong>{{ supplier.name }}</strong><small>Ukázková data</small></span></label>{% endfor %}
+      </div></fieldset>
+      <fieldset><legend><span class="form-step">03</span> Profil spotřeby</legend><div class="profile-options">
+        {% for profile in profiles %}<label class="check profile-option"><input type="checkbox" name="profile_ids" value="{{ profile.profile_id }}" checked><span>{{ profile.label }}</span></label>{% endfor %}
+      </div></fieldset>
+      <div class="launch-submit"><label class="field" for="access-code">Přístupový kód <span>Vyžadován pro spuštění</span><input id="access-code" type="password" autocomplete="off" placeholder="Zadejte přístupový kód" required {% if not launch_enabled %}disabled{% endif %}></label><button type="submit" disabled>Spustit audit</button></div>
+      <p class="form-note">{{ icon('lock') }} Výsledky nového auditu se nepublikují automaticky.</p>
+      <noscript><p class="notice warning">Pro spuštění auditu je nutné povolit JavaScript.</p></noscript>
+      {% if not launch_enabled %}<p class="notice warning">Spouštění auditů není na tomto serveru nastaveno (chybí přístupový kód v konfiguraci).</p>{% endif %}
+      <p id="launch-error" class="notice error" role="alert" hidden></p>
+    </form>
+  </section>
+  <aside class="launch-aside">
+    <div class="insight-card"><span class="eyebrow">JASNĚ. DOHLEDATELNĚ. V KONTEXTU.</span><h2>Marketing slibuje.<br>Data odpovídají.</h2><p>Od cenových výhod po zelenou energii. Každé tvrzení porovnáváme s dostupnými důkazy.</p><div class="orbit-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><span class="orbit-center">{{ icon('bolt') }}</span><span class="orbit-point orbit-point-one"></span><span class="orbit-point orbit-point-two"></span><span class="orbit-tag">Tvrzení → Důkaz</span></div><span class="insight-footer">Lepší přehled. Informovanější rozhodnutí. {{ icon('arrow') }}</span></div>
+    <div class="aside-note">{{ icon('shield') }}<p><strong>Transparentnost na prvním místě</strong>Každý verdikt uvádí zdroje a omezení. Kde data chybí, říkáme to otevřeně.</p></div>
+  </aside>
+</div>
+<section class="results-section" aria-labelledby="latest-heading"><div class="section-heading"><div><p class="eyebrow">SCHVÁLENÝ VÝSTUP</p><h2 id="latest-heading">Poslední publikovaný audit</h2></div><span class="section-note">Publikováno po schválení operátorem</span></div><div id="latest" aria-live="polite"><div class="empty-state panel"><p class="muted">Načítám publikovaný audit…</p></div></div></section>
 {% endblock %}
