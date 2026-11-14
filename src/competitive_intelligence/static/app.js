@@ -5,6 +5,10 @@
   const statusEl = document.getElementById("status");
   const reportEl = document.getElementById("report");
   const buttons = form.querySelectorAll("button");
+  const examplePreviewButton = document.getElementById("preview-show-example");
+  const modeOptions = form.querySelectorAll('input[name="audit-mode"]');
+  const modeHelp = document.getElementById("analysis-mode-help");
+  const runSummary = document.getElementById("run-summary");
 
   const STATUS_TEXT = {
     live: "nalezeno na živé stránce",
@@ -41,12 +45,19 @@
 
   function setBusy(busy, message) {
     buttons.forEach((b) => (b.disabled = busy));
+    // Ukázka je mimo formulář, ale během běžící analýzy má být také nedostupná.
+    if (examplePreviewButton) examplePreviewButton.disabled = busy;
     statusEl.textContent = message || "";
     statusEl.classList.toggle("busy", busy);
   }
 
   function selected() {
     return Array.from(form.querySelectorAll("input[name=supplier]:checked")).map((i) => i.value);
+  }
+
+  function selectedMode() {
+    const checked = form.querySelector('input[name="audit-mode"]:checked');
+    return checked && checked.value === "snapshot" ? "snapshot" : "live";
   }
 
   async function run(mode) {
@@ -525,12 +536,20 @@
   // Vzhledové prvky titulní stránky. Nezasahují do datového workflow ani do výpočtů.
   const summary = document.getElementById("selected-summary");
   function refreshSelected() {
-    if (!summary) return;
     const n = selected().length;
-    summary.textContent = n === 1 ? "Vybrán 1 dodavatel" : "Vybráno " + n + " dodavatelů";
+    if (summary) summary.textContent = n === 1 ? "Vybrán 1 dodavatel" : "Vybráno " + n + " dodavatelů";
+    const live = selectedMode() === "live";
+    if (modeHelp) modeHelp.textContent = live
+      ? "Načtou se dostupné veřejné zdroje. Pokud zdroj selže, případné použití zálohy bude označeno."
+      : "Analýza proběhne nad uloženými daty. Výsledek nebude označen jako živé ověření.";
+    if (runSummary) runSummary.textContent = (n === 1 ? "1 dodavatel" : n + " dodavatelů") +
+      " · " + (live ? "živý sběr" : "uložená data") +
+      " · " + (document.getElementById("perspective").selectedOptions[0]?.textContent || "neutrální srovnání");
   }
   form.querySelectorAll('input[name="supplier"]').forEach((input) =>
     input.addEventListener("change", refreshSelected));
+  modeOptions.forEach((input) => input.addEventListener("change", refreshSelected));
+  document.getElementById("perspective").addEventListener("change", refreshSelected);
   refreshSelected();
 
   async function loadSavedPreview() {
@@ -553,11 +572,9 @@
       supplierEl.textContent = "";
     }
   }
-  const examplePreviewButton = document.getElementById("preview-show-example");
   if (examplePreviewButton) examplePreviewButton.addEventListener("click", showExample);
   loadSavedPreview();
 
-  form.addEventListener("submit", (e) => { e.preventDefault(); run("live"); });
-  document.getElementById("run-snapshot").addEventListener("click", () => run("snapshot"));
-  document.getElementById("show-example").addEventListener("click", showExample);
+  // Jediné spuštění analýzy; režim určuje uživatelsky zvolený přepínač.
+  form.addEventListener("submit", (e) => { e.preventDefault(); run(selectedMode()); });
 })();

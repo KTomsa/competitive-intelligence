@@ -6,6 +6,10 @@
   <meta name="theme-color" content="#153F38">
   <meta name="description" content="Fact or Watt – konkurenční zpravodajství pro energetiku. Ověřování veřejných tvrzení a podklady pro manažerská rozhodnutí.">
   <title>Fact or Watt | Konkurenční analýza</title>
+  <!-- Ikony vytvořené z oficiálního loga Tok energie -->
+  <link rel="icon" type="image/png" sizes="64x64" href="{{ url_for('static', filename='images/favicon-64.png') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -18,7 +22,6 @@
       </a>
       <div class="nav-links">
         <a href="#audit" class="active" aria-current="page">Analýza</a>
-        <a href="#report">Výsledky</a>
         <a href="#method">Metodika</a>
       </div>
       <span class="nav-context"><span class="nav-dot" aria-hidden="true"></span> Competitive Intelligence</span>
@@ -46,6 +49,21 @@
           <span class="section-mark" aria-hidden="true">01</span>
         </div>
         <form id="audit-form">
+          <fieldset class="form-group analysis-mode" aria-describedby="analysis-mode-help">
+            <legend>Režim získání dat</legend>
+            <div class="mode-choices">
+              <label class="mode-option">
+                <input type="radio" name="audit-mode" value="live" checked>
+                <span><strong>Živá analýza</strong><small>Načíst aktuálně dostupné zdroje</small></span>
+              </label>
+              <label class="mode-option">
+                <input type="radio" name="audit-mode" value="snapshot">
+                <span><strong>Analýza ze zálohy</strong><small>Pracovat s uloženými daty</small></span>
+              </label>
+            </div>
+            <p class="mode-help" id="analysis-mode-help">Při výpadku zdroje aplikace označí případné použití snapshotu.</p>
+          </fieldset>
+
           <fieldset class="form-group">
             <legend>Dodavatelé k porovnání</legend>
             <p class="field-note">Zahrňte všechny relevantní subjekty nebo vyberte pouze konkrétní konkurenty.</p>
@@ -85,10 +103,9 @@
           </label>
           {% endif %}
           <div class="run-actions">
-            <button type="submit" class="primary" id="run-live">Spustit živou analýzu <span aria-hidden="true">↗</span></button>
-            <button type="button" id="run-snapshot">Analyzovat uložená data</button>
-            <button type="button" id="show-example" class="subtle-btn">Otevřít uloženou ukázku</button>
+            <button type="submit" class="primary" id="run-analysis">Spustit analýzu <span aria-hidden="true">↗</span></button>
           </div>
+          <p class="run-summary" id="run-summary" aria-live="polite"></p>
         </form>
         <p id="status" class="status" role="status" aria-live="polite"></p>
         <p class="form-disclaimer">{% if llm %}Jazykový model pomáhá extrahovat tvrzení a formulovat briefing. Výpočty a verdikty určují pravidla v kódu.{% else %}Jazykový model není aktivní: systém používá připravená tvrzení a pravidlový briefing.{% endif %} Při neúspěšném živém načtení je případná záloha vždy výslovně označena.</p>

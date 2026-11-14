@@ -361,3 +361,20 @@ a {color:var(--accent)}
   #report .panel {padding:18px 14px}
 }
 @media(prefers-reduced-motion:reduce) {html {scroll-behavior:auto}button {transition:none}}
+
+
+/* Fact or Watt – sjednocené spuštění a výběr režimu (content-improvements) */
+.analysis-mode {border-top:0;padding-top:0;margin-bottom:18px}
+.mode-choices {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.mode-option {display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid #d8e2da;border-radius:8px;min-height:76px;padding:14px 13px;cursor:pointer;transition:border-color .18s,background-color .18s}
+.mode-option:has(input:checked) {background:#edf2eb;border-color:#719581;box-shadow:inset 0 0 0 1px #98b7a0}
+.mode-option:focus-within {outline:2px solid #4d9279;outline-offset:2px}
+.mode-option input {accent-color:#153f38;flex:none;width:16px;height:16px;margin:3px 0 0}
+.mode-option strong {display:block;font-size:13px;font-weight:700;color:#153f38}
+.mode-option small {display:block;font-size:11px;color:#69796e;line-height:1.4;margin-top:5px}
+.mode-help {color:#627269;font-size:12px;margin:10px 0 0;line-height:1.5}
+.run-actions {display:block}
+.run-actions .primary {width:100%;font-size:14px;min-height:49px}
+.run-summary {margin:10px 0 0;color:#64776a;font-size:12px;line-height:1.5}
+.editorial-link:disabled {opacity:.5;cursor:progress;border-bottom-color:transparent}
+@media(max-width:490px) {.mode-choices {grid-template-columns:1fr}.mode-option {min-height:63px}}

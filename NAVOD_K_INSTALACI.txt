@@ -1,0 +1,32 @@
+FACT OR WATT – úprava navigace / verze content-improvements
+==============================================================
+
+Použít pouze na větvi, která obsahuje soubory:
+  src/competitive_intelligence/templates/index.html
+  src/competitive_intelligence/static/app.js
+  src/competitive_intelligence/static/style.css
+
+Obsah:
+  - index.html: pouze Analýza + Metodika, volba režimu, jedno tlačítko Spustit analýzu
+  - app.js: zachované API /api/v1/analyze, přepínání live/snapshot, vypnutí demo tlačítka během běhu
+  - style.css: nové ovládání režimu, ostatní pravidla zachovaná
+  - images/logo.png: původní dodané logo Tok energie
+  - images/favicon.ico, favicon-64.png, apple-touch-icon.png: technicky upravené ikony z původního loga
+
+NEPOUŽÍVEJTE na feature/phase-1-fixture-pipeline (jiná aplikace).
+
+INSTALACE VE WINDOWS POWERSHELLU
+1. Zastavte Flask server klávesami Ctrl+C.
+2. Ujistěte se, že jste ve správné větvi (git branch --show-current).
+3. Doporučeno: před přepsáním mít čistý git status nebo vlastní commit / zálohu.
+4. Rozbalte ZIP do kořenové složky projektu:
+   Expand-Archive -Path "$env:USERPROFILE\Downloads\Fact_or_Watt_UI_nav_a_logo_content_improvements.zip" -DestinationPath . -Force
+5. Spusťte:
+   uv run pytest -q
+   uv run flask --app src/index.py run --debug
+6. Vyzkoušejte živý režim, uložená data a tlačítko ukázkového reportu.
+7. git diff --check; git diff --stat; git status --short
+8. Až po ověření commitnout pouze změněné frontendové soubory.
+
+POZNÁMKA: Nic v backendu, API kontraktech ani výpočtech se tímto balíčkem nemění.
+Logo je PNG 559×362 s transparentním pozadím. Pro web vhodné, pro velkoformátový tisk časem SVG.
