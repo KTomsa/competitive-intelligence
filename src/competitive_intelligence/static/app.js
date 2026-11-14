@@ -522,6 +522,41 @@
     reportEl.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  // Vzhledové prvky titulní stránky. Nezasahují do datového workflow ani do výpočtů.
+  const summary = document.getElementById("selected-summary");
+  function refreshSelected() {
+    if (!summary) return;
+    const n = selected().length;
+    summary.textContent = n === 1 ? "Vybrán 1 dodavatel" : "Vybráno " + n + " dodavatelů";
+  }
+  form.querySelectorAll('input[name="supplier"]').forEach((input) =>
+    input.addEventListener("change", refreshSelected));
+  refreshSelected();
+
+  async function loadSavedPreview() {
+    const quoteEl = document.getElementById("preview-quote");
+    const verdictEl = document.getElementById("preview-verdict");
+    const supplierEl = document.getElementById("preview-supplier");
+    try {
+      const resp = await fetch("/api/v1/example");
+      if (!resp.ok) throw new Error("Uložená ukázka není dostupná.");
+      const data = await resp.json();
+      const supplier = (data.suppliers || []).find((s) => (s.claims || []).length);
+      if (!supplier) throw new Error("Ukázka neobsahuje tvrzení.");
+      const claim = supplier.claims[0];
+      quoteEl.textContent = "„" + claim.quote + "“";
+      verdictEl.textContent = claim.verdict_label || "Vyhodnocené tvrzení";
+      supplierEl.textContent = supplier.name || "";
+    } catch (_err) {
+      quoteEl.textContent = "Prohlédněte si analýzu konkurence podloženou dohledatelnými zdroji.";
+      verdictEl.textContent = "Uložená ukázka nyní není k dispozici";
+      supplierEl.textContent = "";
+    }
+  }
+  const examplePreviewButton = document.getElementById("preview-show-example");
+  if (examplePreviewButton) examplePreviewButton.addEventListener("click", showExample);
+  loadSavedPreview();
+
   form.addEventListener("submit", (e) => { e.preventDefault(); run("live"); });
   document.getElementById("run-snapshot").addEventListener("click", () => run("snapshot"));
   document.getElementById("show-example").addEventListener("click", showExample);

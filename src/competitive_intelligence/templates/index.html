@@ -3,63 +3,134 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fact or Watt</title>
+  <meta name="theme-color" content="#153F38">
+  <meta name="description" content="Fact or Watt – konkurenční zpravodajství pro energetiku. Ověřování veřejných tvrzení a podklady pro manažerská rozhodnutí.">
+  <title>Fact or Watt | Konkurenční analýza</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header class="top">
-    <div class="wrap">
-      <h1>Fact or Watt</h1>
-      <p class="lead">Ověření marketingových tvrzení dodavatelů elektřiny proti veřejným datům ERÚ a OTE.</p>
-    </div>
+  <a class="skip-link" href="#audit">Přejít na nový audit</a>
+  <header class="site-header">
+    <nav class="site-nav shell" aria-label="Hlavní navigace">
+      <a href="/" class="brand" aria-label="Fact or Watt – úvodní stránka">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="" width="48" height="30">
+        <span class="brand-name">Fact or Watt</span>
+      </a>
+      <div class="nav-links">
+        <a href="#audit" class="active" aria-current="page">Analýza</a>
+        <a href="#report">Výsledky</a>
+        <a href="#method">Metodika</a>
+      </div>
+      <span class="nav-context"><span class="nav-dot" aria-hidden="true"></span> Competitive Intelligence</span>
+    </nav>
   </header>
 
-  <main class="wrap">
-    <section class="panel" aria-labelledby="setup-title">
-      <h2 id="setup-title">Koho ověřit</h2>
-      <form id="audit-form">
-        <div class="choices">
-          {% for s in suppliers %}
-          <label class="choice">
-            <input type="checkbox" name="supplier" value="{{ s.id }}" checked>
-            <span>{{ s.name }}</span>
-          </label>
-          {% endfor %}
-        </div>
-        <label class="perspective-pick" for="perspective">Dívám se za firmu
-          <select id="perspective">
-            <option value="">— bez pohledu firmy —</option>
-            {% for s in suppliers %}
-            <option value="{{ s.id }}">{{ s.name }}</option>
-            {% endfor %}
-          </select>
-        </label>
-        <p class="hint">
-          Srovnávací profil: {{ profile.commodity }}, sazba {{ profile.tariff }}, distribuční území {{ profile.area }}.
-          Stránky dodavatelů, jejich ceníky a data ERÚ a OTE se při běhu stahují znovu.
-          {% if llm %}Tvrzení a briefing zpracovává jazykový model, čísla a verdikty počítá kód.
-          {% else %}Jazykový model není nastaven: nová tvrzení se hledají podle klíčových slov a briefing je ze šablony.{% endif %}
-        </p>
-        {% if needs_code %}
-        <label class="code">Přístupový kód <input type="password" id="demo-code" autocomplete="off"></label>
-        {% endif %}
-        <div class="actions">
-          <button type="submit" class="primary" id="run-live">Spustit živý audit</button>
-          <button type="button" id="run-snapshot">Spustit z uložených dat</button>
-          <button type="button" id="show-example">Zobrazit uloženou ukázku</button>
-        </div>
-      </form>
-      <p id="status" class="status" role="status" aria-live="polite"></p>
+  <main>
+    <section class="intro shell" aria-labelledby="intro-title">
+      <div class="intro-copy">
+        <p class="eyebrow">ENERGETIKA <span aria-hidden="true">/</span> KONKURENČNÍ ZPRAVODAJSTVÍ</p>
+        <h1 id="intro-title">Co tvrdí konkurence.<br><em>Co dokládají data.</em></h1>
+        <p class="intro-lead">Analyzujte veřejná tvrzení dodavatelů elektřiny a převeďte zjištění do rozhodnutí podložených zdroji.</p>
+      </div>
+      <div class="intro-decoration" aria-hidden="true"><span class="line one"></span><span class="line two"></span><span class="line three"></span><span class="core"></span></div>
     </section>
 
-    <div id="report" hidden></div>
+    <section class="workspace shell" id="audit" aria-labelledby="setup-title">
+      <div class="setup-panel">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">01 / NASTAVENÍ</span>
+            <h2 id="setup-title">Nová analýza</h2>
+            <p class="section-description">Vyberte sledované společnosti a pohled, ze kterého chcete výsledky interpretovat.</p>
+          </div>
+          <span class="section-mark" aria-hidden="true">01</span>
+        </div>
+        <form id="audit-form">
+          <fieldset class="form-group">
+            <legend>Dodavatelé k porovnání</legend>
+            <p class="field-note">Zahrňte všechny relevantní subjekty nebo vyberte pouze konkrétní konkurenty.</p>
+            <div class="choices">
+              {% for s in suppliers %}
+              <label class="choice">
+                <input type="checkbox" name="supplier" value="{{ s.id }}" checked>
+                <span>{{ s.name }}</span>
+              </label>
+              {% endfor %}
+            </div>
+            <p class="selection-summary" id="selected-summary" aria-live="polite"></p>
+          </fieldset>
+
+          <div class="form-group perspective-group">
+            <label class="perspective-pick" for="perspective">Manažerský pohled</label>
+            <p class="field-note">Zvolte, z pohledu kterého dodavatele má systém připravit doporučení.</p>
+            <select id="perspective">
+              <option value="">Neutrální srovnání trhu</option>
+              {% for s in suppliers %}
+              <option value="{{ s.id }}">{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="profile-note">
+            <span class="profile-symbol" aria-hidden="true">↗</span>
+            <div>
+              <strong>Parametry srovnání</strong>
+              <p>{{ profile.commodity }} · sazba {{ profile.tariff }} · distribuční území {{ profile.area }}.</p>
+              <p class="muted-note">Ceny a referenční data jsou porovnávána jen v odpovídajícím rozsahu.</p>
+            </div>
+          </div>
+          {% if needs_code %}
+          <label class="code" for="demo-code">Přístupový kód
+            <input type="password" id="demo-code" autocomplete="off" placeholder="Zadejte přístupový kód">
+          </label>
+          {% endif %}
+          <div class="run-actions">
+            <button type="submit" class="primary" id="run-live">Spustit živou analýzu <span aria-hidden="true">↗</span></button>
+            <button type="button" id="run-snapshot">Analyzovat uložená data</button>
+            <button type="button" id="show-example" class="subtle-btn">Otevřít uloženou ukázku</button>
+          </div>
+        </form>
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+        <p class="form-disclaimer">{% if llm %}Jazykový model pomáhá extrahovat tvrzení a formulovat briefing. Výpočty a verdikty určují pravidla v kódu.{% else %}Jazykový model není aktivní: systém používá připravená tvrzení a pravidlový briefing.{% endif %} Při neúspěšném živém načtení je případná záloha vždy výslovně označena.</p>
+      </div>
+
+      <aside class="editorial-panel" aria-label="Ukázka výsledku analýzy">
+        <div class="editorial-topline"><span>02 / UKÁZKA VÝSTUPU</span><span class="editorial-orbit" aria-hidden="true">◌</span></div>
+        <h2>Od tvrzení<br>k rozhodnutí.</h2>
+        <p class="editorial-intro">Manažerská analýza začíná přesnou citací. Pokračuje dohledatelnými důkazy a končí doporučeným krokem.</p>
+        <div class="preview-card" id="example-preview">
+          <span class="preview-kicker">ULOŽENÝ PŘÍKLAD · NEJDE O ŽIVÝ BĚH</span>
+          <blockquote id="preview-quote">Ukázková analýza se načítá…</blockquote>
+          <div class="preview-bottom">
+            <span id="preview-verdict">Ověřování v souvislostech</span>
+            <span id="preview-supplier"></span>
+          </div>
+        </div>
+        <button type="button" class="editorial-link" id="preview-show-example">Prohlédnout demonstrační report <span aria-hidden="true">↗</span></button>
+        <div class="editorial-lines" aria-hidden="true"><i></i><i></i><i></i></div>
+      </aside>
+    </section>
+
+    <section class="method shell" id="method" aria-labelledby="method-title">
+      <div class="method-intro">
+        <p class="eyebrow">METODIKA</p>
+        <h2 id="method-title">Průhledný postup.<br><em>Obhajitelné závěry.</em></h2>
+      </div>
+      <div class="method-steps">
+        <div><span>01</span><strong>Citace</strong><p>Přesné znění tvrzení a původní zdroj.</p></div>
+        <div><span>02</span><strong>Důkazy</strong><p>Veřejné informace, datové období a srovnatelnost.</p></div>
+        <div><span>03</span><strong>Rozhodnutí</strong><p>Verdikt v omezeném rozsahu a doporučení pro management.</p></div>
+      </div>
+    </section>
+
+    <section class="results-shell shell" aria-label="Výsledky analýzy">
+      <div id="report" hidden></div>
+    </section>
   </main>
-
-  <footer class="wrap foot">
-    Interní nástroj pro konkurenční zpravodajství. Výsledek není právní posouzení.
-    „Nelze ověřit“ neznamená, že je tvrzení nepravdivé.
+  <footer class="site-footer shell">
+    <span>© 2026 Fact or Watt</span>
+    <span>Analytická podpora, nikoliv právní posouzení. „Nelze ověřit“ neznamená „nepravdivé“.</span>
   </footer>
-
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

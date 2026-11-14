@@ -1,0 +1,33 @@
+FACT OR WATT — FRONTEND REDESIGN PRO VĚTEV CONTENT-IMPROVEMENTS
+============================================================
+Zdroj: competitive-intelligence-content-improvements.zip (poskytnuto uživatelem)
+
+Tento balíček JE PRO JINOU VĚTEV NEŽ feature/phase-1-fixture-pipeline.
+NEKOPÍROVAT dřívější soubory base.html / static/js/app.js / redesign.css z původního balíčku.
+
+POSTUP (PowerShell v kořeni repository):
+1. git branch --show-current
+   Ujistěte se, že větev obsahuje src/competitive_intelligence/templates/index.html
+   a src/competitive_intelligence/static/app.js (nikoliv static/js/app.js).
+2. git switch -c feature/forest-paper-frontend
+   (pouze pokud právě nejste na vlastní pracovní větvi)
+3. Expand-Archive -Path "$env:USERPROFILE\Downloads\Fact_or_Watt_redesign_pro_content_improvements.zip" -DestinationPath . -Force
+4. uv sync --locked
+5. uv run pytest -q
+6. uv run flask --app src/index.py run --debug
+7. Otevřete http://127.0.0.1:5000 a vyzkoušejte živý/snapshot/uložený audit.
+
+ZMĚNĚNÉ SOUBORY:
+src/competitive_intelligence/templates/index.html — nové rozložení s horní navigací
+src/competitive_intelligence/static/style.css — původní styly výsledků zachovány + Forest & Paper
+src/competitive_intelligence/static/app.js — původní funkce zachovány, doplněn živý počet vybraných a náhled uložené ukázky
+src/competitive_intelligence/static/images/logo.png — vámi zvolené logo Tok energie
+
+CO ZŮSTÁVÁ:
+POST /api/v1/analyze, GET /api/v1/example, id audit-form, supplier, perspective,
+run-snapshot, show-example, run-live, demo-code, status a report; backend beze změn.
+Náhled ukazuje obsah JEN z uloženého reportu a označuje jej jako uložený.
+
+POZOR:
+Jde o grafickou úpravu konkrétní větve, která na rozdíl od původní Azure/worker větve
+používá jeden Flask backend, bez samostatného Judge AI agenta.
