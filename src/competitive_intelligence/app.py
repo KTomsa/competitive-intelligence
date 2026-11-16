@@ -122,7 +122,7 @@ def create_app() -> Flask:
         try:
             report = workflow.run(req.supplier_ids, live=live, perspective=req.perspective)
         except workflow.AuditError as exc:
-            return jsonify(error=str(exc)), 502
+            return jsonify(error="Došlo k chybě při provádění auditu."), 502
         finally:
             slots.release()
         return jsonify(report)
