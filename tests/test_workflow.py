@@ -99,23 +99,32 @@ def test_briefing_falls_back_when_model_cites_unknown_claim(monkeypatch):
     assert agents.write_briefing(items, use_llm=True)["method"].startswith("šablona")
 
 
-def test_briefing_rejects_numbers_written_by_model(monkeypatch):
-    items = [c for s in workflow.run(["centropol"], live=False)["suppliers"] for c in s["claims"]]
-    first = items[0]["id"]
+def test_model_can_only_reorder_priorities_never_write_text(monkeypatch):
+    # recenzent: věta „konkurent lže“ od modelu nesmí projít; model už text vůbec nepíše
+    items = [c for s in workflow.run(live=False)["suppliers"] for c in s["claims"]]
+    template = agents.write_briefing(items, use_llm=False)
+    candidates = [p["claim_id"] for p in template["priorities"]]
+    assert len(candidates) >= 2
 
-    def with_number(system, user, schema):
-        return schema(headline="Fixace na 3 měsíce je sporná.", summary="y", priority_claim_ids=[first])
+    def reorder(system, user, schema):
+        return schema.model_validate({"priority_claim_ids": list(reversed(candidates)),
+                                      "headline": "Konkurent lže.", "summary": "Konkurent lže."})
 
-    monkeypatch.setattr(agents, "_parse", with_number)
-    assert agents.write_briefing(items, use_llm=True)["method"].startswith("šablona")
-
-    def clean(system, user, schema):
-        return schema(headline="Jedno tvrzení stojí za pozornost.", summary="y", priority_claim_ids=[first])
-
-    monkeypatch.setattr(agents, "_parse", clean)
+    monkeypatch.setattr(agents, "_parse", reorder)
     out = agents.write_briefing(items, use_llm=True)
     assert out["method"].startswith("model")
-    assert out["priorities"][0]["why"] == items[0]["finding"]  # nález je z kódu, ne z modelu
+    assert [p["claim_id"] for p in out["priorities"]] == list(reversed(candidates))
+    assert "lže" not in out["headline"] + out["summary"]
+    assert out["summary"] == template["summary"]
+    by_id = {i["id"]: i for i in items}
+    assert all(p["why"] == by_id[p["claim_id"]]["finding"] for p in out["priorities"])
+
+    def outside(system, user, schema):  # tvrzení, které kód nevybral jako kandidáta
+        unverified = next(i["id"] for i in items if not i["opportunity"])
+        return schema.model_validate({"priority_claim_ids": [unverified]})
+
+    monkeypatch.setattr(agents, "_parse", outside)
+    assert agents.write_briefing(items, use_llm=True)["method"].startswith("šablona")
 
 
 def test_api_runs_only_configured_suppliers():
@@ -174,25 +183,27 @@ def test_real_data_verdicts_from_snapshots():
     # epet: „vždy tu nejlepší cenu“ – existuje levnější srovnatelná nabídka včetně stálého platu
     assert claims["epet-1"]["verdict"] == "contradicted"
     assert "ČEZ Prodej" in claims["epet-1"]["finding"]
-    # ČEZ: největší v elektřině a v součtu, v plynu ne
-    assert claims["cez-1"]["verdict"] == "partially_supported"
-    statuses = [sub["status"] for sub in claims["cez-1"]["subclaims"]]
-    assert statuses[0] == "ověřeno" and statuses[1].startswith("v rozporu") and statuses[2] == "ověřeno"
-    # PRE: zelené tvrzení s produktovým podkladem
-    assert claims["pre-1"]["verdict"] == "supported"
-    # počty zákazníků řádově odpovídají součtu odběrných míst elektřiny a plynu
-    assert claims["eon-2"]["verdict"] == "partially_supported"
-    assert claims["mnd-1"]["verdict"] == "partially_supported"
-    # tvrzení přes dvě země: nález s českým podílem, verdikt zůstává opatrný
-    assert claims["spp-1"]["verdict"] == "unverifiable" and "Slovensko" in claims["spp-1"]["finding"]
-    # „největší alternativní“ a „největší český“ se posuzují podle definic týmu
-    assert claims["dobra-1"]["verdict"] == "contradicted" and "CENTROPOL" in claims["dobra-1"]["finding"]
-    assert claims["centropol-2"]["verdict"] == "partially_supported"
+    # Dobrá Energie + epet: „více než 185 000 odběrných míst“ – metrika i komodity sedí, lze potvrdit
+    assert claims["dobra-2"]["verdict"] == "supported"
+    # ČEZ „největší dodavatel“ neuvádí metriku: počty odběrných míst jsou jen kontext
+    assert claims["cez-1"]["verdict"] == "unverifiable"
+    assert any("Plyn" in sub["text"] and "2. místo" in sub["status"] for sub in claims["cez-1"]["subclaims"])
+    # PRE: prohlášení dodavatele k produktu je nález, ne nezávislý důkaz
+    assert claims["pre-1"]["verdict"] == "unverifiable" and "prohlášení dodavatele" in claims["pre-1"]["finding"]
+    # počty zákazníků nelze potvrdit počtem odběrných míst
+    assert claims["eon-2"]["verdict"] == claims["mnd-1"]["verdict"] == "unverifiable"
+    assert claims["armex-1"]["opportunity"]  # tvrzení je nad počtem odběrných míst v každém měsíci
+    assert claims["spp-1"]["verdict"] == "unverifiable" and "více zemích" in claims["spp-1"]["finding"]
+    # „největší alternativní“ a „největší český“ nemají v datech oporu: kontext, ne verdikt
+    assert claims["dobra-1"]["verdict"] == "unverifiable" and "CENTROPOL" in claims["dobra-1"]["finding"]
+    assert claims["centropol-2"]["verdict"] == "unverifiable" and "vlastnictví" in claims["centropol-2"]["finding"]
     # slogan o důvěře: verdikt se nevydává, ale nález uvádí pravomocné rozhodnutí ERÚ
     assert claims["cez-3"]["verdict"] == "unverifiable" and "pravomocné rozhodnutí" in claims["cez-3"]["finding"]
-    assert "neeviduje" in claims["epet-2"]["finding"]
+    assert "nenašli" in claims["epet-2"]["finding"]
     # garance dorovnání ceny není tvrzení o prvenství
     assert claims["centropol-1"]["verdict"] == "unverifiable"
+    # žádný nález nevydává pásmo ERÚ za změřené pořadí na trhu
+    assert not any("čtvrtin" in c["finding"] for c in claims.values())
 
 
 def test_comparison_is_sorted_by_annual_cost_and_matches_price_lists():
@@ -277,7 +288,8 @@ def test_market_overview_and_loyalty_gap_from_price_lists():
     rows = {r["id"]: r for r in market["rows"]}
     assert rows["cez"]["price"]["rank"] == 1 and rows["cez"]["electricity"]["abs"] < 0
     assert rows["epet"]["electricity"]["pct"] > 0
-    assert market["observations"][-1].startswith("Nejnižší cena")
+    assert market["observations"][-1].startswith("Ve vzorku tedy") and "příčin" in market["observations"][-1]
+    assert market["market_cohort"]["included"] > 50
     armex = rows["armex"]  # nemá tříletý produkt: cena se bere z nejdelší fixace, kterou nabízí
     assert armex["price"]["fixation_months"] == 24 and armex["price"]["rank"] == 1
     assert armex["electricity"]["abs"] < 0

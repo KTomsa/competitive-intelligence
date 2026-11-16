@@ -81,12 +81,16 @@ def load(supplier: dict, live: bool = True) -> dict:
     if live:
         try:
             items: list[dict] = []
+            truncated = False
             for page in range(MAX_PAGES):
                 raw = http.fetch_live(f"{query_url}&page={page}")
                 found = parse_list(raw.content.decode("utf-8", "replace"))
                 items += [i for i in found if i not in items]
                 if len(found) < PAGE_SIZE:
                     break
+            else:
+                truncated = True  # načteny jen první stránky výsledků
+            items = {"items": items, "truncated": truncated}
             fetched = Fetched(
                 content=json.dumps(items, ensure_ascii=False).encode("utf-8"),
                 url=query_url,
@@ -97,8 +101,11 @@ def load(supplier: dict, live: bool = True) -> dict:
             fetched = load_snapshot(snapshot_name(supplier), str(exc))
     else:
         fetched = load_snapshot(snapshot_name(supplier), "Běh v režimu snapshot.")
+    payload = json.loads(fetched.content.decode("utf-8"))
+    if isinstance(payload, list):  # starší formát snapshotu
+        payload = {"items": payload, "truncated": False}
     decisions = [
-        d for d in json.loads(fetched.content.decode("utf-8"))
+        d for d in payload["items"]
         if name.casefold() in d["title"].casefold()  # filtr ERÚ hledá i v dalších polích
     ]
     for decision in decisions:  # snapshot může být starší než pravidla třídění
@@ -106,7 +113,7 @@ def load(supplier: dict, live: bool = True) -> dict:
     decisions.sort(key=lambda d: d["date_iso"], reverse=True)
     source = fetched.meta()
     source.update({"name": f"ERÚ – pravomocná rozhodnutí: {supplier['name']}", "page_url": query_url})
-    return {"decisions": decisions, "source": source, "_fetched": fetched}
+    return {"decisions": decisions, "truncated": payload["truncated"], "source": source, "_fetched": fetched}
 
 
 def save(supplier: dict, result: dict) -> None:

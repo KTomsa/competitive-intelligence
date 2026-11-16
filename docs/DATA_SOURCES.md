@@ -1,38 +1,37 @@
-# Datové zdroje, režimy načítání a kompetence — v2
+# Datové zdroje
 
-**Pravidlo:** API/scraping/parser získává fakta, metadata a strojově čitelné tabulky. **LLM** vybírá citáty, klasifikuje formulace a volá schválené evidenční nástroje. **Kód** počítá metriky i verdikt. Předem ověřit licenci, robots.txt, podmínky API a datovou dostupnost konkrétního URL.
+Tento dokument popisuje zdroje, které aplikace **skutečně používá** (stav po code review z 15. 11. 2026). Starší návrh s konfigurací `config/suppliers.yaml` a `data/reference/manifest.json` se neimplementoval; je v historii gitu.
 
-| Zdroj a příklady | Frekvence / režim | API, scraping a deterministický kód | LLM agent (pouze role) | Výstup + omezení |
-|---|---|---|---|---|
-| **Weby dodavatelů**: homepage, produkt, green landing, reklamy | **Live při každém auditu** 2–4 URL/dodavatel | Web Scout: bezpečně stahuje HTML, odstraní boilerplate, uloží text/hash/URL/čas, porovná baseline | Claim Extractor: doslovné marketingové výroky, rule ID, produkt, scope, citace | `Claim` + `origin`; JS/anti-bot/robots mohou znemožnit fetch |
-| **Baseline schválených tvrzení** | Při shodném hash live stránky | Načte JSON s verzí a schváleným hashem; žádné nové HTTP | Žádný nový Extractor | `origin=baseline`; musí být znám `baseline_approved_at` |
-| **Snapshot neúspěšného live fetchu** | Jen fallback | Načte immutable uložený text z konkrétní URL a datum | Claim Extractor jen pokud snapshot bez schválených claims | `origin=snapshot`, `fallback_reason`, stáří a omezení |
-| **Ceníky a podmínky dodavatelů** PDF/HTML | Kurátorované `data/reference/`, průběžná aktualizace | HTTP download / PDF parser / manuálně zkontrolované JSON; metadata produktu, DPH, platnosti | Price agent volá `get_price_offers`, `calculate_annual_cost`; interpretuje, co výrok srovnává | Srovnatelné nabídky/roční obchodní náklad; PDF parser bez kontroly může chybovat |
-| **ERÚ — srovnávač/cenové podklady** | Reference; kontrola dostupnosti | Pouze zdokumentované exporty/podporovaný import; nevymýšlet skryté API | Price agent volí důkazní profil, nepočítá samotné ceny | Omezení pokrytí a metodiky zdroje |
-| **OTE — počty OPM dodavatelů** XLSX/statistiky | Reference podle zveřejnění | Stáhnout XLSX/CSV a číst přes parser, vypočítat změny OPM | Customer agent volí období a porovnává **výslovně OPM** tvrzení | OPM ≠ unikátní zákazníci |
-| **OTE — zbytkový mix a záruky původu** | Reference podle publikačního cyklu | Stažení tabulek/výkazů a parsování | Green agent volí konkrétní produkt / doklad, posoudí souvislost | Zbytkový mix ≠ individuální mix produktu; chybějící GO nemusí znamenat nepravdu |
-| **Mix konkrétního produktu/dodavatele** | Reference, obvykle ročně či při změně produktu | Stáhnout deklaraci a doklad, uchovat čas a produkt | Green agent interpretuje formulaci a vyžádá konkrétní evidence | Přednost produktově specifickým důkazům |
-| **ERÚ — sankce / rozhodnutí** | Reference, nepravidelně | Download záznamů, normalizace IČO, data a předmětu rozhodnutí | Customer agent určí relevanci; případně jen kontext | Sankce sama nedokazuje nepravdivost obecného sloganu; absence sankcí nedokazuje férovost |
-| **ARES** (volitelné) | Reference dle potřeby | REST lookup entity / IČO, bez potřeby LLM | Agent případně jen řeší nejednoznačné jméno firmy | Identifikace entity, ne důkaz marketingového tvrzení |
-| **Google hodnocení** (volitelné) | Reference s API podmínkami | Legální API / agregované hodnoty a počet, bez jmen a textů | Customer agent posoudí vztah k přesnému tvrzení | Není reprezentativní spokojenost všech zákazníků |
+**Pravidlo:** konektor zdroj stáhne a rozparsuje, kód počítá čísla i verdikty, jazykový model (volitelný) jen navrhuje další citáty a řadí priority. Každý zdroj ve zprávě nese URL, čas získání, období dat a stav (živě, snapshot, chybí, ruční podklad).
 
-## Registry zdrojů
-Konfigurace v `config/suppliers.yaml` uvádí `supplier_id`, právní entitu/IČO (pokud ověřeno), `allowed_urls` (přesné HTTPS URL a domény), `page_kind`, `commodity`. `data/reference/manifest.json` uvádí `source_id`, `source_url`, `retrieved_at`, `valid_from`, `valid_to`, `content_sha256`, `parser_version`, `scope`, `license_note` a případně `reviewed_by`.
+## Matice zdrojů
 
-### Přístupová a provozní pravidla
-- `mode=live`: stahuj **pouze reklamní stránky** při každém auditu; referenční data se načítají z kontrolovaných verzovaných souborů s datem platnosti.
-- Chybí-li oficiální/API přístup, použij legální zveřejněný dokument nebo import; neobcházej ochrany webu a neodvozuj skryté API.
-- Každý důkaz potřebuje `source_url`, `source_ref`, `captured_at`, `valid_as_of`, identitu produktu a lokátor údajů; poškozené PDF/HTML data nepodporují kladný verdict.
-- Test fixtures uchovávej odděleně od produkčních dat; UI je musí jasně označit jako ukázkové.
+| Zdroj | Konektor | URL | Období dat | Záloha | Omezení |
+|---|---|---|---|---|---|
+| ERÚ – indikativní pásma cen elektřiny (CSV) | `connectors/eru.py` | https://eru.gov.cz/ipnc (odkaz na CSV se čte ze stránky) | měsíce, sazby, fixace 12/24/36 | `snapshots/eru_elektrina.csv` | cena komodity bez stálého platu a regulovaných složek; odhad ERÚ, ne pořadí na trhu |
+| OTE – počty OPM dodavatelů elektřiny | `connectors/ote.py` | https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote | měsíce aktuálního roku | `snapshots/ote_opm.html` | odběrná místa, ne zákazníci; prázdná buňka = chybí, ne nula |
+| OTE – počty OPM dodavatelů plynu | `connectors/ote.py` | https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu | měsíce aktuálního roku | `snapshots/ote_opm_gas.html` | tabulka zkracuje názvy na 20 znaků; s elektřinou se sčítá jen při stejném období |
+| ERÚ – pravomocná rozhodnutí | `connectors/eru_decisions.py` | https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=… | datum zveřejnění | `snapshots/eru_decisions_<id>.json` | čte se jen název, datum a štítky; nejvýše 3 stránky výsledků (zkrácení se hlásí) |
+| Weby dodavatelů | `connectors/web.py` | `source_url` v `suppliers.json` | den stažení | `snapshots/web_<id>.html` | kontrola přítomnosti citátu v textu; JavaScriptové stránky mohou část textu skrýt |
+| Ceníky dodavatelů (PDF) | `connectors/pricelist.py` | `price_list.url` v `suppliers.json` | `effective_from` v ceníku | `snapshots/pricelist_<id>.txt` | porovnává se otisk ručně zkontrolovaného textu; řádek tabulky je zapsán ručně |
+| Ceníky E.ON | ruční podklad | – (za průvodcem na eon.cz) | `effective_from` | – | v manifestu jako „ruční podklad“; živě se kontroluje jen jedna cena na webu |
 
-## Uživatelské časové označení (UI)
-- **Live:** „Z webu načteno: datum a čas“ + údaj o tom, kdy platí referenční ceník.
-- **Baseline:** „Web byl načten a beze změny; použitá schválená tvrzení ze dne …“.
-- **Snapshot:** „Web se nepodařilo načíst; použit uložený snapshot z …“.
-Žádné datum získání referenční ceny nesmí být přepsáno na datum aktuálního web fetchu.
+Všechna stahování jdou přes `connectors/http.py`: jen HTTPS, schválení hostitelé a port, nejvýše 3 přesměrování kontrolovaná před odesláním, limit 3 MB a jeden časový limit celého auditu.
 
-## Oficiální orientační vstupy (ověřit aktuální URL/formát při implementaci)
-- OTE OPM elektřina: https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote
-- OTE zbytkový mix: https://www.ote-cr.cz/cs/statistika/zbytkovy-energeticky-mix
-- ERÚ: https://eru.gov.cz/
-- ARES: https://ares.gov.cz/
+## Připravená data (`src/competitive_intelligence/data/suppliers.json`)
+
+- **Profil srovnání:** elektřina, sazba D02d, území PREdistribuce, 2 a 4 MWh ročně.
+- **Dodavatel:** `ote_name` (název v tabulce OTE), `eru_name` (název v seznamu rozhodnutí ERÚ), `source_url`, datum zachycení.
+- **Tvrzení:** doslovný citát, pravidlo a rozsah (`params.scope`: metrika, komodity, subjekty, období, srovnání).
+- **Nabídka:** produkt, sazba, území, fixace, skupina zákazníků (`new`, `existing`, `all`), cena s DPH i bez, stálý plat, ceník (`url`, `effective_from`, `markers`, `row_locator`, `reviewed_sha256`, `reviewed_at`).
+- **Zelený podklad:** produkt, typ (prohlášení dodavatele), text a značka pro kontrolu na stránce.
+- **Definice:** seznam „tradičních dodavatelů“ jako výklad týmu, ne údaj ze zdroje.
+
+## Časové označení v rozhraní
+
+- **Živě:** „Získáno: datum a čas“ a období dat zdroje.
+- **Snapshot:** „živé stažení selhalo, použit snapshot z …“, v běhu ze zálohy jedno souhrnné upozornění.
+- **Chybí:** zdroj se nepodařilo stáhnout ani načíst ze zálohy; verdikty, které ho potřebují, se nevydají.
+- **Ruční podklad:** údaje, které nejdou stáhnout automaticky (ceníky E.ON).
+
+Datum získání nikdy nepřepisuje období dat: stažení v listopadu může vrátit tabulku za září.

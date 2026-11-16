@@ -2,6 +2,8 @@
 
 Každé tvrzení má právě jedno `rule_id` z tohoto seznamu. Výpočet a verdikt patří kódu (`rules.py`), ne jazykovému modelu.
 
+**Společná brána:** pravidla nedostávají surová data, ale výsledek `evidence.py`: rozsah tvrzení (metrika, komodity, subjekty, období, srovnání), oprávněnost nabídky a součty OPM, u kterých chybějící údaj není nula a různá období se nesčítají.
+
 **Verdikty:** `supported` (podloženo), `partially_supported` (částečně; vždy s rozpisem dílčích tvrzení), `contradicted` (v rozporu s daty), `unverifiable` (nelze ověřit). Odděleně příznak `possible_regulatory_risk` s důvodem; není to právní závěr.
 
 | Rule ID | Typický výrok | Zdroj | Jak se rozhoduje |
@@ -10,13 +12,13 @@ Každé tvrzení má právě jedno `rule_id` z tohoto seznamu. Výpočet a verdi
 | `price_rank` | „Vždy nejlepší cena“, „Garance nejnižší ceny“ | ceníky dodavatelů | Levnější srovnatelná nabídka s nižším ročním nákladem ve všech profilech spotřeby → `contradicted`. Nižší jen cena za MWh nebo chybí stálý plat → `unverifiable` s nálezem. Prvenství ve vzorku → `unverifiable`. Závazek dorovnání ceny → vždy `unverifiable`, nález uvádí levnější nabídku. Bez ceníku dodavatele → `unverifiable`. |
 | `price_pct_cheaper` | „O 7 % levnější než X“ | ceníky dodavatelů | Roční náklad obchodní části obou dodavatelů ve všech profilech spotřeby. Platí všude → `supported`, nikde → `contradicted`, jen někde nebo bez stálého platu či základu → `unverifiable`. |
 | `price_guarantee` | „Garance ceny na 3 roky“ | ceník + ERÚ | Produkt s danou fixací existuje a cena nepřesahuje pásmo → `supported`; existuje, ale cenu nelze srovnat → `partially_supported`. |
-| `market_size` | „Největší dodavatel“ | OTE elektřina + plyn | Pořadí podle počtu OPM. Jen elektřina: 1. místo → `supported`, jinak `contradicted`. Elektřina i plyn: první v obou → `supported`; první jen v elektřině nebo v součtu → `partially_supported` s rozpisem; jinak `contradicted`. Přívlastek, který tvrzení nedefinuje („český“, „alternativní“), se posuzuje podle výkladů týmu (všichni dodavatelé; dodavatelé mimo tradiční skupiny): platí při obou → `supported`, jen při užším → `partially_supported`, při žádném → `contradicted`. Bez definice v `suppliers.json` → `unverifiable`. |
-| `customer_count` | „1,5 milionu zákazníků“ | OTE elektřina + plyn | Tvrzený počet nejvýše roven součtu OPM elektřiny a plynu → `partially_supported` (řádově sedí). Tvrzený počet o víc než 10 % nad součtem → `contradicted`. Tvrzení přes více zemí → `unverifiable`, nález uvádí český podíl. Výslovně o odběrných místech → porovnání s OPM elektřiny. |
-| `customer_growth` | „Rosteme“ | OTE | Počet OPM mezi prvním a posledním zveřejněným měsícem roku: růst → `supported`, jinak `contradicted`. Superlativ („nejrychleji“) → `unverifiable`. |
-| `green_share` | „100 % zelená elektřina“, „krytá zárukami původu“ | podklad k produktu | Výslovné prohlášení dodavatele vázané na produkt, ověřené na živé stránce → `supported`. Bez produktového podkladu → `unverifiable` + příznak rizika. |
+| `market_size` | „Největší dodavatel“ | OTE elektřina + plyn | Bez metriky v tvrzení → `unverifiable`, pořadí podle OPM jako kontext. Jen u tvrzení výslovně o odběrných místech: první ve všech komoditách → `supported`, v části → `partially_supported`, v žádné → `contradicted`; chybějící údaj o plynu → `unverifiable`. „Český“ (vlastnictví) a „alternativní“ (výklad týmu) → vždy `unverifiable` s kontextem. |
+| `customer_count` | „1,5 milionu zákazníků“, „185 000 odběrných míst“ | OTE elektřina + plyn | Tvrzení o odběrných místech v ČR: porovnání podle srovnání (`at_least`, `at_most`, `exactly`, `approx` ±5 % potvrzuje, nad 15 % vyvrací). Tvrzení o zákaznících nebo přes více zemí → vždy `unverifiable`, OPM jen jako kontext (nad počtem OPM v každém měsíci se označí příležitost). Jiné období tvrzení a dat, chybějící údaj nebo komodita z jiného období → `unverifiable`. |
+| `customer_growth` | „Rosteme“ | OTE | Změna OPM ve společném období tabulky. Jen u tvrzení výslovně o odběrných místech: růst → `supported`, jinak `contradicted`; bez metriky nebo superlativ → `unverifiable`. |
+| `green_share` | „100 % zelená elektřina“, „krytá zárukami původu“ | podklad k témuž produktu | Podklad jiného produktu se nepoužije. Prohlášení dodavatele → `unverifiable` s nálezem „prohlášení nalezeno, záruky nezávisle neověřeny“. Bez podkladu → `unverifiable` + příznak rizika. |
 | `carbon_neutral` | „Emise kompenzujeme“ | – | `unverifiable` + příznak rizika s důvodem. |
 | `green_generic` | „Šetrná k přírodě“ | – | `unverifiable` + příznak rizika. |
-| `soft_trust` | „Férový a spolehlivý“ | ERÚ – pravomocná rozhodnutí | Vždy `unverifiable`. Nález uvádí počet pravomocných rozhodnutí o přestupcích a kolik se jich týká obchodních praktik nebo nepravdivých informací; zastavená řízení a spory se nepočítají. |
+| `soft_trust` | „Férový a spolehlivý“ | ERÚ – pravomocná rozhodnutí | Vždy `unverifiable`. Nález uvádí počet pravomocných rozhodnutí o přestupcích a kolik se jich týká obchodních praktik; bez nálezu „v načtených výsledcích nenalezeno“, ne „neexistuje“. |
 | `other` | cokoli jiného | – | `unverifiable`. |
 
 ## Srovnávací profil
@@ -28,7 +30,7 @@ Každé tvrzení má právě jedno `rule_id` z tohoto seznamu. Výpočet a verdi
 
 ## Jak číst pásmo ERÚ
 
-Podle metodiky ERÚ odpovídá dolní hranice pásma 25. percentilu a horní hranice přibližně mediánu fixovaných nabídek na trhu. Pod pásmem tedy znamená „mezi nejlevnější čtvrtinou nabídek“, nad pásmem „dražší než přibližně polovina nabídek“. Pásmo je cena komodity bez stálého platu a regulovaných složek.
+Indikativní pásmo je odhad ERÚ pro sazbu, délku fixace a měsíc. Podle metodiky dolní mez navazuje na 25. percentil a horní mez přibližně na medián nabídek ze srovnávače, nabídky se ale od pásma krátkodobě odchylují. Pozice vůči pásmu proto není změřené pořadí na trhu; pořadí ve vzorku dodavatelů platí jen pro tento vzorek. Pásmo je cena komodity bez stálého platu a regulovaných složek.
 
 ## Závazné zásady
 

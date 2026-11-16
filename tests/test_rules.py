@@ -1,11 +1,14 @@
-"""Pravidla: podložený, vyvrácený a nesrovnatelný případ. Běží bez sítě."""
+"""Pravidla a společná brána důkazů: podložený, vyvrácený a nesrovnatelný případ. Běží bez sítě."""
 import copy
+from datetime import date
 
 import pytest
 
+from competitive_intelligence import evidence as ev
 from competitive_intelligence import rules
 from competitive_intelligence.connectors import eru
 
+AUDIT_DAY = date(2026, 11, 16)
 BAND_ROWS = [
     {"month": "2026-11", "tariff": "D02d", "fixation_months": 12,
      "low_excl_vat": 3800.0, "high_excl_vat": 3900.0, "low_incl_vat": 4598.0, "high_incl_vat": 4719.0},
@@ -14,43 +17,65 @@ BAND_ROWS = [
 ]
 
 
-def offer(oid, price_excl, fixation=12, tariff="D02d", fee=None):
+def offer(oid, price_excl, fixation=12, tariff="D02d", fee=None, **extra):
     return {
-        "id": oid, "product": f"Produkt {oid}", "tariff": tariff, "fixation_months": fixation,
+        "id": oid, "product": f"Produkt {oid}", "tariff": tariff, "area": "PRE", "fixation_months": fixation,
         "price_mwh_excl_vat": price_excl,
         "price_mwh_incl_vat": None if price_excl is None else round(price_excl * 1.21, 2),
         "monthly_fee_incl_vat": fee, "confirmed_live": True, "captured_at": "2026-11-13",
+        "audience": "new", **extra,
     }
 
 
-def supplier(sid, offers, ote_name=None):
-    return {"id": sid, "name": sid.upper(), "ote_name": ote_name or sid, "offers": offers, "green_evidence": []}
+def supplier(sid, offers=(), ote_name=None):
+    return {"id": sid, "name": sid.upper(), "ote_name": ote_name or sid, "offers": list(offers),
+            "green_evidence": []}
 
 
-def make_ctx(suppliers):
+def ote_table(rows: dict, year=2026, latest=None):
+    """Tabulka OTE ve stejném tvaru, jaký vrací konektor."""
+    if latest is None:
+        latest = max(i + 1 for values in rows.values() for i, v in enumerate(values) if v is not None)
+    ranking = sorted(((n, v[latest - 1]) for n, v in rows.items() if v[latest - 1] is not None), key=lambda p: -p[1])
     return {
-        "suppliers": suppliers,
-        "profile": {"tariff": "D02d", "annual_mwh": [2, 4]},
-        "eru": {"rows": copy.deepcopy(BAND_ROWS)},
-        "ote": {
-            "ranking": [("velky", 1000), ("stredni", 500), ("maly", 10)],
-            "source": {"data_period": "2026-09"},
-        },
-        "offer_month": lambda o: "2026-11",
+        "table": {"year": year, "latest_month": latest, "suppliers": {n: list(v) for n, v in rows.items()}},
+        "ranking": ranking,
+        "source": {"data_period": f"{year}-{latest:02d}"},
     }
 
+
+def months(*values):
+    return list(values) + [None] * (12 - len(values))
+
+
+def make_ctx(suppliers=(), ele=None, gas=None):
+    return {
+        "suppliers": list(suppliers),
+        "profile": {"tariff": "D02d", "area": "PRE", "annual_mwh": [2, 4]},
+        "eru": {"rows": copy.deepcopy(BAND_ROWS)},
+        "ote": ele or ote_table({"velky": months(1000), "stredni": months(500), "maly": months(10)}),
+        "ote_gas": gas,
+        "audit_date": AUDIT_DAY,
+        "definitions": {},
+    }
+
+
+def claim(**params):
+    return {"quote": "", "params": params}
+
+
+# ---------- ERÚ pásmo ----------
 
 def test_price_favorable_supported_when_not_above_band():
     s = supplier("a", [offer("a1", 3850.0)])
-    out = rules.price_favorable({"params": {}}, s, make_ctx([s]))
+    out = rules.price_favorable(claim(), s, make_ctx([s]))
     assert out["verdict"] == rules.SUPPORTED
     assert out["evidence"][0]["chart"]["position"] == "within"
 
 
 def test_price_above_band_is_not_a_contradiction():
     s = supplier("a", [offer("a1", 4500.0)])
-    out = rules.price_favorable({"params": {}}, s, make_ctx([s]))
-    assert out["verdict"] == rules.UNVERIFIABLE
+    assert rules.price_favorable(claim(), s, make_ctx([s]))["verdict"] == rules.UNVERIFIABLE
 
 
 def test_result_recomputes_when_price_changes():
@@ -61,177 +86,181 @@ def test_result_recomputes_when_price_changes():
     assert rules.benchmark_offer(s["offers"][0], ctx)["position"] == "below"
 
 
-def test_missing_band_period_stops_verdict():
-    s = supplier("a", [offer("a1", 3850.0)])
-    ctx = make_ctx([s])
-    ctx["offer_month"] = lambda o: "2024-01"  # historické tvrzení se nesmí měřit dnešním pásmem
-    out = rules.price_favorable({"params": {}}, s, ctx)
-    assert out["verdict"] == rules.UNVERIFIABLE
+def test_unconfirmed_offer_is_benchmarked_in_its_capture_month():
+    # nepotvrzená nabídka zachycená v lednu 2024 se nesmí měřit dnešním pásmem
+    s = supplier("a", [offer("a1", 3850.0, confirmed_live=False, captured_at="2024-01-10")])
+    bench = rules.benchmark_offer(s["offers"][0], make_ctx([s]))
+    assert bench["period"] == "2024-01" and bench["band"] is None and not bench["eligible"]
+    assert rules.price_favorable(claim(), s, make_ctx([s]))["verdict"] == rules.UNVERIFIABLE
 
 
-def test_unknown_tariff_or_vat_is_not_eligible():
-    s = supplier("a", [offer("a1", 3850.0, tariff=None)])
-    assert rules.price_favorable({"params": {}}, s, make_ctx([s]))["verdict"] == rules.UNVERIFIABLE
-    unknown_vat = {**offer("a2", None), "price_mwh_unknown_vat": 3850.0}
-    assert rules.benchmark_offer(unknown_vat, make_ctx([s]))["eligible"] is False
+def test_below_band_wording_is_not_a_market_rank():
+    s = supplier("a", [offer("a1", 3700.0)])
+    out = rules.price_favorable(claim(), s, make_ctx([s]))
+    assert out["verdict"] == rules.SUPPORTED
+    text = out["finding"] + out["evidence"][0]["value"]
+    assert "pod indikativním pásmem ERÚ" in text and "čtvrt" not in text
+    assert "není změřené pořadí" in out["limitation"]
 
+
+# ---------- společná oprávněnost nabídek ----------
+
+@pytest.mark.parametrize("change, reason", [
+    ({"tariff": "D25d"}, "sazbu"),
+    ({"area": "EGD"}, "území"),
+    ({"stepped": True}, "měnící"),
+    ({"stale": True}, "znovu zachytit"),
+    ({"fixation_months": None}, "fixaci"),
+    ({"price_mwh_incl_vat": None}, "s DPH"),
+])
+def test_ineligible_offers_give_a_reason(change, reason):
+    check = ev.offer_eligibility(offer("a1", 3000.0, fee=100.0, **change), make_ctx())
+    assert not check.ok and reason in check.reason
+
+
+def test_future_dated_price_list_is_not_trusted():
+    future = offer("a1", 3000.0, fee=100.0, price_list={"effective_from": "2027-01-01"})
+    check = ev.offer_eligibility(future, make_ctx())
+    assert not check.ok and "2027-01-01" in check.reason
+
+
+def test_audience_filter_accepts_offers_open_to_everyone():
+    ctx = make_ctx()
+    assert ev.offer_eligibility(offer("a", 3000.0, audience="all"), ctx, audience="new").ok
+    assert not ev.offer_eligibility(offer("b", 3000.0, audience="existing"), ctx, audience="new").ok
+
+
+def test_wrong_tariff_is_out_of_rules_and_rankings_alike():
+    mine = supplier("a", [offer("a1", 3000.0, fee=150.0)])
+    rival = supplier("b", [offer("b1", 2000.0, fee=150.0, tariff="D25d")])
+    ctx = make_ctx([mine, rival])
+    assert rules.price_rank(claim(kind="superlative"), mine, ctx)["evidence"] == []
+    assert not ev.offer_eligibility(rival["offers"][0], ctx, need_fees=True, audience="new").ok
+
+
+# ---------- cenové prvenství a procenta ----------
 
 def test_price_rank_contradicted_by_cheaper_comparable_offer_with_fees():
     mine = supplier("a", [offer("a1", 3000.0, fee=150.0)])
     rival = supplier("b", [offer("b1", 2800.0, fee=150.0)])
-    out = rules.price_rank({"params": {"kind": "superlative"}}, mine, make_ctx([mine, rival]))
+    out = rules.price_rank(claim(kind="superlative"), mine, make_ctx([mine, rival]))
     assert out["verdict"] == rules.CONTRADICTED
 
 
 def test_price_rank_unverifiable_without_monthly_fee():
     mine = supplier("a", [offer("a1", 3000.0)])
     rival = supplier("b", [offer("b1", 2800.0)])
-    out = rules.price_rank({"params": {"kind": "superlative"}}, mine, make_ctx([mine, rival]))
-    assert out["verdict"] == rules.UNVERIFIABLE
-    assert out["opportunity"]
+    out = rules.price_rank(claim(kind="superlative"), mine, make_ctx([mine, rival]))
+    assert out["verdict"] == rules.UNVERIFIABLE and out["opportunity"]
 
 
 def test_cheapest_in_sample_does_not_prove_cheapest_on_market():
     mine = supplier("a", [offer("a1", 2500.0, fee=100.0)])
     rival = supplier("b", [offer("b1", 2800.0, fee=150.0)])
-    out = rules.price_rank({"params": {"kind": "superlative"}}, mine, make_ctx([mine, rival]))
-    assert out["verdict"] == rules.UNVERIFIABLE
+    assert rules.price_rank(claim(kind="superlative"), mine, make_ctx([mine, rival]))["verdict"] == rules.UNVERIFIABLE
+
+
+def test_explicit_sample_claim_can_be_supported():
+    mine = supplier("a", [offer("a1", 2500.0, fee=100.0)])
+    rival = supplier("b", [offer("b1", 2800.0, fee=150.0)])
+    assert rules.price_rank(claim(scope="sample"), mine, make_ctx([mine, rival]))["verdict"] == rules.SUPPORTED
 
 
 def test_different_fixation_is_not_comparable():
     mine = supplier("a", [offer("a1", 3000.0, fixation=12, fee=100.0)])
     rival = supplier("b", [offer("b1", 2000.0, fixation=36, fee=100.0)])
-    out = rules.price_rank({"params": {"kind": "superlative"}}, mine, make_ctx([mine, rival]))
-    assert out["verdict"] == rules.UNVERIFIABLE
-    assert out["evidence"] == []
+    out = rules.price_rank(claim(kind="superlative"), mine, make_ctx([mine, rival]))
+    assert out["verdict"] == rules.UNVERIFIABLE and out["evidence"] == []
 
 
-def test_market_size_by_supply_points():
-    ctx = make_ctx([])
-    assert rules.market_size({"params": {"scope": "all"}}, supplier("velky", []), ctx)["verdict"] == rules.SUPPORTED
-    assert rules.market_size({"params": {"scope": "all"}}, supplier("maly", []), ctx)["verdict"] == rules.CONTRADICTED
-    assert rules.market_size({"params": {"scope": "all"}}, supplier("neznamy", []), ctx)["verdict"] == rules.UNVERIFIABLE
-    partial = rules.market_size(
-        {"params": {"scope": "all", "commodities": ["elektřina", "plyn"]}}, supplier("velky", []), ctx
-    )
-    assert partial["verdict"] == rules.PARTIAL and len(partial["subclaims"]) == 2
-
-
-def test_supply_points_are_not_customers():
-    out = rules.customer_count({"params": {"claimed": 1000}}, supplier("velky", []), make_ctx([]))
-    assert out["verdict"] == rules.UNVERIFIABLE
-
-
-def test_missing_green_evidence_is_unverifiable_not_false():
-    out = rules.green_share({"params": {}}, supplier("a", []), make_ctx([]))
-    assert out["verdict"] == rules.UNVERIFIABLE and out["possible_regulatory_risk"]
+def test_fee_can_outweigh_a_lower_unit_price():
+    mine = supplier("a", [offer("a1", 3000.0, fee=100.0)])
+    rival = supplier("b", [offer("b1", 2900.0, fee=400.0)])
+    assert rules.price_rank(claim(kind="superlative"), mine, make_ctx([mine, rival]))["verdict"] == rules.UNVERIFIABLE
 
 
 def test_annual_cost_is_exact():
     assert rules._annual_cost(offer("a1", 3000.0, fee=163.35), 2) == 12 * 163.35 + 2 * 3630.0
 
 
-def test_explicit_sample_claim_can_be_supported():
-    mine = supplier("a", [offer("a1", 2500.0, fee=100.0)])
-    rival = supplier("b", [offer("b1", 2800.0, fee=150.0)])
-    out = rules.price_rank({"params": {"scope": "sample"}}, mine, make_ctx([mine, rival]))
-    assert out["verdict"] == rules.SUPPORTED
-
-
 def test_pct_cheaper_supported_contradicted_and_without_basis():
     mine = supplier("a", [offer("a1", 2700.0, fee=100.0)])
     rival = supplier("b", [offer("b1", 3000.0, fee=100.0)])
     ctx = make_ctx([mine, rival])
-    claim = lambda pct: {"params": {"pct": pct, "baseline_supplier_id": "b"}}
-    assert rules.price_pct_cheaper(claim(5), mine, ctx)["verdict"] == rules.SUPPORTED
-    assert rules.price_pct_cheaper(claim(30), mine, ctx)["verdict"] == rules.CONTRADICTED
-    assert rules.price_pct_cheaper({"params": {"pct": 5}}, mine, ctx)["verdict"] == rules.UNVERIFIABLE
-    total_bill = {"params": {"pct": 5, "baseline_supplier_id": "b", "basis": "total_bill"}}
+    assert rules.price_pct_cheaper(claim(pct=5, baseline_supplier_id="b"), mine, ctx)["verdict"] == rules.SUPPORTED
+    assert rules.price_pct_cheaper(claim(pct=30, baseline_supplier_id="b"), mine, ctx)["verdict"] == rules.CONTRADICTED
+    assert rules.price_pct_cheaper(claim(pct=5), mine, ctx)["verdict"] == rules.UNVERIFIABLE
+    total_bill = claim(pct=5, baseline_supplier_id="b", basis="total_bill")
     assert rules.price_pct_cheaper(total_bill, mine, ctx)["verdict"] == rules.UNVERIFIABLE
 
 
-def test_pct_cheaper_without_fees_is_unverifiable():
-    mine = supplier("a", [offer("a1", 2700.0)])
-    rival = supplier("b", [offer("b1", 3000.0)])
-    claim = {"params": {"pct": 5, "baseline_supplier_id": "b"}}
-    assert rules.price_pct_cheaper(claim, mine, make_ctx([mine, rival]))["verdict"] == rules.UNVERIFIABLE
+# ---------- OTE: rozsah tvrzení (QUAL-001) ----------
+
+def opm_claim(claimed, commodities=("elektřina",), comparator="approx", metric="opm", **extra):
+    return claim(claimed=claimed, scope={"metric": metric, "commodities": list(commodities),
+                                         "comparator": comparator}, **extra)
 
 
-def test_customer_growth_uses_supply_points_within_year():
-    ctx = make_ctx([])
-    ctx["ote"]["table"] = {"year": 2026, "suppliers": {
-        "roste": [100, 110, None, None, None, None, None, None, None, None, None, None],
-        "klesa": [100, 90, None, None, None, None, None, None, None, None, None, None],
-        "jeden": [100] + [None] * 11,
-    }}
-    assert rules.customer_growth({"params": {}}, supplier("roste", []), ctx)["verdict"] == rules.SUPPORTED
-    assert rules.customer_growth({"params": {}}, supplier("klesa", []), ctx)["verdict"] == rules.CONTRADICTED
-    assert rules.customer_growth({"params": {}}, supplier("jeden", []), ctx)["verdict"] == rules.UNVERIFIABLE
-    fastest = {"params": {"superlative": True}}
-    assert rules.customer_growth(fastest, supplier("roste", []), ctx)["verdict"] == rules.UNVERIFIABLE
+def test_missing_gas_is_not_zero():
+    # recenzent: 1 000 OPM elektřiny, plyn chybí; tvrzeno 1 500 OPM celkem → nelze určit, ne rozpor
+    out = rules.customer_count(opm_claim(1500, ("elektřina", "plyn")), supplier("velky"), make_ctx())
+    assert out["verdict"] == rules.UNVERIFIABLE and "nelze určit" in out["finding"]
 
 
-def test_supply_point_claim_is_checked_against_supply_points():
-    ctx = make_ctx([])
-    ok = rules.customer_count({"params": {"claimed": 900, "metric": "opm"}}, supplier("velky", []), ctx)
-    bad = rules.customer_count({"params": {"claimed": 2000, "metric": "opm"}}, supplier("velky", []), ctx)
-    assert ok["verdict"] == rules.SUPPORTED and bad["verdict"] == rules.CONTRADICTED
+def test_commodities_from_different_periods_are_not_added():
+    ele = ote_table({"velky": months(1000), "stredni": months(500), "maly": months(10)})
+    gas = ote_table({"velky": months(None, None, 500)}, year=2025)
+    ctx = make_ctx(ele=ele, gas=gas)
+    both = rules.customer_count(opm_claim(1500, ("elektřina", "plyn")), supplier("velky"), ctx)
+    assert both["verdict"] == rules.UNVERIFIABLE and "jiné období" in both["finding"]
+    # recenzent: tvrzení jen o elektřině se nesmí potvrdit přičtením plynu
+    only_ele = rules.customer_count(opm_claim(1100, comparator="at_least"), supplier("velky"), ctx)
+    assert only_ele["verdict"] == rules.CONTRADICTED and "plyn" not in only_ele["finding"]
 
 
-def test_carbon_offsets_flag_risk_without_factual_verdict():
-    out = rules.carbon_neutral({"params": {"uses_offsets": True}}, supplier("a", []), make_ctx([]))
-    assert out["verdict"] == rules.UNVERIFIABLE
-    assert out["possible_regulatory_risk"] and out["risk_reason"] and out["review_required"]
+@pytest.mark.parametrize("comparator, claimed, verdict", [
+    ("at_least", 900, rules.SUPPORTED),
+    ("at_least", 1100, rules.CONTRADICTED),
+    ("exactly", 1000, rules.SUPPORTED),
+    ("exactly", 999, rules.CONTRADICTED),
+    ("approx", 1030, rules.SUPPORTED),
+    ("approx", 1100, rules.UNVERIFIABLE),
+    ("approx", 1500, rules.CONTRADICTED),
+])
+def test_comparators_for_supply_point_claims(comparator, claimed, verdict):
+    out = rules.customer_count(opm_claim(claimed, comparator=comparator), supplier("velky"), make_ctx())
+    assert out["verdict"] == verdict
 
 
-def test_params_are_read_from_quote_of_automatically_found_claims():
-    ctx = make_ctx([])
-    with_gas = {"quote": "Přejděte k největšímu dodavateli elektřiny a plynu", "params": {}}
-    assert rules.market_size(with_gas, supplier("velky", []), ctx)["verdict"] == rules.PARTIAL
-    s = supplier("a", [offer("a1", 3300.0, fixation=36)])
-    out = rules.price_guarantee({"quote": "Jistota ceny na 3 roky.", "params": {}}, s, make_ctx([s]))
-    assert out["verdict"] == rules.SUPPORTED
+def test_claim_period_must_match_data_period():
+    out = rules.customer_count(opm_claim(1000, period="2025-12"), supplier("velky"), make_ctx())
+    assert out["verdict"] == rules.UNVERIFIABLE and "liší" in out["finding"]
 
 
-def gas_ctx():
-    ctx = make_ctx([])
-    ctx["ote_gas"] = {
-        "ranking": [("plynar", 2000), ("velky", 300), ("stredni", 100)],
-        "source": {"data_period": "2026-09"},
-    }
-    return ctx
+def test_merged_companies_are_summed_only_when_all_values_exist():
+    gas = ote_table({"velky": months(300), "stredni": months(100), "x": months(1), "y": months(1),
+                     "z": months(1), "w": months(1), "v": months(1), "u": months(1), "t": months(1),
+                     "s": months(1)})
+    ctx = make_ctx(gas=gas)
+    merged = opm_claim(1850, ("elektřina", "plyn"), comparator="at_least", merged_with=["stredni"])
+    assert rules.customer_count(merged, supplier("velky"), ctx)["verdict"] == rules.SUPPORTED  # 1300 + 600
+    no_gas_row = opm_claim(1000, ("elektřina", "plyn"), comparator="at_least", merged_with=["maly"])
+    out = rules.customer_count(no_gas_row, supplier("velky"), ctx)
+    assert out["verdict"] == rules.UNVERIFIABLE and "maly (plyn)" in out["finding"]
 
 
-def test_largest_in_electricity_and_gas_checks_both_commodities():
-    claim = {"params": {"scope": "all", "commodities": ["elektřina", "plyn"]}}
-    out = rules.market_size(claim, supplier("velky", []), gas_ctx())
-    # velky: elektřina 1., plyn 2. (první je plynar), v součtu 2. za plynarem → jen částečně
-    assert out["verdict"] == rules.PARTIAL
-    statuses = [sub["status"] for sub in out["subclaims"]]
-    assert statuses[0] == "ověřeno" and statuses[1].startswith("v rozporu") and "plynar" in statuses[1]
-    ctx = gas_ctx()
-    ctx["ote_gas"]["ranking"] = [("velky", 900), ("stredni", 100)]
-    assert rules.market_size(claim, supplier("velky", []), ctx)["verdict"] == rules.SUPPORTED
+def test_customer_claims_never_get_a_verdict_from_supply_points():
+    ctx = make_ctx()
+    for claimed in (900, 1000, 5000):
+        out = rules.customer_count(claim(claimed=claimed), supplier("velky"), ctx)
+        assert out["verdict"] == rules.UNVERIFIABLE
+    over = rules.customer_count(claim(claimed=5000), supplier("velky"), ctx)
+    assert over["opportunity"] and "v kterémkoli měsíci" in over["finding"]
 
 
-def test_customer_count_against_electricity_plus_gas_supply_points():
-    ctx = gas_ctx()  # velky: 1000 + 300 = 1300 OPM
-    ok = rules.customer_count({"params": {"claimed": 1200}}, supplier("velky", []), ctx)
-    assert ok["verdict"] == rules.PARTIAL and len(ok["subclaims"]) == 2
-    too_many = rules.customer_count({"params": {"claimed": 2000}}, supplier("velky", []), ctx)
-    assert too_many["verdict"] == rules.CONTRADICTED
-    slightly = rules.customer_count({"params": {"claimed": 1350}}, supplier("velky", []), ctx)
-    assert slightly["verdict"] == rules.UNVERIFIABLE
-    abroad = {"params": {"claimed": 100000, "includes_other_markets": "Česko a Slovensko"}}
-    out = rules.customer_count(abroad, supplier("velky", []), ctx)
-    assert out["verdict"] == rules.UNVERIFIABLE and "1,3 %" in out["finding"]
-
-
-def test_supply_point_claim_of_merged_companies_sums_electricity_and_gas():
-    ctx = gas_ctx()  # velky 1000 + 300, stredni 500 + 100 → 1900
-    claim = lambda n: {"params": {"claimed": n, "metric": "opm", "merged_with": ["stredni"]}}
-    assert rules.customer_count(claim(1850), supplier("velky", []), ctx)["verdict"] == rules.SUPPORTED
-    assert rules.customer_count(claim(2500), supplier("velky", []), ctx)["verdict"] == rules.CONTRADICTED
+def test_multi_country_customer_count_reports_czech_share():
+    out = rules.customer_count(claim(claimed=100000, includes_other_markets="CZ+SK"), supplier("velky"), make_ctx())
+    assert out["verdict"] == rules.UNVERIFIABLE and "1,0 %" in out["finding"]
 
 
 def test_claimed_number_is_read_from_quote():
@@ -241,97 +270,120 @@ def test_claimed_number_is_read_from_quote():
     assert rules._claimed_from_quote("jsme tu pro vás") == (None, None)
 
 
-def test_customer_claim_above_every_month_of_the_year_is_flagged_but_not_contradicted():
-    ctx = gas_ctx()
-    ctx["ote"]["table"] = {"year": 2026, "suppliers": {"velky": [1100, 1050, 1000] + [None] * 9}}
-    ctx["ote_gas"]["table"] = {"year": 2026, "suppliers": {"velky": [320, 310, 300] + [None] * 9}}
-    # aktuálně 1300 OPM, nejvíc 1420 v lednu; tvrzeno 1425 (v toleranci 10 %, ale nad každým měsícem)
-    out = rules.customer_count({"params": {"claimed": 1425}}, supplier("velky", []), ctx)
-    assert out["verdict"] == rules.UNVERIFIABLE and out["opportunity"]
-    assert "v každém měsíci roku" in out["finding"] and "klesá" in out["finding"]
+def test_size_claim_without_metric_is_context_only():
+    first = rules.market_size(claim(), supplier("velky"), make_ctx())
+    third = rules.market_size(claim(), supplier("maly"), make_ctx())
+    assert first["verdict"] == third["verdict"] == rules.UNVERIFIABLE
+    assert "neuvádí, podle čeho" in third["finding"] and third["opportunity"]
 
 
-def test_size_claim_with_qualifier_is_judged_by_team_definitions():
-    ctx = gas_ctx()  # součty: plynar 2000, velky 1300, stredni 600, maly 10
-    ctx["definitions"] = {"traditional_suppliers": {"names": ["velky", "plynar"], "note": "Definice týmu."}}
-    claim = {"params": {"scope": "qualified", "qualifier": "alternativní"}}
-    # stredni je největší mimo tradiční, ale ne mezi všemi → platí jen při užším výkladu
-    partial = rules.market_size(claim, supplier("stredni", []), ctx)
-    assert partial["verdict"] == rules.PARTIAL
-    assert [sub["status"].split(" ")[0] for sub in partial["subclaims"]] == ["neplatí", "platí"]
-    # maly není největší ani mimo tradiční → neplatí při žádném výkladu
-    wrong = rules.market_size(claim, supplier("maly", []), ctx)
-    assert wrong["verdict"] == rules.CONTRADICTED and "stredni" in wrong["finding"]
-    # největší ze všech → platí při obou výkladech
-    top = gas_ctx()
-    top["definitions"] = ctx["definitions"]
-    top["ote_gas"]["ranking"] = [("velky", 900), ("stredni", 100)]
-    assert rules.market_size(claim, supplier("velky", []), top)["verdict"] == rules.SUPPORTED
-    # sloučené firmy se sčítají
-    merged = {"params": {"scope": "qualified", "qualifier": "alternativní", "merged_with": ["maly"]}}
-    assert "610" in rules.market_size(merged, supplier("stredni", []), ctx)["finding"]
-
-
-def test_size_claim_without_any_definition_gets_no_verdict():
-    out = rules.market_size({"params": {"scope": "czech_owned"}}, supplier("maly", []), gas_ctx())
+def test_size_claim_about_supply_points_gets_a_verdict():
+    gas = ote_table({"plynar": months(2000), "velky": months(300), "stredni": months(100), "maly": months(5)})
+    explicit = claim(scope={"metric": "opm", "commodities": ["elektřina", "plyn"]})
+    assert rules.market_size(explicit, supplier("velky"), make_ctx(gas=gas))["verdict"] == rules.PARTIAL
+    assert rules.market_size(explicit, supplier("maly"), make_ctx(gas=gas))["verdict"] == rules.CONTRADICTED
+    # dodavatel bez řádku v tabulce plynu: chybějící údaj zastaví verdikt
+    no_gas = {k: v for k, v in gas["table"]["suppliers"].items() if k != "maly"}
+    out = rules.market_size(explicit, supplier("maly"), make_ctx(gas=ote_table(no_gas)))
     assert out["verdict"] == rules.UNVERIFIABLE
+    ele_only = claim(scope={"metric": "opm"})
+    assert rules.market_size(ele_only, supplier("velky"), make_ctx())["verdict"] == rules.SUPPORTED
 
+
+def test_czech_or_alternative_qualifier_is_never_a_verdict():
+    gas = ote_table({"velky": months(300), "stredni": months(100), "maly": months(5)})
+    ctx = make_ctx(gas=gas)
+    ctx["definitions"] = {"traditional_suppliers": {"names": ["velky"], "note": "Definice týmu."}}
+    czech = rules.market_size(claim(qualifier="český"), supplier("maly"), ctx)
+    assert czech["verdict"] == rules.UNVERIFIABLE and "vlastnictví" in czech["finding"]
+    alternative = rules.market_size(claim(qualifier="alternativní"), supplier("maly"), ctx)
+    assert alternative["verdict"] == rules.UNVERIFIABLE and "stredni" in alternative["finding"]
+    assert alternative["opportunity"]
+
+
+# ---------- OTE: období a růst (QUAL-005) ----------
+
+def test_market_change_uses_one_window_and_cohort():
+    # recenzent: A 100/200/200, B chybí/100/200 → společné období únor–březen, +33,3 %, ne +100 %
+    table = ote_table({"A": months(100, 200, 200), "B": months(None, 100, 200)})
+    change = ev.market_change(table)
+    assert change.window.label == "2026-02 až 2026-03" and change.pct == 33.3
+    assert (change.cohort, change.excluded) == (2, 0)
+
+
+def test_supplier_without_value_at_window_edge_has_no_change():
+    table = ote_table({"A": months(100, 200, 200), "B": months(100, 150, 200), "C": months(100, 120, None)})
+    assert ev.opm_change(table, "C").abs is None
+    assert ev.market_change(table).excluded == 1
+
+
+def test_growth_claim_needs_supply_point_metric():
+    ele = ote_table({"roste": months(100, 110), "klesa": months(100, 90), "jeden": months(100, None)})
+    ctx = make_ctx(ele=ele)
+    opm = claim(scope={"metric": "opm"})
+    assert rules.customer_growth(opm, supplier("roste"), ctx)["verdict"] == rules.SUPPORTED
+    assert rules.customer_growth(opm, supplier("klesa"), ctx)["verdict"] == rules.CONTRADICTED
+    assert rules.customer_growth(opm, supplier("jeden"), ctx)["verdict"] == rules.UNVERIFIABLE
+    assert rules.customer_growth(claim(), supplier("roste"), ctx)["verdict"] == rules.UNVERIFIABLE
+    assert rules.customer_growth(claim(superlative=True), supplier("roste"), ctx)["verdict"] == rules.UNVERIFIABLE
+
+
+# ---------- zelená tvrzení (QUAL-002) ----------
+
+def green_supplier(product="Produkt A", **extra):
+    s = supplier("a")
+    s["green_evidence"] = [{"label": "Prohlášení", "value": "kryto zárukami původu", "product": product,
+                            "type": "prohlášení dodavatele", "status": "nalezeno na živé stránce", **extra}]
+    return s
+
+
+def test_declaration_for_another_product_is_not_evidence():
+    out = rules.green_share(claim(product="Produkt B"), green_supplier("Produkt A"), make_ctx())
+    assert out["verdict"] == rules.UNVERIFIABLE and out["evidence"] == []
+
+
+def test_declaration_is_reported_but_not_a_supported_verdict():
+    out = rules.green_share(claim(product="Produkt A"), green_supplier("Produkt A"), make_ctx())
+    assert out["verdict"] == rules.UNVERIFIABLE
+    assert "prohlášení dodavatele" in out["finding"] and "nezávisle" in out["finding"]
+    stale = rules.green_share(claim(product="Produkt A"), green_supplier("Produkt A", stale=True), make_ctx())
+    assert "už na živé stránce není" in stale["finding"]
+
+
+def test_missing_green_evidence_is_unverifiable_not_false():
+    out = rules.green_share(claim(), supplier("a"), make_ctx())
+    assert out["verdict"] == rules.UNVERIFIABLE and out["possible_regulatory_risk"]
+
+
+def test_carbon_offsets_flag_risk_without_factual_verdict():
+    out = rules.carbon_neutral(claim(uses_offsets=True), supplier("a"), make_ctx())
+    assert out["verdict"] == rules.UNVERIFIABLE and out["risk_reason"] and out["review_required"]
+
+
+# ---------- rozhodnutí ERÚ ----------
 
 def test_trust_slogan_gets_regulator_context_but_no_verdict():
-    s = supplier("a", [])
+    s = supplier("a")
     practice = {"date": "01.04.2026", "title": "A - rozhodnutí k užití nekalé obchodní praktiky",
                 "url": "https://eru.gov.cz/x", "kind": "practice"}
     other = {"date": "01.01.2025", "title": "A - rozhodnutí k porušení povinností držitele licence",
              "url": "https://eru.gov.cz/y", "kind": "offence"}
     stopped = {"date": "01.01.2024", "title": "A - usnesení o zastavení řízení",
                "url": "https://eru.gov.cz/z", "kind": "discontinued"}
-    ctx = make_ctx([])
-    ctx["decisions"] = {"a": {"decisions": [practice, other, stopped]}}
-    out = rules.soft_trust({"params": {}}, s, ctx)
+    ctx = make_ctx()
+    ctx["decisions"] = {"a": {"decisions": [practice, other, stopped], "truncated": False}}
+    out = rules.soft_trust(claim(), s, ctx)
     assert out["verdict"] == rules.UNVERIFIABLE and out["opportunity"]
-    assert "2 pravomocná rozhodnutí" in out["finding"] and "01.04.2026" in out["finding"]
-    assert len(out["evidence"]) == 2 and out["evidence"][0]["url"]  # zastavené řízení se nepočítá
-    ctx["decisions"] = {"a": {"decisions": [other]}}
-    assert not rules.soft_trust({"params": {}}, s, ctx)["opportunity"]
-    ctx["decisions"] = {"a": {"decisions": []}}
-    assert "neeviduje" in rules.soft_trust({"params": {}}, s, ctx)["finding"]
-    assert rules.soft_trust({"params": {}}, s, make_ctx([]))["evidence"] == []  # zdroj není k dispozici
-
-
-def test_stepped_products_and_other_areas_are_not_compared():
-    mine = supplier("a", [offer("a1", 3000.0, fee=150.0)])
-    stepped = supplier("b", [{**offer("b1", 2000.0, fee=150.0), "stepped": True}])
-    claim = {"params": {"kind": "superlative"}}
-    assert rules.price_rank(claim, mine, make_ctx([mine, stepped]))["evidence"] == []
-    mine["offers"][0]["area"] = "PREdistribuce"
-    elsewhere = supplier("c", [{**offer("c1", 2000.0, fee=150.0), "area": "EG.D"}])
-    assert rules.price_rank(claim, mine, make_ctx([mine, elsewhere]))["evidence"] == []
-
-
-def test_fee_can_outweigh_a_lower_unit_price():
-    # nižší cena za MWh, ale vysoký stálý plat: při nízké spotřebě dražší → žádný rozpor
-    mine = supplier("a", [offer("a1", 3000.0, fee=100.0)])
-    rival = supplier("b", [offer("b1", 2900.0, fee=400.0)])
-    out = rules.price_rank({"params": {"kind": "superlative"}}, mine, make_ctx([mine, rival]))
-    assert out["verdict"] == rules.UNVERIFIABLE
-
-
-def test_green_claim_with_product_evidence_is_supported_until_evidence_disappears():
-    s = supplier("a", [])
-    s["green_evidence"] = [{"label": "Produkt EKO", "value": "kryto zárukami původu", "status": "nalezeno"}]
-    assert rules.green_share({"params": {}}, s, make_ctx([]))["verdict"] == rules.SUPPORTED
-    s["green_evidence"][0]["stale"] = True
-    assert rules.green_share({"params": {}}, s, make_ctx([]))["verdict"] == rules.UNVERIFIABLE
-
-
-def test_below_band_means_cheapest_quarter_in_finding():
-    s = supplier("a", [offer("a1", 3700.0)])
-    out = rules.price_favorable({"params": {}}, s, make_ctx([s]))
-    assert out["verdict"] == rules.SUPPORTED and "nejlevnější čtvrtinou" in out["finding"]
+    assert "2 pravomocná rozhodnutí" in out["finding"] and len(out["evidence"]) == 2
+    ctx["decisions"] = {"a": {"decisions": [], "truncated": False}}
+    none = rules.soft_trust(claim(), s, ctx)["finding"]
+    assert "nenašli" in none and "neeviduje" not in none
+    ctx["decisions"] = {"a": {"decisions": [], "truncated": True}}
+    assert "zkrácen" in rules.soft_trust(claim(), s, ctx)["finding"]
 
 
 def test_unknown_rule_gets_no_verdict():
-    assert rules.evaluate({"rule_id": "vymyslene"}, supplier("a", []), make_ctx([]))["verdict"] == rules.UNVERIFIABLE
+    assert rules.evaluate({"rule_id": "vymyslene"}, supplier("a"), make_ctx())["verdict"] == rules.UNVERIFIABLE
 
 
 def test_eru_rejects_changed_columns_and_bad_values():

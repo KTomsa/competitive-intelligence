@@ -1,43 +1,26 @@
 # Fact or Watt — Competitive Intelligence
 
-Studentská ukázka: nástroj, který ověřuje marketingová tvrzení českých dodavatelů elektřiny proti veřejným datům **ERÚ** a **OTE** a proti jejich vlastním ceníkům, a vrací manažerovi krátký briefing s doporučeným krokem.
+Studentská ukázka: nástroj, který ověřuje marketingová tvrzení českých dodavatelů elektřiny proti veřejným datům **ERÚ** a **OTE** a proti jejich vlastním ceníkům, a vrací manažerovi krátký briefing s doporučeným krokem. Kde podklady nestačí, nástroj výslovně odpoví „nelze ověřit“.
 
-Rozsah vychází z revize architektury z 13. 11. 2026 (jedna aplikace, žádná databáze, živý úřední zdroj). Technologie zůstává Flask.
+Rozsah vychází z revize architektury z 13. 11. 2026 (jedna Flask aplikace, žádná databáze, živý úřední zdroj). Code review z 15. 11. 2026 je zapracované; přehled změn je v části [Zapracované code review](#zapracované-code-review).
 
-## Co aplikace dělá
+## Start za pět minut
 
-1. **Stáhne stránky dodavatelů** a zkontroluje, že připravené citáty na nich stále jsou. Ve vzorku je jedenáct dodavatelů: ČEZ Prodej, Centropol, E.ON, epet, PRE, MND, Dobrá Energie, SPP CZ, LAMA energy, ARMEX ENERGY a bezDodavatele.
-2. **Stáhne jejich ceníky (PDF)** a ověří, že obsahují cenu i stálý měsíční plat z přípravy.
-3. **Stáhne úřední data**: indikativní cenová pásma ERÚ (CSV), počty odběrných míst dodavatelů elektřiny i plynu z OTE a seznam pravomocných rozhodnutí ERÚ, ve kterých je dodavatel účastníkem řízení.
-4. **Vyhodnotí tvrzení pravidly v kódu** (ne jazykovým modelem) a ke každému vrátí kartu: tvrzení, nález, omezení, doporučený krok, podklady s výpočtem.
-5. **Srovná fixované nabídky** podle ročního nákladu (cena komodity a stálý plat) a podle pozice vůči pásmu ERÚ.
-6. **Ukáže cenu a růst vedle sebe**: kdo získává odběrná místa (OTE) a za jakou cenu, a o kolik víc platí stávající zákazníci než noví u téhož dodavatele.
-7. **Sestaví pohled jedné firmy** (volba „Dívám se za firmu“): kde stojíme cenou, která naše tvrzení jsou napadnutelná, co můžeme tvrdit a doložit a co dělá konkurence.
-8. **Sestaví briefing** s nejvýše třemi prioritami.
-
-Když živé stažení selže, použije se datovaný snapshot a rozhraní to viditelně označí. Snapshot se nikdy nevydává za živá data.
-
-## Spuštění
+Podporované prostředí: **Python 3.14** (soubor `.python-version`, na něm běží testy i CI) a správce balíčků `uv`. `pyproject.toml` povoluje Python 3.12 a novější kvůli hostingu; jiná verze než 3.14 ale není vyzkoušená.
 
 ```bash
-uv lock
+uv sync --locked
 ```
 
 ```bash
-uv sync
+uv run pytest -q
 ```
 
 ```bash
 uv run flask --app src/index.py run --debug
 ```
 
-```bash
-uv run pytest
-```
-
-Bez `uv` stačí virtuální prostředí a `pip install flask httpx beautifulsoup4 pypdf pydantic google-genai python-dotenv pytest`.
-
-Testy běží bez sítě a bez jazykového modelu (nad uloženými snapshoty).
+Pak otevřete `http://127.0.0.1:5000`, zvolte „Analýza ze zálohy“ a spusťte analýzu: běží bez internetu i bez klíče k modelu. Testy také běží bez sítě a bez modelu, nad uloženými snapshoty.
 
 ### Užitečné příkazy
 
@@ -48,21 +31,95 @@ uv run python -m competitive_intelligence.snapshot
 Uloží aktuální živé zdroje jako nové snapshoty (`data/snapshots/`) a u každého ceníku vypíše, zda stále obsahuje cenu a stálý plat z přípravy.
 
 ```bash
-uv run python -m competitive_intelligence.workflow --save-example
+uv run python -m competitive_intelligence.workflow --save-example --perspective=centropol
 ```
 
 Spustí živý audit a uloží ho jako ukázkovou zprávu (`data/example_report.json`), kterou rozhraní umí zobrazit bez stahování.
 
-## Jazykový model (volitelný)
+Kontrola živých úředních zdrojů je oddělená od běžných testů a pouští se jen na vyžádání:
 
-Bez modelu aplikace funguje celá. S modelem navíc:
+```bash
+RUN_LIVE_SMOKE=1 uv run pytest tests/test_live_smoke.py -q
+```
 
-- **Claim Extractor** hledá na stránkách další tvrzení; kód ověří, že citát na stránce doslova je.
-- **Strategist** vybere priority a napíše shrnutí; kód ověří, že odkazuje jen na existující tvrzení.
+## Co aplikace dělá
 
-Zapnutí: zkopírujte `.env.example` jako `.env`, nastavte `CI_USE_LLM=1` a `GEMINI_API_KEY` (Google Gemini, bezplatná vrstva stačí). Audit s modelem dělá dvě volání (jedno na tvrzení ze všech stránek, jedno na briefing) a s deseti dodavateli trvá zhruba 12 sekund. Bezplatná vrstva Gemini nesnáší souběžná volání, proto se stránky posílají najednou. Při chybě modelu se použije cesta bez modelu a rozhraní to uvede.
+1. **Stáhne stránky dodavatelů** a zkontroluje, že připravené citáty na nich stále jsou. Ve vzorku je jedenáct dodavatelů: ČEZ Prodej, Centropol, E.ON, epet, PRE, MND, Dobrá Energie, SPP CZ, LAMA energy, ARMEX ENERGY a bezDodavatele.
+2. **Stáhne jejich ceníky (PDF)** a porovná je s ručně zkontrolovanou verzí (otisk textu). Shodný ceník potvrzuje nabídku; změněný ceník se označí k nové kontrole a nabídka zůstane nepotvrzená.
+3. **Stáhne úřední data**: indikativní cenová pásma ERÚ (CSV), počty odběrných míst elektřiny i plynu z OTE a seznam pravomocných rozhodnutí ERÚ podle účastníka řízení.
+4. **Vyhodnotí tvrzení pravidly v kódu** (ne jazykovým modelem). Silný verdikt vydá jen tehdy, když podklad odpovídá rozsahu tvrzení: stejná metrika, komodita, subjekt a období.
+5. **Srovná fixované nabídky pro nové zákazníky** podle ročního nákladu a ukáže i nabídky, které ze srovnání vyřadil, s důvodem.
+6. **Ukáže cenu a růst vedle sebe** za stejné období pro všechny dodavatele a rozdíl cen pro nové a stávající zákazníky.
+7. **Sestaví pohled jedné firmy** („Manažerský pohled“): kde stojíme cenou, co je v naší reklamě napadnutelné, co můžeme tvrdit a doložit a co dělá konkurence.
+8. **Sestaví briefing** z pravidel v kódu.
 
-Model nesmí do briefingu psát čísla: nálezy, ceny a lhůty doplňuje kód. Text s číslicí od modelu se zahodí a použije se šablona.
+## Příklad: od citátu k doporučení
+
+| Krok | Obsah |
+|---|---|
+| Citát | epet: „Pro naše zákazníky máme vždy tu nejlepší cenu“ (epet.cz, zachyceno 13. 11. 2026) |
+| Rozsah | cena pro nového zákazníka; srovnává se sazba D02d, území PRE, stejná délka fixace, roční náklad obchodní části |
+| Přípustné důkazy | živě stažené ceníky epet FIX 36 GARANT a ČEZ Elektřina Fix na 3 roky, shodné se zkontrolovanou verzí |
+| Výsledek | **v rozporu s daty**: levnější srovnatelnou nabídku mají ČEZ, Centropol, E.ON i ARMEX; např. při tříleté fixaci a 2 MWh ročně 9 871 Kč (epet) proti 8 460 Kč (ČEZ) |
+| Omezení | jde o obchodní část ceny, ne celý účet; „nejlepší cena“ může v reklamě znamenat i něco jiného |
+| Doporučený krok | tvrzení lze zpochybnit konkrétním protipříkladem z veřejných ceníků; před použitím znovu ověřit oba ceníky |
+
+Opačný příklad: ČEZ „Jsme největší dodavatel elektřiny a plynu“ dostane **nelze ověřit**, protože tvrzení neříká, podle čeho se velikost měří. Počty odběrných míst z OTE (v elektřině 1., v plynu 2. za innogy) se ukážou jen jako kontext.
+
+## Jazykový model (volitelný, ve výchozím stavu vypnutý)
+
+Bez modelu aplikace funguje celá a je to doporučený režim pro ukázku. S modelem (`CI_USE_LLM=1`, `GEMINI_API_KEY`) navíc:
+
+- **Claim Extractor** hledá na stránkách další tvrzení. Kód ověří, že citát na stránce doslova je, a pravidlo navržené modelem přijme jen tehdy, když mu citát odpovídá i podle klíčových slov.
+- **Strategist** smí jen seřadit priority mezi kandidáty, které určil kód. Text briefingu, čísla i verdikty jsou vždy ze šablony a pravidel; model nepíše žádnou větu, kterou by aplikace zobrazila.
+
+Do modelu jde nejvýše 20 000 znaků z jedné stránky a 120 000 znaků celkem. Volání se nezačne, když do konce časového limitu auditu zbývá málo času.
+
+## Co je připravené a co se děje při běhu
+
+| Připraveno předem (`suppliers.json`) | Staženo a spočítáno při běhu |
+|---|---|
+| Dodavatelé, schválené URL, názvy podle OTE a ERÚ | Stránky dodavatelů; kontrola, že citát stále platí |
+| Doslovné citáty s datem zachycení, pravidlem a **rozsahem** (metrika, komodity, subjekty, období, srovnání) | Ceníky (PDF); porovnání s otiskem zkontrolované verze |
+| Ceny, stálé platy, sazba, území, fixace, platnost a umístění řádku v ceníku | Pásma ERÚ pro sazbu, fixaci a měsíc nabídky |
+| Otisk (SHA-256) ručně zkontrolovaného textu ceníku | Počty OPM elektřiny a plynu z OTE |
+| Definice „tradičních dodavatelů“ (kontext k pojmu „alternativní“) | Pravomocná rozhodnutí ERÚ podle účastníka řízení |
+| | Verdikt, nález, omezení, doporučený krok a stav každého zdroje |
+
+Verdikty se předem nepřipravují.
+
+## Zásady ověřování
+
+- Chybějící nebo nesrovnatelný podklad znamená „nelze ověřit“, ne „nepravdivé“. Chybějící údaj není nula.
+- Silný verdikt jen při shodě rozsahu: odběrná místa nejsou zákazníci, elektřina není elektřina a plyn, údaje z různých období se nesčítají.
+- Pozice vůči indikativnímu pásmu ERÚ je nález, ne důkaz klamání ani změřené pořadí na trhu.
+- Srovnávají se jen nabídky, které projdou jedním společným pravidlem oprávněnosti (sazba, území, fixace, skupina zákazníků, platnost, stav dokumentu). Totéž pravidlo platí pro verdikty, srovnání i doporučení.
+- Nejnižší cena ve vzorku neprokazuje nejnižší cenu na trhu; levnější srovnatelná nabídka ale tvrzení o prvenství vyvrátit může.
+- Prohlášení dodavatele není nezávislý důkaz.
+- Pravomocné rozhodnutí ERÚ je kontext, ne verdikt. „Nenalezeno ve výsledcích hledání“ neznamená „neexistuje“.
+- Výsledek není právní posouzení.
+
+## Spolehlivost běhu
+
+- **Manifest zdrojů**: zpráva vypisuje každý očekávaný zdroj a jeho stav (živě, snapshot, chybí, ruční podklad). Běh je „živý“ jen tehdy, když jsou živě všechny očekávané zdroje.
+- **Jeden časový limit**: celý audit má limit `AUDIT_DEADLINE_S` (výchozí 45 s, pod limitem hostingu 60 s). Každé stažení dostane jen zbývající čas, po vypršení se nové stažení nezačne a použije se datovaný snapshot.
+- **Přesměrování**: každý krok přesměrování se kontroluje (HTTPS, schválený hostitel a port) dřív, než se na něj odešle požadavek.
+
+## Nasazení a veřejné demo
+
+`vercel.json` a `src/index.py` jsou připravené pro Vercel, ale **nasazení zatím nikdo nevyzkoušel**, stejně jako dostupnost Pythonu 3.14 na hostingu. Postup pro veřejné demo:
+
+1. Nastavte `DEMO_CODE` (sdílený přístupový kód). Na Vercelu (`VERCEL`) nebo s `PUBLIC_DEMO=1` je bez něj živý audit vypnutý; analýza ze zálohy a uložená ukázka fungují dál.
+2. Model nechte vypnutý, dokud nemáte nastavenou kvótu a rozpočet u poskytovatele.
+3. Aplikace omezuje velikost požadavku (8 kB), souběžné audity (`MAX_CONCURRENT_AUDITS`, výchozí 2) a živé audity z jedné adresy (`LIVE_AUDITS_PER_WINDOW` za 10 minut, výchozí 6). **Tyto limity platí pro jednu instanci**; na serverless hostingu doplňte ochranu hostingu (např. heslo nasazení) a ověřte je na cílové adrese.
+4. Před prezentací ověřte, že nasazená aplikace dosáhne na `eru.gov.cz`, `www.ote-cr.cz` a weby dodavatelů.
+
+## Postup na den prezentace
+
+1. Spustit živou analýzu a ukázat panel zdrojů: období dat ERÚ a OTE a čas stažení.
+2. Projít příklad epet (v rozporu s daty) a ČEZ (nelze ověřit) a ukázat, proč se liší.
+3. Přepnout na „Analýza ze zálohy“ a ukázat, že aplikace použití snapshotu výslovně označí.
+4. Mít připravenou uloženou ukázku pro případ, že nepůjde internet.
 
 ## Struktura
 
@@ -70,64 +127,56 @@ Model nesmí do briefingu psát čísla: nálezy, ceny a lhůty doplňuje kód. 
 src/
   index.py                      # vstupní bod pro Vercel
   competitive_intelligence/
-    app.py                      # Flask: stránka + POST /api/v1/analyze + GET /api/v1/example
-    workflow.py                 # jeden běh auditu
+    app.py                      # Flask, validace požadavků, limity veřejného dema
+    workflow.py                 # jeden běh auditu, časový limit, manifest zdrojů
+    evidence.py                 # společná brána: rozsah tvrzení, oprávněnost nabídek, období OTE
     rules.py                    # pravidla a verdikty
-    insights.py                 # přehled trhu (cena a růst) a pohled jedné firmy
-    agents.py                   # Claim Extractor, Strategist
-    connectors/                 # http (allowlist), eru, eru_decisions, ote, web, pricelist
-    data/suppliers.json         # připravené vstupy: citáty, URL, data zachycení, ceny, odkazy na ceníky
+    insights.py                 # přehled trhu a pohled jedné firmy
+    agents.py                   # Claim Extractor, Strategist (jen řazení priorit)
+    connectors/                 # http (allowlist, přesměrování, limit), eru, eru_decisions, ote, web, pricelist
+    data/suppliers.json         # připravené vstupy
     data/snapshots/             # datované zálohy zdrojů
     data/example_report.json    # uložená ukázka
     templates/, static/
-tests/
-docs/ARCHITECTURE.md, RULE_CATALOG.md, DATA_SOURCES.md
+tests/                          # test_adjudicated.py = ručně posouzené případy na reálných datech
+docs/ARCHITECTURE.md, RULE_CATALOG.md, DATA_SOURCES.md, historical/
 ```
-
-## Co je připravené a co se děje při běhu
-
-| Připraveno předem (`suppliers.json`) | Staženo a spočítáno při běhu |
-|---|---|
-| Seznam dodavatelů a schválených URL | Stránky dodavatelů; kontrola, že citát stále platí |
-| Doslovné citáty s datem zachycení a přiřazeným pravidlem | Ceníky (PDF); kontrola, že obsahují cenu i stálý plat |
-| Ceny a stálé platy z ceníků (produkt, sazba, území, fixace) | Pásma ERÚ pro sazbu, fixaci a měsíc nabídky |
-| Odkazy na ceníky a jejich účinnost | Počty OPM elektřiny a plynu z OTE |
-| | Roční náklad, verdikt, nález, omezení a doporučený krok |
-
-Verdikty se předem nepřipravují.
 
 ## Jak přidat dodavatele nebo ceník
 
-1. Do `suppliers.json` přidejte dodavatele (název právnické osoby podle tabulky OTE do `ote_name`), doslovné citáty a pravidlo.
-2. U nabídky uveďte cenu bez DPH i s DPH, stálý plat s DPH, sazbu, distribuční území a odkaz na PDF ceník. Do `markers` dejte řetězce, které v ceníku musí být (název produktu, cena, stálý plat).
-3. Hostitele stránky a ceníku přidejte do `ALLOWED_HOSTS` v `connectors/http.py`.
-4. Spusťte příkaz pro snapshoty a testy; test ověří, že citáty i ceny ve zdrojích opravdu jsou.
+1. Do `suppliers.json` přidejte dodavatele (`ote_name` podle tabulky OTE, `eru_name` podle seznamu rozhodnutí ERÚ), doslovné citáty a pravidlo.
+2. U tvrzení vyplňte rozsah (`params.scope`): `metric` (`opm`, `customers`, nebo bez metriky), `commodities`, případně `merged_with`, `period` a `comparator` (`at_least`, `at_most`, `approx`, `exactly`).
+3. U nabídky uveďte cenu bez DPH i s DPH, stálý plat s DPH, sazbu, území, fixaci, skupinu zákazníků a odkaz na PDF ceník. Do `markers` dejte řetězce, které v ceníku musí být, do `row_locator` řádek a sloupec, odkud čísla jsou, a po ruční kontrole spusťte příkaz pro snapshoty a zapište otisk do `reviewed_sha256`.
+4. Hostitele stránky a ceníku přidejte do `ALLOWED_HOSTS` v `connectors/http.py`.
+5. Spusťte testy; ověří, že citáty i ceny ve zdrojích opravdu jsou. U nového důležitého tvrzení doplňte ručně posouzený řádek do `tests/test_adjudicated.py`.
 
-## Zásady ověřování
+## Zapracované code review
 
-- Chybějící nebo nesrovnatelný podklad znamená „nelze ověřit“, ne „nepravdivé“.
-- Pozice vůči pásmu ERÚ je nález, ne důkaz klamání. Pásmo odpovídá zhruba 25. až 50. percentilu nabídek na trhu.
-- Srovnávají se jen nabídky se stejnou sazbou, distribučním územím a délkou fixace a s jednou pevnou cenou.
-- Nejnižší cena ve vzorku neprokazuje nejnižší cenu na trhu; levnější srovnatelná nabídka ale tvrzení o prvenství vyvrátit může.
-- OPM jsou odběrná místa, ne zákazníci.
-- Nedefinovaný pojem („český“, „alternativní“ dodavatel) se posuzuje podle výkladů, které tým zapsal do `suppliers.json` (část `definitions`); karta uvede výsledek pro každý výklad zvlášť.
-- Pravomocné rozhodnutí ERÚ je kontext k tvrzením o důvěře a férovosti, ne verdikt: minulý přestupek nedokazuje, že slogan je dnes nepravdivý. Zastavená řízení se mezi přestupky nepočítají.
-- Výsledek není právní posouzení.
-
-## Nasazení
-
-`vercel.json` a `src/index.py` jsou připravené pro Vercel, ale **nasazení zatím nikdo nevyzkoušel**. Před prezentací je potřeba ověřit hlavně to, že nasazená aplikace dosáhne na `eru.gov.cz`, `www.ote-cr.cz` a weby dodavatelů. Na veřejném nasazení nastavte `DEMO_CODE` a `GEMINI_API_KEY`.
+| Nález | Co se změnilo |
+|---|---|
+| QUAL-001 | Tvrzení mají rozsah (metrika, komodity, subjekty, období, srovnání). Chybějící údaj se nepočítá jako nula, různá období se nesčítají, velikost bez metriky a počty zákazníků dostanou jen kontext. |
+| QUAL-002 | Zelený podklad musí patřit ke stejnému produktu; prohlášení dodavatele je nález, ne nezávislý důkaz. |
+| QUAL-003 | Pásmo ERÚ se popisuje jako odhad pro sazbu, fixaci a měsíc, ne jako pořadí na trhu. |
+| QUAL-004 | Jedno pravidlo oprávněnosti nabídek (`evidence.offer_eligibility`) pro verdikty, srovnání i doporučení; ceníky s otiskem a umístěním řádku; budoucí platnost se nepřijímá; období srovnání se řídí platností nabídky. |
+| QUAL-005 | Změny počtu OPM za jedno společné období; trh jen za dodavatele s údajem na začátku i konci. |
+| QUAL-006 | Briefing je vždy ze šablony; model smí jen seřadit kandidáty určené kódem. |
+| OPS-001 | Manifest všech očekávaných zdrojů; „živý běh“ jen při živých zdrojích všech; „nenalezeno ve výsledcích“ místo „neexistuje“. |
+| OPS-002 | Jeden časový limit auditu pro všechna stažení i volání modelu. |
+| SEC-001 | Ruční přesměrování s kontrolou před každým krokem. |
+| SEC-002 | Povinný kód na veřejném nasazení, limit velikosti, souběhu a četnosti. |
+| QUAL-007 | Validace požadavku přes Pydantic, bezpečné porovnání kódu s diakritikou. |
+| DEP-001 | Jedna podporovaná verze Pythonu, zámek bez větve pro staré Pythony. |
+| TEST-001 | Ručně posouzené případy, testy limitu, přesměrování, manifestu a vstupů, CI úloha, volitelná kontrola živých zdrojů. |
+| DOC-001 | Tento README, aktualizované `docs/`, staré návody přesunuté do `docs/historical/`. |
 
 ## Známá omezení
 
 - Ceny jsou z ceníků pro distribuční území PRE a sazbu D02d; jinde se mohou lišit.
-- Ceníky E.ON nejdou stáhnout automaticky (jsou za vícekrokovým průvodcem). Jejich ceny dodal tým z PDF stažených 13. 11. 2026; při běhu se živě ověřuje jen cena jednoho produktu na stránce.
-- LAMA energy nemá ve vzorku ceník, takže její cenové tvrzení zůstává neověřené.
-- Údaj, zda je produkt určen novým nebo i stávajícím zákazníkům, pochází ze stránek dodavatele a neověřuje se živě. U ČEZ ho uvádí sám dodavatel, u E.ON je odvozen z názvů produktů.
-- Souběh ceny a růstu není důkaz příčiny; změna počtu odběrných míst může zahrnovat i převzetí jiného dodavatele.
-- Kontrola ceníku hledá v textu PDF název produktu, cenu a stálý plat; neověřuje, že čísla patří ke stejnému řádku tabulky.
-- Zelená tvrzení lze podložit jen prohlášením dodavatele; záruky původu v evidenci OTE se neověřují.
-- Připravené citáty a ceny zastarávají; když dodavatel změní web nebo ceník, aplikace na to upozorní a údaj je potřeba znovu zachytit.
+- Ceníky E.ON nejdou stáhnout automaticky; jejich ceny dodal tým z PDF stažených 13. 11. 2026 a v přehledu zdrojů jsou označené jako ruční podklad.
+- Kontrola ceníku porovnává otisk celého textu a hledá hodnoty v textu; řádek tabulky, odkud čísla pochází, je zapsaný ručně (`row_locator`), automaticky se neověřuje.
+- Údaj, zda je produkt pro nové nebo i stávající zákazníky, pochází ze stránek dodavatele; u E.ON je odvozen z názvů produktů.
+- Velikost dodavatele umíme měřit jen počtem odběrných míst; objem dodané energie, tržby ani vlastnictví firem v datech nejsou.
+- Z rozhodnutí ERÚ se čte jen název, datum zveřejnění a štítky, a hledá se podle názvu; skutek ani výši sankce aplikace nezná.
+- Souběh ceny a růstu není důkaz příčiny.
 - Odkaz na směrnici (EU) 2024/825 u zelených tvrzení nebyl právně ověřen.
-- Z rozhodnutí ERÚ se čte jen název, datum zveřejnění a štítky; skutek ani výši sankce aplikace nezná. Hledá se podle názvu účastníka řízení.
-- Velikost dodavatele se měří jen počtem odběrných míst; objem dodané energie, tržby ani vlastnictví firem v datech nejsou.
+- Nevyzkoušeno: nasazení na hosting, chování pod zátěží, skutečné výstupy a náklady modelu.

@@ -57,6 +57,7 @@ def load(offer: dict, live: bool = True) -> dict | None:
         fetched = load_snapshot(name, "Běh v režimu snapshot.")
     source = fetched.meta()
     source.update({
+        "text_sha256": fetched.sha256,
         "name": f"Ceník: {offer['product']}",
         "document": price_list.get("document"),
         "effective_from": price_list.get("effective_from"),

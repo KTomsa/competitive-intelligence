@@ -1,7 +1,9 @@
 """Logické role (ne samostatné služby): Claim Extractor a Strategist.
 
 Obě role umí běžet s jazykovým modelem (Gemini, strukturovaný výstup kontrolovaný kódem)
-i bez něj (klíčová slova a šablona). Model nikdy nepočítá čísla ani verdikty.
+i bez něj (klíčová slova a šablona). Model nikdy nepočítá čísla ani verdikty a nepíše text
+briefingu: jen vybírá, která už vyhodnocená tvrzení dát vedení na první místo. Platný JSON,
+existující odkaz ani absence číslic nedokazují, že by věta modelu byla pravdivá.
 """
 from __future__ import annotations
 
@@ -13,12 +15,14 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from .connectors import http
 from .connectors.web import contains, normalize
 from .rules import CONTRADICTED, PARTIAL, RULE_LABELS, SUPPORTED, UNVERIFIABLE
 
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
 LLM_TIMEOUT_MS = 15_000
-MAX_PAGE_CHARS = 60_000
+MAX_PAGE_CHARS = 20_000  # na jednu stránku
+MAX_TOTAL_CHARS = 120_000  # na celé volání modelu
 MAX_NEW_CLAIMS = 3
 
 RuleId = Literal[
@@ -46,10 +50,14 @@ def _parse(system: str, user: str, schema: type[BaseModel]):
     from google.genai.errors import APIError
     from pydantic import ValidationError
 
+    left = http.remaining()
+    if left is not None and left < 5:
+        raise LlmUnavailable("Na volání modelu nezbyl čas.")
+    timeout_ms = LLM_TIMEOUT_MS if left is None else int(min(LLM_TIMEOUT_MS, (left - 3) * 1000))
     try:
         client = genai.Client(
             api_key=os.environ["GEMINI_API_KEY"],
-            http_options=types.HttpOptions(timeout=LLM_TIMEOUT_MS),
+            http_options=types.HttpOptions(timeout=timeout_ms),
         )
         config = types.GenerateContentConfig(
             system_instruction=system,
@@ -59,9 +67,10 @@ def _parse(system: str, user: str, schema: type[BaseModel]):
         try:
             response = client.models.generate_content(model=MODEL, contents=user, config=config)
         except APIError as exc:
-            if exc.code not in (403, 429, 500, 503):
+            left = http.remaining()
+            if exc.code not in (403, 429, 500, 503) or (left is not None and left < timeout_ms / 1000 + 4):
                 raise
-            time.sleep(2)  # přetížení bývá krátké: jeden opakovaný pokus
+            time.sleep(2)  # přetížení bývá krátké: jeden opakovaný pokus, jen když zbývá čas
             response = client.models.generate_content(model=MODEL, contents=user, config=config)
     except APIError as exc:
         raise LlmUnavailable(f"Model vrátil chybu {exc.code}.") from exc
@@ -192,6 +201,9 @@ def extract_claims_batch(
             if len(text) > MAX_PAGE_CHARS:
                 text = text[:MAX_PAGE_CHARS]
                 note = f"Některá stránka byla pro model zkrácena na {MAX_PAGE_CHARS} znaků."
+            if sum(len(part) for part in parts) + len(text) > MAX_TOTAL_CHARS:
+                note = f"Do modelu se vešly jen některé stránky (limit {MAX_TOTAL_CHARS} znaků)."
+                continue
             parts.append(f"### supplier_id: {sid}\n{text}")
         user = (
             "Níže jsou texty stránek několika dodavatelů. U každého tvrzení uveď supplier_id stránky, "
@@ -230,27 +242,27 @@ VERDICT_LABEL = {
 VERDICT_ORDER = {CONTRADICTED: 0, PARTIAL: 1, UNVERIFIABLE: 2, SUPPORTED: 3}
 
 
-class Briefing(BaseModel):
-    headline: str
-    summary: str
+class Priorities(BaseModel):
     priority_claim_ids: list[str]
 
 
 STRATEGIST_SYSTEM = (
-    "Jsi Strategist. Píšeš česky krátký briefing pro manažera dodavatele elektřiny o tvrzeních konkurence. "
-    "Vycházej výhradně z předaných výsledků a neměň verdikty. „Nelze ověřit“ neznamená nepravdivé. "
-    "Nevynášej právní závěry. V textu neuváděj žádná čísla, ceny, lhůty ani data; ty doplní aplikace z výpočtu. "
-    "headline je jedna věta, summary nejvýše čtyři věty. Do priority_claim_ids dej nejvýše tři id tvrzení "
-    "přesně podle vstupu, seřazená podle toho, jak moc si zaslouží pozornost vedení."
+    "Jsi Strategist. Z předaných, už vyhodnocených tvrzení konkurence vyber nejvýše tři, která si nejvíc "
+    "zaslouží pozornost vedení dodavatele elektřiny. Vrať jen jejich id přesně podle vstupu, seřazená podle "
+    "důležitosti. Nepiš žádný text."
 )
 
 
-def _template_briefing(items: list[dict]) -> dict:
-    counts = {v: sum(1 for i in items if i["verdict"] == v) for v in VERDICT_ORDER}
-    ranked = sorted(
-        [i for i in items if i["opportunity"] and i.get("evaluated", True)],
+def _candidates(items: list[dict]) -> list[dict]:
+    return sorted(
+        [i for i in items if i["opportunity"]],
         key=lambda i: (i["verdict"] != CONTRADICTED, -int(i["opportunity"]), not i["evidence"]),
-    )[:3]
+    )
+
+
+def _template_briefing(items: list[dict], ranked: list[dict] | None = None) -> dict:
+    counts = {v: sum(1 for i in items if i["verdict"] == v) for v in VERDICT_ORDER}
+    ranked = (ranked if ranked is not None else _candidates(items))[:3]
     if ranked:
         headline = f"{len(ranked)} tvrzení konkurence si zaslouží pozornost."
     else:
@@ -273,42 +285,35 @@ def _template_briefing(items: list[dict]) -> dict:
              "why": i["finding"], "next_step": i["action"]}
             for i in ranked
         ],
-        "method": "šablona (bez modelu)",
+        "method": "šablona: priority a text z pravidel v kódu",
     }
 
 
 def write_briefing(items: list[dict], use_llm: bool) -> dict:
-    base = _template_briefing(items)
-    if not use_llm or not items:
+    """Briefing je vždy ze šablony. Model smí jen přeřadit priority mezi kandidáty, které určil kód."""
+    candidates = _candidates(items)
+    base = _template_briefing(items, candidates)
+    if not use_llm or len(candidates) < 2:
         return base
     payload = [
-        {k: i[k] for k in ("id", "supplier", "quote", "verdict", "finding", "limitation", "action", "opportunity")}
-        for i in items
+        {k: i[k] for k in ("id", "supplier", "quote", "verdict", "finding", "action")}
+        for i in candidates[:12]
     ]
     try:
-        parsed = _parse(STRATEGIST_SYSTEM, json.dumps(payload, ensure_ascii=False, indent=1), Briefing)
+        parsed = _parse(STRATEGIST_SYSTEM, json.dumps(payload, ensure_ascii=False, indent=1), Priorities)
     except LlmUnavailable as exc:
         base["method"] = f"šablona ({exc})"
         return base
-    by_id = {i["id"]: i for i in items}
-    ids = parsed.priority_claim_ids[:3]
-    if any(cid not in by_id for cid in ids):  # model smí odkazovat jen na existující tvrzení
-        base["method"] = "šablona (model odkázal na neexistující tvrzení)"
+    by_id = {i["id"]: i for i in candidates[:12]}
+    ids = list(dict.fromkeys(parsed.priority_claim_ids))[:3]
+    if not ids or any(cid not in by_id for cid in ids):  # jen kandidáti, které vybral kód
+        base["method"] = "šablona (model vybral tvrzení mimo kandidáty)"
         return base
-    if re.search(r"\d", parsed.headline + parsed.summary):  # čísla smí do briefingu dát jen kód
-        base["method"] = "šablona (model do textu vložil čísla)"
-        return base
-    return {
-        "headline": parsed.headline,
-        "summary": parsed.summary,
-        "matrix": base["matrix"],
-        "priorities": [
-            {"claim_id": cid, "supplier": by_id[cid]["supplier"], "quote": by_id[cid]["quote"],
-             "why": by_id[cid]["finding"], "next_step": by_id[cid]["action"]}
-            for cid in ids
-        ],
-        "method": f"model {MODEL} vybral priority a napsal shrnutí; nálezy, čísla a verdikty jsou z pravidel v kódu",
-    }
+    chosen = _template_briefing(items, [by_id[cid] for cid in ids])
+    chosen["method"] = (
+        f"model {MODEL} jen seřadil priority mezi kandidáty z pravidel; text, čísla a verdikty jsou z kódu"
+    )
+    return chosen
 
 
 __all__ = ["extract_claims", "write_briefing", "llm_available", "VERDICT_LABEL", "RULE_LABELS"]

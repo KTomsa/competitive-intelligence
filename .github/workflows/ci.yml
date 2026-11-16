@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Install locked dependencies
+        run: uv sync --locked
+      - name: Tests (offline, without model)
+        run: uv run pytest -q
+        env:
+          CI_USE_LLM: "0"

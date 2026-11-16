@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 
+from . import evidence as ev
 from . import rules
 from .connectors import ote
 
@@ -23,35 +24,15 @@ def pct_text(value: float) -> str:
 
 
 def _series(table_data: dict | None, legal_name: str) -> dict | None:
-    """Změna počtu OPM dodavatele mezi prvním a posledním zveřejněným měsícem roku."""
-    if not table_data:
+    """Změna počtu OPM dodavatele ve společném období tabulky; None, když chybí krajní údaj."""
+    change = ev.opm_change(table_data, legal_name)
+    if change.abs is None:
         return None
-    table = table_data["table"]
-    for name, values in table["suppliers"].items():
-        if not ote.same_supplier(name, legal_name):
-            continue
-        filled = [(i + 1, v) for i, v in enumerate(values) if v is not None]
-        if len(filled) < 2 or not filled[0][1]:
-            return None
-        (m0, first), (m1, last) = filled[0], filled[-1]
-        year = table.get("year") or "rok"
-        return {
-            "first": first, "last": last, "abs": last - first,
-            "pct": round((last - first) / first * 100, 1),
-            "from": f"{year}-{m0:02d}", "to": f"{year}-{m1:02d}",
-        }
-    return None
-
-
-def _market_change(table_data: dict | None) -> float | None:
-    if not table_data:
-        return None
-    first = last = 0
-    for values in table_data["table"]["suppliers"].values():
-        filled = [v for v in values if v is not None]
-        if len(filled) >= 2:
-            first, last = first + filled[0], last + filled[-1]
-    return round((last - first) / first * 100, 1) if first else None
+    return {
+        "first": change.first, "last": change.last, "abs": change.abs, "pct": change.pct,
+        "from": f"{change.window.year}-{change.window.start + 1:02d}",
+        "to": f"{change.window.year}-{change.window.end + 1:02d}",
+    }
 
 
 def _best_by_supplier(group: dict) -> list[dict]:
@@ -93,7 +74,8 @@ def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) ->
             "decisions": _decision_counts(supplier, ctx),
         })
     rows.sort(key=lambda r: (r["electricity"] is None, -(r["electricity"] or {"pct": 0})["pct"]))
-    period = next((r["electricity"] for r in rows if r["electricity"]), None)
+    window = ev.common_window(ctx["ote"])
+    market = ev.market_change(ctx["ote"])
 
     observations = []
     priced = sorted(
@@ -126,8 +108,11 @@ def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) ->
                 f"({rules.num(leader['electricity']['abs'])}, {pct_text(leader['electricity']['pct'])})."
             )
     if len(observations) >= 2:
-        observations.append("Nejnižší cena tedy sama o sobě zákazníky nepřivádí.")
-    gaps = loyalty_gaps(suppliers, ctx["profile"])
+        observations.append(
+            "Ve vzorku tedy nejnižší ceníková cena nejde ruku v ruce s růstem počtu odběrných míst. "
+            "Jde o souběh dvou údajů, ne o zjištěnou příčinu."
+        )
+    gaps = loyalty_gaps(suppliers, ctx)
     return {
         "loyalty_gaps": gaps,
         "loyalty_caveat": (
@@ -136,34 +121,37 @@ def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) ->
         ),
         "fixation_months": longest["fixation_months"] if longest else None,
         "annual_mwh": longest["annual_mwh"][0] if longest else None,
-        "period": {"from": period["from"], "to": period["to"]} if period else None,
-        "market_electricity_pct": _market_change(ctx["ote"]),
+        "period": {"from": f"{window.year}-{window.start + 1:02d}", "to": f"{window.year}-{window.end + 1:02d}"}
+        if window else None,
+        "market_electricity_pct": market.pct,
+        "market_cohort": {"included": market.cohort, "excluded": market.excluded},
         "observations": observations,
         "rows": rows,
         "caveat": (
-            OPM_CAVEAT + " Jde o souběh dvou údajů, ne o důkaz příčiny. Ceny jsou nabídky pro nové zákazníky "
-            "v jedné sazbě a jednom distribučním území."
+            OPM_CAVEAT + " Změny se počítají za stejné období pro všechny; dodavatel bez údaje na začátku nebo "
+            "na konci období změnu nemá. Jde o souběh dvou údajů, ne o důkaz příčiny. Ceny jsou nabídky pro nové "
+            "zákazníky v jedné sazbě a jednom distribučním území a pořadí platí jen pro tento vzorek."
         ),
     }
 
 
-def loyalty_gaps(suppliers: list[dict], profile: dict) -> list[dict]:
+def loyalty_gaps(suppliers: list[dict], ctx: dict) -> list[dict]:
     """O kolik víc platí stávající zákazník než nový u téhož dodavatele a stejné délky fixace."""
+    profile = ctx["profile"]
     gaps = []
     for supplier in suppliers:
         source = supplier.get("audience_source") or {}
         by_months: dict[int, dict[str, dict]] = {}
         for offer in supplier["offers"]:
-            if (
-                offer.get("stale") or offer.get("stepped") or offer.get("fixation_months") is None
-                or offer.get("audience") not in ("new", "existing")
-                or offer.get("price_mwh_incl_vat") is None or offer.get("tariff") != profile["tariff"]
-            ):
+            if not ev.offer_eligibility(offer, ctx).ok:  # stejné pravidlo jako verdikty a srovnání
+                continue
+            group = {"new": "new", "existing": "existing", "all": "existing"}.get(offer.get("audience"))
+            if group is None:
                 continue
             slot = by_months.setdefault(offer["fixation_months"], {})
-            current = slot.get(offer["audience"])
+            current = slot.get(group)
             if current is None or offer["price_mwh_incl_vat"] < current["price_mwh_incl_vat"]:
-                slot[offer["audience"]] = offer
+                slot[group] = offer
         for months in sorted(by_months, reverse=True):
             new, existing = by_months[months].get("new"), by_months[months].get("existing")
             if not new or not existing:
@@ -259,7 +247,8 @@ def build_perspective(own: dict, ctx: dict, comparison: list[dict], evaluated: d
                 f"({pct_text(change['pct'])})."
             )
             if label == "elektřiny" and market_pct is not None and change["pct"] > market_pct:
-                text += f" Trh jako celek se změnil o {pct_text(market_pct)}."
+                text += (f" Trh za stejné období (dodavatelé s údajem na začátku i na konci) se změnil o "
+                         f"{pct_text(market_pct)}.")
             provable.append({"text": text, "source": source, "caveat": OPM_CAVEAT})
         else:
             cautions.append(
@@ -268,26 +257,29 @@ def build_perspective(own: dict, ctx: dict, comparison: list[dict], evaluated: d
             )
     position, count, ranking = rules.ote_position(ctx["ote"], own)
     if position is not None:
-        _, gas_count, _ = rules.ote_position(ctx.get("ote_gas"), own)
         text = (
             f"Podle OTE máme {rules.num(count)} odběrných míst elektřiny "
-            f"({position}. místo z {len(ranking)} dodavatelů)"
+            f"({position}. místo z {len(ranking)} dodavatelů, {ev.table_period(ctx['ote'])})"
         )
-        if gas_count:
-            text += f" a {rules.num(gas_count)} plynu, dohromady {rules.num(count + gas_count)}"
+        both = ev.opm_measure(ctx, (own["ote_name"],), (ev.ELECTRICITY, ev.GAS))
+        if both.total is not None:
+            text += f"; s plynem dohromady {rules.num(both.total)}"
         provable.append({"text": text + ".", "source": "OTE – počty OPM",
-                         "caveat": "Uvádět jako odběrná místa, ne jako zákazníky."})
+                         "caveat": "Uvádět jako odběrná místa, ne jako zákazníky, a s měsícem údaje."})
     marks = [rules.benchmark_offer(offer, ctx) for offer in own["offers"]]
     below = [m["product"] for m in marks if m["eligible"] and m["position"] == "below"]
     above = [m["product"] for m in marks if m["eligible"] and m["position"] == "above"]
     if below:
         provable.append({
             "text": (
-                f"Naše fixované nabídky ({', '.join(below)}) jsou pod indikativním pásmem ERÚ, tedy podle ERÚ "
-                "mezi nejlevnější čtvrtinou fixovaných nabídek na trhu."
+                f"Cena komodity našich fixovaných nabídek ({', '.join(below)}) je pod indikativním pásmem ERÚ "
+                f"pro sazbu {profile['tariff']}, příslušnou délku fixace a měsíc."
             ),
             "source": "ERÚ – indikativní pásma nabídkových cen",
-            "caveat": f"Platí pro cenu komodity v sazbě {profile['tariff']} a aktuální měsíc; pásmo se mění každý měsíc.",
+            "caveat": (
+                "Pásmo je odhad ERÚ, ne změřené pořadí na trhu; neříkat „nejlevnější čtvrtina trhu“. Platí jen pro "
+                "cenu komodity (bez stálého platu a regulovaných složek) a daný měsíc."
+            ),
         })
     if above:
         cautions.append(f"Nabídky nad pásmem ERÚ ({', '.join(above)}): tvrzení o výhodné ceně by u nich šlo napadnout.")

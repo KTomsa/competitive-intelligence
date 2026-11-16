@@ -1,6 +1,376 @@
 {
- "generated_at": "2026-11-13T14:37:57+00:00",
+ "generated_at": "2026-11-16T18:24:17+00:00",
  "mode": "live",
+ "coverage": {
+  "live": 37,
+  "snapshot": 0,
+  "missing": 0,
+  "expected": 37
+ },
+ "manifest": [
+  {
+   "id": "eru",
+   "label": "ERÚ – indikativní pásma cen elektřiny",
+   "kind": "official",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://eru.gov.cz/ipnc",
+   "note": null
+  },
+  {
+   "id": "ote",
+   "label": "OTE – počty OPM elektřiny",
+   "kind": "official",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote",
+   "note": null
+  },
+  {
+   "id": "ote_gas",
+   "label": "OTE – počty OPM plynu",
+   "kind": "official",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu",
+   "note": null
+  },
+  {
+   "id": "web:cez",
+   "label": "Web dodavatele ČEZ Prodej",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.cez.cz/cs/prejdeteknam",
+   "note": null
+  },
+  {
+   "id": "decisions:cez",
+   "label": "ERÚ – rozhodnutí: ČEZ Prodej",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:24+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=%C4%8CEZ+Prodej",
+   "note": null
+  },
+  {
+   "id": "pricelist:cez-fix36",
+   "label": "ČEZ Prodej – ceník Elektřina Fix na 3 roky",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:cez-online12",
+   "label": "ČEZ Prodej – ceník Elektřina Online na 1 rok",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:cez-bezstarosti36",
+   "label": "ČEZ Prodej – ceník Elektřina Bez starostí na 3 roky",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:cez-bezstarosti24",
+   "label": "ČEZ Prodej – ceník Elektřina Bez starostí na 2 roky",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:cez-bezstarosti12",
+   "label": "ČEZ Prodej – ceník Elektřina Bez starostí na 1 rok",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
+   "note": null
+  },
+  {
+   "id": "web:centropol",
+   "label": "Web dodavatele Centropol",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.centropol.cz/domacnost/elektrina/",
+   "note": null
+  },
+  {
+   "id": "decisions:centropol",
+   "label": "ERÚ – rozhodnutí: Centropol",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:24+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=CENTROPOL+ENERGY",
+   "note": null
+  },
+  {
+   "id": "pricelist:centropol-fix36",
+   "label": "Centropol – ceník Fixně online pro začátek na 3 roky",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:centropol-fix24",
+   "label": "Centropol – ceník Fixně online pro začátek na 2 roky",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:centropol-fix12",
+   "label": "Centropol – ceník Fixně online pro začátek na 1 rok",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
+   "note": null
+  },
+  {
+   "id": "web:eon",
+   "label": "Web dodavatele E.ON",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.eon.cz/domacnosti/elektrina/",
+   "note": null
+  },
+  {
+   "id": "decisions:eon",
+   "label": "ERÚ – rozhodnutí: E.ON",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:25+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=E.ON+Energie",
+   "note": null
+  },
+  {
+   "id": "pricelist:eon-variantpro36",
+   "label": "E.ON – ceník Variant PRO na 3 roky",
+   "kind": "price_list",
+   "state": "not_required",
+   "fetched_at": null,
+   "url": null,
+   "note": "Ceník dodaný týmem a ručně zkontrolovaný; automaticky ho stáhnout nelze."
+  },
+  {
+   "id": "pricelist:eon-variantpro24",
+   "label": "E.ON – ceník Variant PRO na 2 roky",
+   "kind": "price_list",
+   "state": "not_required",
+   "fetched_at": null,
+   "url": null,
+   "note": "Ceník dodaný týmem a ručně zkontrolovaný; automaticky ho stáhnout nelze."
+  },
+  {
+   "id": "pricelist:eon-variant36",
+   "label": "E.ON – ceník Variant na 3 roky",
+   "kind": "price_list",
+   "state": "not_required",
+   "fetched_at": null,
+   "url": null,
+   "note": "Ceník dodaný týmem a ručně zkontrolovaný; automaticky ho stáhnout nelze."
+  },
+  {
+   "id": "web:epet",
+   "label": "Web dodavatele epet",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://epet.cz/elektrina-1",
+   "note": null
+  },
+  {
+   "id": "decisions:epet",
+   "label": "ERÚ – rozhodnutí: epet",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:29+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=epet+energie",
+   "note": null
+  },
+  {
+   "id": "pricelist:epet-fix36",
+   "label": "epet – ceník FIX 36 GARANT",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:20+00:00",
+   "url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-14-59/EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:epet-fix24",
+   "label": "epet – ceník FIX 24 GARANT",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:20+00:00",
+   "url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-11-06/EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
+   "note": null
+  },
+  {
+   "id": "web:pre",
+   "label": "Web dodavatele PRE",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.pre.cz/cs/domacnosti/elektrina/",
+   "note": null
+  },
+  {
+   "id": "decisions:pre",
+   "label": "ERÚ – rozhodnutí: PRE",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:25+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=Pra%C5%BEsk%C3%A1+energetika",
+   "note": null
+  },
+  {
+   "id": "web:mnd",
+   "label": "Web dodavatele MND",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.mnd.cz/elektrina",
+   "note": null
+  },
+  {
+   "id": "decisions:mnd",
+   "label": "ERÚ – rozhodnutí: MND",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:29+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=MND+Energie",
+   "note": null
+  },
+  {
+   "id": "web:dobra",
+   "label": "Web dodavatele Dobrá Energie",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://dobra-energie.eu/",
+   "note": null
+  },
+  {
+   "id": "decisions:dobra",
+   "label": "ERÚ – rozhodnutí: Dobrá Energie",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:29+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=Dobr%C3%A1+Energie",
+   "note": null
+  },
+  {
+   "id": "web:spp",
+   "label": "Web dodavatele SPP CZ",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.spp.cz/",
+   "note": null
+  },
+  {
+   "id": "decisions:spp",
+   "label": "ERÚ – rozhodnutí: SPP CZ",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:30+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=SPP+CZ",
+   "note": null
+  },
+  {
+   "id": "web:lama",
+   "label": "Web dodavatele LAMA energy",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
+   "url": "https://www.lamaenergy.cz/",
+   "note": null
+  },
+  {
+   "id": "decisions:lama",
+   "label": "ERÚ – rozhodnutí: LAMA energy",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:30+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=LAMA+energy",
+   "note": null
+  },
+  {
+   "id": "web:armex",
+   "label": "Web dodavatele ARMEX ENERGY",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.armexenergy.cz/",
+   "note": null
+  },
+  {
+   "id": "decisions:armex",
+   "label": "ERÚ – rozhodnutí: ARMEX ENERGY",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:32+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=ARMEX+ENERGY",
+   "note": null
+  },
+  {
+   "id": "pricelist:armex-optimal24",
+   "label": "ARMEX ENERGY – ceník OPTIMAL 606 FIX",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+   "note": null
+  },
+  {
+   "id": "pricelist:armex-klasik12",
+   "label": "ARMEX ENERGY – ceník KLASIK 602 FIX",
+   "kind": "price_list",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
+   "url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+   "note": null
+  },
+  {
+   "id": "web:bezdodavatele",
+   "label": "Web dodavatele bezDodavatele",
+   "kind": "page",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:20+00:00",
+   "url": "https://www.bezdodavatele.cz/",
+   "note": null
+  },
+  {
+   "id": "decisions:bezdodavatele",
+   "label": "ERÚ – rozhodnutí: bezDodavatele",
+   "kind": "decisions",
+   "state": "live",
+   "fetched_at": "2026-11-16T18:24:32+00:00",
+   "url": "https://eru.gov.cz/pravomocna-rozhodnuti?ucastnik_rizeni=bezDodavatele",
+   "note": null
+  }
+ ],
+ "duration_s": 24.7,
+ "deadline_s": 45.0,
  "profile": {
   "commodity": "elektřina",
   "tariff": "D02d",
@@ -29,7 +399,7 @@
  "sources": {
   "eru": {
    "source_url": "https://eru.gov.cz/sites/default/files/obsah/prilohy/elektrina_6.csv",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "cd2dfc19a2353f86",
@@ -41,7 +411,7 @@
   },
   "ote": {
    "source_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-elektrina/pocty-opm-dodavatelu-v-cs-ote",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "2a410f57cd912210",
@@ -52,10 +422,10 @@
   },
   "ote_gas": {
    "source_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
    "origin": "live",
    "warning": null,
-   "sha256": "e39455130be486a2",
+   "sha256": "9745efed1f58ad41",
    "name": "OTE – počty OPM dodavatelů plynu",
    "page_url": "https://www.ote-cr.cz/cs/statistika/mesicni-zprava-plyn/pocty-opm-dodavatelu",
    "data_period": "2026-09",
@@ -66,7 +436,7 @@
    "page_url": "https://eru.gov.cz/pravomocna-rozhodnuti",
    "source_url": "https://eru.gov.cz/pravomocna-rozhodnuti",
    "origin": "live",
-   "fetched_at": "2026-11-13T14:38:00+00:00",
+   "fetched_at": "2026-11-16T18:24:32+00:00",
    "warning": null,
    "unit": "název, datum zveřejnění a štítky rozhodnutí; obsah rozhodnutí se nečte"
   }
@@ -74,10 +444,11 @@
  "price_lists": [
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "e541c3be5e9a5c26",
+   "text_sha256": "e541c3be5e9a5c26e20aa7f60b9583be5cf32c6e32b6af8be870bc67beb1b305",
    "name": "Ceník: Elektřina Fix na 3 roky",
    "document": "moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
    "effective_from": "2026-01-30",
@@ -85,10 +456,11 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "6961b7f5bd95cb63",
+   "text_sha256": "6961b7f5bd95cb63041ed3228af355d8afc82afecb739ef42c4579220ccd29e1",
    "name": "Ceník: Elektřina Online na 1 rok",
    "document": "moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
    "effective_from": "2026-01-30",
@@ -96,10 +468,11 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:18+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "f21625b5ac1e7503",
+   "text_sha256": "f21625b5ac1e7503df96c45ecd046b0ddee614dffb14855c0420ab080e4f58f5",
    "name": "Ceník: Elektřina Bez starostí na 3 roky",
    "document": "moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
    "effective_from": "2026-08-25",
@@ -107,10 +480,11 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "1987f52ba59a1d94",
+   "text_sha256": "1987f52ba59a1d94692722879fc2d9503df943deb9fd9fc54561d875fe00f2fe",
    "name": "Ceník: Elektřina Bez starostí na 2 roky",
    "document": "moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
    "effective_from": "2026-08-25",
@@ -118,10 +492,11 @@
   },
   {
    "source_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
-   "fetched_at": "2026-11-13T14:37:58+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "d309c4a76dd37b27",
+   "text_sha256": "d309c4a76dd37b2792e31e3f37e20c8f3e3fa490c4389a48f19e657a55c5ec04",
    "name": "Ceník: Elektřina Bez starostí na 1 rok",
    "document": "moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
    "effective_from": "2026-08-25",
@@ -129,10 +504,11 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T14:37:59+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "bc3a8475a19746e9",
+   "text_sha256": "bc3a8475a19746e9fec40410e9b57b0a21bd5b90bd79d0b431ca15b80f3cf4d4",
    "name": "Ceník: Fixně online pro začátek na 3 roky",
    "document": "d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
    "effective_from": "2026-11-04",
@@ -140,10 +516,11 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T14:37:59+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "5e8316fd523fb36c",
+   "text_sha256": "5e8316fd523fb36cc138c93c8c343adffd597c7b85a5c3d03c44f08f9ad282e1",
    "name": "Ceník: Fixně online pro začátek na 2 roky",
    "document": "d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
    "effective_from": "2026-11-04",
@@ -151,10 +528,11 @@
   },
   {
    "source_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
-   "fetched_at": "2026-11-13T14:37:59+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "09ddd13da37cb785",
+   "text_sha256": "09ddd13da37cb7857ddac078ba2e6dbdc1d5d1bf3a9c44c9d91ceedb6e5071b4",
    "name": "Ceník: Fixně online pro začátek na 1 rok",
    "document": "d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
    "effective_from": "2026-11-04",
@@ -162,10 +540,11 @@
   },
   {
    "source_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-14-59/EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
-   "fetched_at": "2026-11-13T14:38:01+00:00",
+   "fetched_at": "2026-11-16T18:24:20+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "8d6a5d6a4770cae4",
+   "text_sha256": "8d6a5d6a4770cae4a346490a0caefb20dee6a121844ce8e5d46bd898da0bdbcb",
    "name": "Ceník: FIX 36 GARANT",
    "document": "EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
    "effective_from": "2026-11-04",
@@ -173,10 +552,11 @@
   },
   {
    "source_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-11-06/EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
-   "fetched_at": "2026-11-13T14:38:02+00:00",
+   "fetched_at": "2026-11-16T18:24:20+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "5b0865214b8e599b",
+   "text_sha256": "5b0865214b8e599bce076b2254325d0a87db883fbf9887e862c3e2d0188fd185",
    "name": "Ceník: FIX 24 GARANT",
    "document": "EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
    "effective_from": "2026-11-04",
@@ -184,10 +564,11 @@
   },
   {
    "source_url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
-   "fetched_at": "2026-11-13T14:38:00+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "dfe0a9d0631e2522",
+   "text_sha256": "dfe0a9d0631e25225fec0b0931920ed6968931f1984297b3178d565059d7eda7",
    "name": "Ceník: OPTIMAL 606 FIX",
    "document": "X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
    "effective_from": "2026-10-21",
@@ -195,10 +576,11 @@
   },
   {
    "source_url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
-   "fetched_at": "2026-11-13T14:38:00+00:00",
+   "fetched_at": "2026-11-16T18:24:19+00:00",
    "origin": "live",
    "warning": null,
    "sha256": "a9bcc2a99df30f84",
+   "text_sha256": "a9bcc2a99df30f84e53d8ce3976c07a94422d156c28e4d2ee2c652046d14d536",
    "name": "Ceník: KLASIK 602 FIX",
    "document": "XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
    "effective_from": "2026-08-01",
@@ -226,14 +608,16 @@
       14960.2
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-01-30"
     },
     {
      "supplier_id": "centropol",
-     "audience": null,
+     "audience": "new",
      "supplier": "Centropol",
      "product": "Fixně online pro začátek na 3 roky",
      "price_mwh_excl_vat": 2817.0,
@@ -244,9 +628,11 @@
       15594.48
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-11-04"
     },
     {
@@ -262,14 +648,16 @@
       15566.28
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "cena nalezena na živé stránce dodavatele; stálý plat z ceníku, který dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
+     "confirmation": "cena nalezena na živé stránce dodavatele (kontrola přítomnosti); stálý plat z ceníku, který dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
      "price_list_url": null,
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-10-10"
     },
     {
      "supplier_id": "cez",
-     "audience": "existing",
+     "audience": "all",
      "supplier": "ČEZ Prodej",
      "product": "Elektřina Bez starostí na 3 roky",
      "price_mwh_excl_vat": 3000.0,
@@ -280,32 +668,16 @@
       16480.2
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-08-25"
     },
     {
-     "supplier_id": "eon",
-     "audience": "existing",
-     "supplier": "E.ON",
-     "product": "Variant na 3 roky",
-     "price_mwh_excl_vat": 3239.0,
-     "price_mwh_incl_vat": 3919.0,
-     "monthly_fee_incl_vat": 168.19,
-     "annual_cost": [
-      9856.28,
-      17694.28
-     ],
-     "position": "below",
-     "confirmed_live": false,
-     "confirmation": "jen z přípravy: ceník dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
-     "price_list_url": null,
-     "effective_from": "2026-11-04"
-    },
-    {
      "supplier_id": "epet",
-     "audience": null,
+     "audience": "new",
      "supplier": "epet",
      "product": "FIX 36 GARANT",
      "price_mwh_excl_vat": 3299.0,
@@ -316,9 +688,11 @@
       17854.76
      ],
      "position": "within",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-14-59/EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-11-04"
     }
    ]
@@ -332,7 +706,7 @@
    "rows": [
     {
      "supplier_id": "armex",
-     "audience": null,
+     "audience": "new",
      "supplier": "ARMEX ENERGY",
      "product": "OPTIMAL 606 FIX",
      "price_mwh_excl_vat": 2990.0,
@@ -343,9 +717,11 @@
       15894.56
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-10-21"
     },
     {
@@ -361,14 +737,16 @@
       16050.28
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": false,
      "confirmation": "jen z přípravy: ceník dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
      "price_list_url": null,
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-10-01"
     },
     {
      "supplier_id": "centropol",
-     "audience": null,
+     "audience": "new",
      "supplier": "Centropol",
      "product": "Fixně online pro začátek na 2 roky",
      "price_mwh_excl_vat": 3213.0,
@@ -379,14 +757,16 @@
       17511.12
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-11-04"
     },
     {
      "supplier_id": "cez",
-     "audience": "existing",
+     "audience": "all",
      "supplier": "ČEZ Prodej",
      "product": "Elektřina Bez starostí na 2 roky",
      "price_mwh_excl_vat": 3223.14,
@@ -397,14 +777,16 @@
       17560.2
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-08-25"
     },
     {
      "supplier_id": "epet",
-     "audience": null,
+     "audience": "new",
      "supplier": "epet",
      "product": "FIX 24 GARANT",
      "price_mwh_excl_vat": 3399.0,
@@ -415,9 +797,11 @@
       18338.76
      ],
      "position": "within",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-11-06/EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-11-04"
     }
    ]
@@ -442,14 +826,16 @@
       15320.2
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-01-30"
     },
     {
      "supplier_id": "armex",
-     "audience": null,
+     "audience": "new",
      "supplier": "ARMEX ENERGY",
      "product": "KLASIK 602 FIX",
      "price_mwh_excl_vat": 3250.0,
@@ -460,14 +846,16 @@
       17603.08
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-08-01"
     },
     {
      "supplier_id": "cez",
-     "audience": "existing",
+     "audience": "all",
      "supplier": "ČEZ Prodej",
      "product": "Elektřina Bez starostí na 1 rok",
      "price_mwh_excl_vat": 3280.99,
@@ -478,14 +866,16 @@
       17840.2
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-08-25"
     },
     {
      "supplier_id": "centropol",
-     "audience": null,
+     "audience": "new",
      "supplier": "Centropol",
      "product": "Fixně online pro začátek na 1 rok",
      "price_mwh_excl_vat": 3608.0,
@@ -496,12 +886,21 @@
       19422.92
      ],
      "position": "below",
+     "period": "2026-11",
      "confirmed_live": true,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list_url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
+     "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d",
      "effective_from": "2026-11-04"
     }
    ]
+  }
+ ],
+ "comparison_excluded": [
+  {
+   "supplier": "E.ON",
+   "product": "Variant na 3 roky",
+   "reason": "Nabídka je určena jiné skupině zákazníků."
   }
  ],
  "market": {
@@ -584,11 +983,15 @@
    "to": "2026-09"
   },
   "market_electricity_pct": 0.6,
+  "market_cohort": {
+   "included": 109,
+   "excluded": 9
+  },
   "observations": [
    "Nejlevnější nabídku ve vzorku má ČEZ Prodej, přesto odběrná místa elektřiny ztrácí (-4 252, -0,2 %).",
    "Nejdražší nabídku ve vzorku má epet, přesto roste (+5,7 %).",
    "U fixace na 24 měsíců je nejlevnější ARMEX ENERGY a také ztrácí (-1 263, -2,5 %).",
-   "Nejnižší cena tedy sama o sobě zákazníky nepřivádí."
+   "Ve vzorku tedy nejnižší ceníková cena nejde ruku v ruce s růstem počtu odběrných míst. Jde o souběh dvou údajů, ne o zjištěnou příčinu."
   ],
   "rows": [
    {
@@ -913,7 +1316,7 @@
     }
    }
   ],
-  "caveat": "Odběrná místa nejsou zákazníci; změna může zahrnovat i převzetí jiného dodavatele. Jde o souběh dvou údajů, ne o důkaz příčiny. Ceny jsou nabídky pro nové zákazníky v jedné sazbě a jednom distribučním území."
+  "caveat": "Odběrná místa nejsou zákazníci; změna může zahrnovat i převzetí jiného dodavatele. Změny se počítají za stejné období pro všechny; dodavatel bez údaje na začátku nebo na konci období změnu nemá. Jde o souběh dvou údajů, ne o důkaz příčiny. Ceny jsou nabídky pro nové zákazníky v jedné sazbě a jednom distribučním území a pořadí platí jen pro tento vzorek."
  },
  "perspective": {
   "id": "centropol",
@@ -1023,10 +1426,10 @@
    {
     "id": "centropol-2",
     "quote": "Největší český dodavatel energií",
-    "verdict": "partially_supported",
-    "verdict_label": "částečně podloženo",
-    "finding": "Podle OTE má CENTROPOL ENERGY, a.s. dohromady 292 503 odběrných míst elektřiny a plynu. Mezi všemi dodavateli jsou větší ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779); mimo tradiční dodavatele je ale největší.",
-    "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Pojem „český dodavatel“ tvrzení nedefinuje, proto se posuzuje podle výkladů stanovených týmem. Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json. Za tradiční se berou: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.. Velikost se měří součtem odběrných míst elektřiny a plynu; objem dodané energie ani vlastnictví firem v datech nejsou."
+    "verdict": "unverifiable",
+    "verdict_label": "nelze ověřit",
+    "finding": "Tvrzení neuvádí, podle čeho se velikost měří (zákazníci, odběrná místa, objem dodávky, tržby). OTE zveřejňuje jen počty odběrných míst, proto je níže jen jako kontext, ne jako verdikt. Data OTE neobsahují vlastnictví firem, takže „český dodavatel“ z nich určit nelze. Mezi všemi dodavateli je Centropol podle odběrných míst elektřiny 5. (225 805 OPM, 2026-09).",
+    "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby."
    }
   ],
   "solid": [
@@ -1035,13 +1438,13 @@
     "quote": "Přidejte se k nám a ušetříte.",
     "verdict": "partially_supported",
     "verdict_label": "částečně podloženo",
-    "finding": "Všechny srovnatelné nabídky jsou pod pásmem ERÚ, tedy podle ERÚ mezi nejlevnější čtvrtinou fixovaných nabídek na trhu (Fixně online pro začátek na 3 roky pod pásmem; Fixně online pro začátek na 2 roky pod pásmem; Fixně online pro začátek na 1 rok pod pásmem). Skutečná úspora konkrétního zákazníka ale závisí na jeho současné smlouvě.",
-    "limitation": "Pásmo ERÚ odpovídá zhruba 25. až 50. percentilu fixovaných nabídek na trhu (dolní mez = hranice nejlevnější čtvrtiny, horní mez = přibližně medián). Je to cena komodity bez stálého měsíčního platu a bez regulovaných složek; neříká nic o celkovém účtu ani o tom, zda je nabídka nejlevnější na trhu."
+    "finding": "Všechny srovnatelné nabídky jsou pod indikativním pásmem ERÚ pro svou sazbu, fixaci a měsíc (Fixně online pro začátek na 3 roky pod pásmem; Fixně online pro začátek na 2 roky pod pásmem; Fixně online pro začátek na 1 rok pod pásmem). Skutečná úspora konkrétního zákazníka ale závisí na jeho současné smlouvě.",
+    "limitation": "Indikativní pásmo ERÚ je odhad ceny komodity pro danou sazbu, délku fixace a měsíc, bez stálého platu a regulovaných složek. Podle metodiky ERÚ dolní mez navazuje na 25. percentil a horní mez přibližně na medián nabídek ze srovnávače, nabídky se ale od pásma krátkodobě odchylují. Pozice vůči pásmu proto není změřené pořadí na trhu ani celkový účet."
    }
   ],
   "provable": [
    {
-    "text": "Rosteme: počet našich odběrných míst elektřiny vzrostl od 2026-01 do 2026-09 o 5 948 (+2,7 %). Trh jako celek se změnil o +0,6 %.",
+    "text": "Rosteme: počet našich odběrných míst elektřiny vzrostl od 2026-01 do 2026-09 o 5 948 (+2,7 %). Trh za stejné období (dodavatelé s údajem na začátku i na konci) se změnil o +0,6 %.",
     "source": "OTE – počty OPM dodavatelů elektřiny",
     "caveat": "Odběrná místa nejsou zákazníci; změna může zahrnovat i převzetí jiného dodavatele."
    },
@@ -1051,14 +1454,14 @@
     "caveat": "Odběrná místa nejsou zákazníci; změna může zahrnovat i převzetí jiného dodavatele."
    },
    {
-    "text": "Podle OTE máme 225 805 odběrných míst elektřiny (5. místo z 114 dodavatelů) a 66 698 plynu, dohromady 292 503.",
+    "text": "Podle OTE máme 225 805 odběrných míst elektřiny (5. místo z 114 dodavatelů, 2026-09); s plynem dohromady 292 503.",
     "source": "OTE – počty OPM",
-    "caveat": "Uvádět jako odběrná místa, ne jako zákazníky."
+    "caveat": "Uvádět jako odběrná místa, ne jako zákazníky, a s měsícem údaje."
    },
    {
-    "text": "Naše fixované nabídky (Fixně online pro začátek na 3 roky, Fixně online pro začátek na 2 roky, Fixně online pro začátek na 1 rok) jsou pod indikativním pásmem ERÚ, tedy podle ERÚ mezi nejlevnější čtvrtinou fixovaných nabídek na trhu.",
+    "text": "Cena komodity našich fixovaných nabídek (Fixně online pro začátek na 3 roky, Fixně online pro začátek na 2 roky, Fixně online pro začátek na 1 rok) je pod indikativním pásmem ERÚ pro sazbu D02d, příslušnou délku fixace a měsíc.",
     "source": "ERÚ – indikativní pásma nabídkových cen",
-    "caveat": "Platí pro cenu komodity v sazbě D02d a aktuální měsíc; pásmo se mění každý měsíc."
+    "caveat": "Pásmo je odhad ERÚ, ne změřené pořadí na trhu; neříkat „nejlevnější čtvrtina trhu“. Platí jen pro cenu komodity (bez stálého platu a regulovaných složek) a daný měsíc."
    },
    {
     "text": "Při fixaci na 36 měsíců jsme levnější než epet (FIX 36 GARANT): o 1 094 Kč ročně při 2 MWh a o 2 260 Kč ročně při 4 MWh.",
@@ -1098,8 +1501,8 @@
     "kind": "claim",
     "supplier": "Dobrá Energie",
     "quote": "Po sloučení s epet jsme největší alternativní dodavatel energií v ČR",
-    "verdict_label": "v rozporu s daty",
-    "text": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají i dodavatelé mimo tradiční skupiny: CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578). Tvrzení neplatí při žádném z výkladů."
+    "verdict_label": "nelze ověřit",
+    "text": "Tvrzení neuvádí, podle čeho se velikost měří (zákazníci, odběrná místa, objem dodávky, tržby). OTE zveřejňuje jen počty odběrných míst, proto je níže jen jako kontext, ne jako verdikt. Při výkladu týmu („alternativní“ = mimo tradiční skupiny: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.) a měření odběrnými místy elektřiny a plynu by tvrzení neplatilo: víc jich má CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578)."
    },
    {
     "kind": "regulator",
@@ -1131,16 +1534,16 @@
    "source_url": "https://www.cez.cz/cs/prejdeteknam",
    "page": {
     "source_url": "https://www.cez.cz/cs/prejdeteknam",
-    "fetched_at": "2026-11-13T14:37:58+00:00",
+    "fetched_at": "2026-11-16T18:24:18+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "bfb295c3381baf7d",
+    "sha256": "015c4f0d7cb21c17",
     "name": "Web dodavatele ČEZ Prodej",
     "text_sha256": "14f088b56aae53ee"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [
     {
@@ -1153,14 +1556,18 @@
      "price_mwh_incl_vat": 3250.0,
      "monthly_fee_incl_vat": 163.35,
      "audience": "new",
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
       "document": "moo_ele_pre_fix_na_3_roky_30012026_012026.pdf",
-      "effective_from": "2026-01-30"
+      "effective_from": "2026-01-30",
+      "reviewed_sha256": "e541c3be5e9a5c26e20aa7f60b9583be5cf32c6e32b6af8be870bc67beb1b305",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "cez-fix36",
@@ -1170,7 +1577,9 @@
       "eligible": true,
       "reason": null,
       "price": 2685.95,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -1183,14 +1592,18 @@
      "price_mwh_incl_vat": 3340.0,
      "monthly_fee_incl_vat": 163.35,
      "audience": "new",
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
       "document": "moo_ele_pre_online_na_1_rok_30012026_012026.pdf",
-      "effective_from": "2026-01-30"
+      "effective_from": "2026-01-30",
+      "reviewed_sha256": "6961b7f5bd95cb63041ed3228af355d8afc82afecb739ef42c4579220ccd29e1",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "cez-online12",
@@ -1200,7 +1613,9 @@
       "eligible": true,
       "reason": null,
       "price": 2760.33,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -1212,15 +1627,19 @@
      "price_mwh_excl_vat": 3000.0,
      "price_mwh_incl_vat": 3630.0,
      "monthly_fee_incl_vat": 163.35,
-     "audience": "existing",
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "all",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
       "document": "moo_ele_pre_bez_starosti_na_3_roky_25082026_012026.pdf",
-      "effective_from": "2026-08-25"
+      "effective_from": "2026-08-25",
+      "reviewed_sha256": "f21625b5ac1e7503df96c45ecd046b0ddee614dffb14855c0420ab080e4f58f5",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "cez-bezstarosti36",
@@ -1230,7 +1649,9 @@
       "eligible": true,
       "reason": null,
       "price": 3000.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -1242,15 +1663,19 @@
      "price_mwh_excl_vat": 3223.14,
      "price_mwh_incl_vat": 3900.0,
      "monthly_fee_incl_vat": 163.35,
-     "audience": "existing",
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "all",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
       "document": "moo_ele_pre_bez_starosti_na_2_roky_25082026_012026.pdf",
-      "effective_from": "2026-08-25"
+      "effective_from": "2026-08-25",
+      "reviewed_sha256": "1987f52ba59a1d94692722879fc2d9503df943deb9fd9fc54561d875fe00f2fe",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "cez-bezstarosti24",
@@ -1260,7 +1685,9 @@
       "eligible": true,
       "reason": null,
       "price": 3223.14,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -1272,15 +1699,19 @@
      "price_mwh_excl_vat": 3280.99,
      "price_mwh_incl_vat": 3970.0,
      "monthly_fee_incl_vat": 163.35,
-     "audience": "existing",
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "all",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.cez.cz/webpublic/file/edee/ceniky/moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
       "document": "moo_ele_pre_bez_starosti_na_1_rok_25082026_012026.pdf",
-      "effective_from": "2026-08-25"
+      "effective_from": "2026-08-25",
+      "reviewed_sha256": "d309c4a76dd37b2792e31e3f37e20c8f3e3fa490c4389a48f19e657a55c5ec04",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "cez-bezstarosti12",
@@ -1290,7 +1721,9 @@
       "eligible": true,
       "reason": null,
       "price": 3280.99,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     }
    ],
@@ -1305,13 +1738,13 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "částečně podloženo",
+     "verdict_label": "nelze ověřit",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "partially_supported",
-     "finding": "V elektřině je dodavatel 1. (2 694 690 OPM, 2026-09). V plynu je 2. (615 980 OPM, 2026-09); největší v plynu je innogy Energie, s.r.o. (1 019 792 OPM). V součtu elektřiny a plynu je 1. (3 310 670 OPM).",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Tvrzení může myslet jinou metriku.",
-     "action": "Příležitost: tvrzení platí pro elektřinu a pro součet obou komodit, ne pro plyn samostatně. Kdo je silný v plynu, může to doložit přesnými čísly OTE.",
+     "verdict": "unverifiable",
+     "finding": "Tvrzení neuvádí, podle čeho se velikost měří (zákazníci, odběrná místa, objem dodávky, tržby). OTE zveřejňuje jen počty odběrných míst, proto je níže jen jako kontext, ne jako verdikt. Podle odběrných míst (OTE, 2026-09): Elektřina podle OPM: 1. místo; Plyn podle OPM: 2. místo; největší je innogy Energie, s.r.o..",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby.",
+     "action": "Příležitost: podle odběrných míst tvrzení neplatí ve všech komoditách. Lze se zeptat, jakou metriku dodavatel myslí; vlastní tvrzení o velikosti formulovat s metrikou a zdrojem.",
      "evidence": [
       {
        "label": "Elektřina – ČEZ Prodej, a.s.: 2 694 690 OPM (2026-09)",
@@ -1334,23 +1767,19 @@
        "source": "ote_gas"
       },
       {
-       "label": "Součet elektřina + plyn: 3 310 670 OPM",
-       "value": "1. místo; pět největších: 1. ČEZ Prodej, a.s. (3 310 670); 2. innogy Energie, s.r.o. (1 684 220); 3. E.ON Energie, a.s. (1 536 779); 4. Pražská energetika, a.s. (838 677); 5. Pražská plynárenská, a.s. (455 328)",
+       "label": "Součet elektřina + plyn (2026-09): 3 310 670 OPM",
+       "value": "ČEZ Prodej, a.s. – elektřina: 2 694 690; ČEZ Prodej, a.s. – plyn: 615 980",
        "source": "ote"
       }
      ],
      "subclaims": [
       {
-       "text": "Největší dodavatel elektřiny (podle OPM)",
-       "status": "ověřeno"
+       "text": "Elektřina podle OPM",
+       "status": "1. místo"
       },
       {
-       "text": "Největší dodavatel plynu (podle OPM)",
-       "status": "v rozporu s daty OTE – 2. místo, největší je innogy Energie, s.r.o."
-      },
-      {
-       "text": "Největší v součtu elektřiny a plynu",
-       "status": "ověřeno"
+       "text": "Plyn podle OPM",
+       "status": "2. místo; největší je innogy Energie, s.r.o."
       }
      ],
      "possible_regulatory_risk": false,
@@ -1370,13 +1799,13 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "supported",
-     "finding": "Všechny srovnatelné nabídky jsou pod pásmem ERÚ, tedy podle ERÚ mezi nejlevnější čtvrtinou fixovaných nabídek na trhu (Elektřina Fix na 3 roky pod pásmem; Elektřina Online na 1 rok pod pásmem; Elektřina Bez starostí na 3 roky pod pásmem; Elektřina Bez starostí na 2 roky pod pásmem; Elektřina Bez starostí na 1 rok pod pásmem).",
-     "limitation": "Pásmo ERÚ odpovídá zhruba 25. až 50. percentilu fixovaných nabídek na trhu (dolní mez = hranice nejlevnější čtvrtiny, horní mez = přibližně medián). Je to cena komodity bez stálého měsíčního platu a bez regulovaných složek; neříká nic o celkovém účtu ani o tom, zda je nabídka nejlevnější na trhu. „Výhodná cena“ je zde vyložena jako cena nepřesahující pásmo ERÚ.",
-     "action": "Cenou komodity tohoto konkurenta nepodbízet; odlišit se stálým platem, podmínkami a službami.",
+     "finding": "Všechny srovnatelné nabídky jsou pod indikativním pásmem ERÚ pro svou sazbu, fixaci a měsíc (Elektřina Fix na 3 roky pod pásmem; Elektřina Online na 1 rok pod pásmem; Elektřina Bez starostí na 3 roky pod pásmem; Elektřina Bez starostí na 2 roky pod pásmem; Elektřina Bez starostí na 1 rok pod pásmem).",
+     "limitation": "Indikativní pásmo ERÚ je odhad ceny komodity pro danou sazbu, délku fixace a měsíc, bez stálého platu a regulovaných složek. Podle metodiky ERÚ dolní mez navazuje na 25. percentil a horní mez přibližně na medián nabídek ze srovnávače, nabídky se ale od pásma krátkodobě odchylují. Pozice vůči pásmu proto není změřené pořadí na trhu ani celkový účet. „Výhodná cena“ je zde vyložena jako cena nepřesahující pásmo ERÚ.",
+     "action": "Cena komodity konkurenta je vůči pásmu ERÚ nízko; soutěžit spíš stálým platem, podmínkami a službami.",
      "evidence": [
       {
        "label": "Elektřina Fix na 3 roky: 2 686 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3242.1611569371285,
@@ -1387,7 +1816,7 @@
       },
       {
        "label": "Elektřina Online na 1 rok: 2 760 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3834.1199946102115,
@@ -1398,7 +1827,7 @@
       },
       {
        "label": "Elektřina Bez starostí na 3 roky: 3 000 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3242.1611569371285,
@@ -1409,7 +1838,7 @@
       },
       {
        "label": "Elektřina Bez starostí na 2 roky: 3 223 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 387–3 569 Kč/MWh (bez DPH; D02d, fixace 24 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 387–3 569 Kč/MWh (bez DPH; D02d, fixace 24 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3387.3525703324126,
@@ -1420,7 +1849,7 @@
       },
       {
        "label": "Elektřina Bez starostí na 1 rok: 3 281 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3834.1199946102115,
@@ -1462,67 +1891,6 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": 2
-    },
-    {
-     "id": "cez-n1",
-     "supplier": "ČEZ Prodej",
-     "quote": "Přejděte k největšímu dodavateli elektřiny a plynu",
-     "rule_id": "market_size",
-     "rule_label": "Velikost na trhu",
-     "source_url": "https://www.cez.cz/cs/prejdeteknam",
-     "captured_at": "2026-11-13",
-     "source_status": "live",
-     "discovered": true,
-     "verdict_label": "částečně podloženo",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "partially_supported",
-     "finding": "V elektřině je dodavatel 1. (2 694 690 OPM, 2026-09). V plynu je 2. (615 980 OPM, 2026-09); největší v plynu je innogy Energie, s.r.o. (1 019 792 OPM). V součtu elektřiny a plynu je 1. (3 310 670 OPM).",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Tvrzení může myslet jinou metriku.",
-     "action": "Příležitost: tvrzení platí pro elektřinu a pro součet obou komodit, ne pro plyn samostatně. Kdo je silný v plynu, může to doložit přesnými čísly OTE.",
-     "evidence": [
-      {
-       "label": "Elektřina – ČEZ Prodej, a.s.: 2 694 690 OPM (2026-09)",
-       "value": "1. místo z 114 dodavatelů",
-       "source": "ote"
-      },
-      {
-       "label": "Pět největších v elektřině podle OPM",
-       "value": "1. ČEZ Prodej, a.s. (2 694 690); 2. E.ON Energie, a.s. (1 256 867); 3. Pražská energetika, a.s. (796 293); 4. innogy Energie, s.r.o. (664 428); 5. CENTROPOL ENERGY, a.s. (225 805)",
-       "source": "ote"
-      },
-      {
-       "label": "Plyn – ČEZ Prodej, a.s.: 615 980 OPM (2026-09)",
-       "value": "2. místo z 57 dodavatelů",
-       "source": "ote_gas"
-      },
-      {
-       "label": "Pět největších v plynu podle OPM",
-       "value": "1. innogy Energie, s.r.o. (1 019 792); 2. ČEZ Prodej, a.s. (615 980); 3. Pražská plynárenská, a.s. (347 967); 4. E.ON Energie, a.s. (279 912); 5. MND Energie a.s. (114 942)",
-       "source": "ote_gas"
-      },
-      {
-       "label": "Součet elektřina + plyn: 3 310 670 OPM",
-       "value": "1. místo; pět největších: 1. ČEZ Prodej, a.s. (3 310 670); 2. innogy Energie, s.r.o. (1 684 220); 3. E.ON Energie, a.s. (1 536 779); 4. Pražská energetika, a.s. (838 677); 5. Pražská plynárenská, a.s. (455 328)",
-       "source": "ote"
-      }
-     ],
-     "subclaims": [
-      {
-       "text": "Největší dodavatel elektřiny (podle OPM)",
-       "status": "ověřeno"
-      },
-      {
-       "text": "Největší dodavatel plynu (podle OPM)",
-       "status": "v rozporu s daty OTE – 2. místo, největší je innogy Energie, s.r.o."
-      },
-      {
-       "text": "Největší v součtu elektřiny a plynu",
-       "status": "ověřeno"
-      }
-     ],
-     "possible_regulatory_risk": false,
-     "opportunity": 2
     }
    ],
    "candidates": [],
@@ -1551,7 +1919,9 @@
      "url": "https://eru.gov.cz/rozhodnuti-ve-sporu-mezi-cez-prodej-sasa-sun-sro",
      "kind": "dispute"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "centropol",
@@ -1559,16 +1929,16 @@
    "source_url": "https://www.centropol.cz/domacnost/elektrina/",
    "page": {
     "source_url": "https://www.centropol.cz/domacnost/elektrina/",
-    "fetched_at": "2026-11-13T14:37:59+00:00",
+    "fetched_at": "2026-11-16T18:24:19+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "2201741e9f1b749c",
+    "sha256": "5fc19a1c1bbf8694",
     "name": "Web dodavatele Centropol",
-    "text_sha256": "235e0631bbe75710"
+    "text_sha256": "f94d58d97735f4e0"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [
     {
@@ -1580,14 +1950,19 @@
      "price_mwh_excl_vat": 2817.0,
      "price_mwh_incl_vat": 3408.57,
      "monthly_fee_incl_vat": 163.35,
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "new",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
       "document": "d-fixne-online-pro-zacatek-na-3-roky-04112026-d-pre-01012026.pdf",
-      "effective_from": "2026-11-04"
+      "effective_from": "2026-11-04",
+      "reviewed_sha256": "bc3a8475a19746e9fec40410e9b57b0a21bd5b90bd79d0b431ca15b80f3cf4d4",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "centropol-fix36",
@@ -1597,7 +1972,9 @@
       "eligible": true,
       "reason": null,
       "price": 2817.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -1609,14 +1986,19 @@
      "price_mwh_excl_vat": 3213.0,
      "price_mwh_incl_vat": 3887.73,
      "monthly_fee_incl_vat": 163.35,
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "new",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
       "document": "d-fixne-online-pro-zacatek-na-2-roky-04112026-d-pre-01012026.pdf",
-      "effective_from": "2026-11-04"
+      "effective_from": "2026-11-04",
+      "reviewed_sha256": "5e8316fd523fb36cc138c93c8c343adffd597c7b85a5c3d03c44f08f9ad282e1",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "centropol-fix24",
@@ -1626,7 +2008,9 @@
       "eligible": true,
       "reason": null,
       "price": 3213.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -1638,14 +2022,19 @@
      "price_mwh_excl_vat": 3608.0,
      "price_mwh_incl_vat": 4365.68,
      "monthly_fee_incl_vat": 163.35,
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "new",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.centropol.cz/wp-content/uploads/2026/11/d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
       "document": "d-fixne-online-pro-zacatek-na-1-rok-04112026-d-pre-01012026.pdf",
-      "effective_from": "2026-11-04"
+      "effective_from": "2026-11-04",
+      "reviewed_sha256": "09ddd13da37cb7857ddac078ba2e6dbdc1d5d1bf3a9c44c9d91ceedb6e5071b4",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "centropol-fix12",
@@ -1655,7 +2044,9 @@
       "eligible": true,
       "reason": null,
       "price": 3608.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     }
    ],
@@ -1691,11 +2082,6 @@
       {
        "label": "Fixace 36 měs.: Centropol – Fixně online pro začátek na 3 roky 2 817 Kč/MWh",
        "value": "E.ON – Variant PRO na 3 roky: 2 799 Kč/MWh (rozdíl +18 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 8 777 Kč vs. 8 792 Kč; 4 MWh/rok: 15 594 Kč vs. 15 566 Kč",
-       "source": "web:eon"
-      },
-      {
-       "label": "Fixace 36 měs.: Centropol – Fixně online pro začátek na 3 roky 2 817 Kč/MWh",
-       "value": "E.ON – Variant na 3 roky: 3 239 Kč/MWh (rozdíl -422 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 8 777 Kč vs. 9 856 Kč; 4 MWh/rok: 15 594 Kč vs. 17 694 Kč",
        "source": "web:eon"
       },
       {
@@ -1753,13 +2139,13 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "částečně podloženo",
+     "verdict_label": "nelze ověřit",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "partially_supported",
-     "finding": "Podle OTE má CENTROPOL ENERGY, a.s. dohromady 292 503 odběrných míst elektřiny a plynu. Mezi všemi dodavateli jsou větší ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779); mimo tradiční dodavatele je ale největší.",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Pojem „český dodavatel“ tvrzení nedefinuje, proto se posuzuje podle výkladů stanovených týmem. Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json. Za tradiční se berou: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.. Velikost se měří součtem odběrných míst elektřiny a plynu; objem dodané energie ani vlastnictví firem v datech nejsou.",
-     "action": "Příležitost: tvrzení platí jen při užším výkladu. Formulace s konkrétním číslem a zdrojem by obstála lépe.",
+     "verdict": "unverifiable",
+     "finding": "Tvrzení neuvádí, podle čeho se velikost měří (zákazníci, odběrná místa, objem dodávky, tržby). OTE zveřejňuje jen počty odběrných míst, proto je níže jen jako kontext, ne jako verdikt. Data OTE neobsahují vlastnictví firem, takže „český dodavatel“ z nich určit nelze. Mezi všemi dodavateli je Centropol podle odběrných míst elektřiny 5. (225 805 OPM, 2026-09).",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby.",
+     "action": "Příležitost: superlativ „největší český“ stojí na pojmu, který data nedefinují. Vlastní tvrzení o velikosti formulovat s konkrétním číslem a zdrojem.",
      "evidence": [
       {
        "label": "Elektřina – CENTROPOL ENERGY, a.s.: 225 805 OPM (2026-09)",
@@ -1770,25 +2156,16 @@
        "label": "Pět největších v elektřině podle OPM",
        "value": "1. ČEZ Prodej, a.s. (2 694 690); 2. E.ON Energie, a.s. (1 256 867); 3. Pražská energetika, a.s. (796 293); 4. innogy Energie, s.r.o. (664 428); 5. CENTROPOL ENERGY, a.s. (225 805)",
        "source": "ote"
-      },
-      {
-       "label": "Součet odběrných míst elektřiny a plynu – CENTROPOL ENERGY, a.s.: 292 503",
-       "value": "větší: ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)",
-       "source": "ote"
       }
      ],
      "subclaims": [
       {
-       "text": "Výklad „všichni dodavatelé“",
-       "status": "neplatí – víc odběrných míst má ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)"
-      },
-      {
-       "text": "Výklad „dodavatelé mimo tradiční skupiny“",
-       "status": "platí"
+       "text": "Elektřina podle OPM",
+       "status": "5. místo; největší je ČEZ Prodej, a.s."
       }
      ],
      "possible_regulatory_risk": false,
-     "opportunity": 2
+     "opportunity": true
     },
     {
      "id": "centropol-3",
@@ -1804,13 +2181,13 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "partially_supported",
-     "finding": "Všechny srovnatelné nabídky jsou pod pásmem ERÚ, tedy podle ERÚ mezi nejlevnější čtvrtinou fixovaných nabídek na trhu (Fixně online pro začátek na 3 roky pod pásmem; Fixně online pro začátek na 2 roky pod pásmem; Fixně online pro začátek na 1 rok pod pásmem). Skutečná úspora konkrétního zákazníka ale závisí na jeho současné smlouvě.",
-     "limitation": "Pásmo ERÚ odpovídá zhruba 25. až 50. percentilu fixovaných nabídek na trhu (dolní mez = hranice nejlevnější čtvrtiny, horní mez = přibližně medián). Je to cena komodity bez stálého měsíčního platu a bez regulovaných složek; neříká nic o celkovém účtu ani o tom, zda je nabídka nejlevnější na trhu.",
+     "finding": "Všechny srovnatelné nabídky jsou pod indikativním pásmem ERÚ pro svou sazbu, fixaci a měsíc (Fixně online pro začátek na 3 roky pod pásmem; Fixně online pro začátek na 2 roky pod pásmem; Fixně online pro začátek na 1 rok pod pásmem). Skutečná úspora konkrétního zákazníka ale závisí na jeho současné smlouvě.",
+     "limitation": "Indikativní pásmo ERÚ je odhad ceny komodity pro danou sazbu, délku fixace a měsíc, bez stálého platu a regulovaných složek. Podle metodiky ERÚ dolní mez navazuje na 25. percentil a horní mez přibližně na medián nabídek ze srovnávače, nabídky se ale od pásma krátkodobě odchylují. Pozice vůči pásmu proto není změřené pořadí na trhu ani celkový účet.",
      "action": "Tvrzení o úspoře je pro zákazníka neověřitelné předem; můžeme nabídnout konkrétní kalkulaci úspory.",
      "evidence": [
       {
        "label": "Fixně online pro začátek na 3 roky: 2 817 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3242.1611569371285,
@@ -1821,7 +2198,7 @@
       },
       {
        "label": "Fixně online pro začátek na 2 roky: 3 213 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 387–3 569 Kč/MWh (bez DPH; D02d, fixace 24 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 387–3 569 Kč/MWh (bez DPH; D02d, fixace 24 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3387.3525703324126,
@@ -1832,7 +2209,7 @@
       },
       {
        "label": "Fixně online pro začátek na 1 rok: 3 608 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3834.1199946102115,
@@ -1854,31 +2231,21 @@
      ],
      "possible_regulatory_risk": false,
      "opportunity": false
-    },
+    }
+   ],
+   "candidates": [
     {
      "id": "centropol-n1",
      "supplier": "Centropol",
-     "quote": "Nízké ceny elektřiny v případě změny dodavatele.",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
+     "quote": "Zjistěte, kolik byste s námi mohli ušetřit na energiích.",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
      "source_url": "https://www.centropol.cz/domacnost/elektrina/",
      "captured_at": "2026-11-13",
      "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
+     "discovered": true
     }
    ],
-   "candidates": [],
    "decisions": [
     {
      "date": "17.06.2025",
@@ -1916,7 +2283,9 @@
      "url": "https://eru.gov.cz/centropol-energy-usneseni-o-zastaveni-rizeni",
      "kind": "discontinued"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "eon",
@@ -1924,16 +2293,16 @@
    "source_url": "https://www.eon.cz/domacnosti/elektrina/",
    "page": {
     "source_url": "https://www.eon.cz/domacnosti/elektrina/",
-    "fetched_at": "2026-11-13T14:37:59+00:00",
+    "fetched_at": "2026-11-16T18:24:18+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "72a588bf40773f05",
+    "sha256": "68b8f96137ea4566",
     "name": "Web dodavatele E.ON",
     "text_sha256": "9f0a50a2837d4be5"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [
     {
@@ -1946,15 +2315,17 @@
      "price_mwh_incl_vat": 3387.0,
      "monthly_fee_incl_vat": 168.19,
      "audience": "new",
+     "captured_at": "2026-11-13",
+     "document_status": null,
      "confirmed_live": true,
      "stale": false,
-     "confirmation": "cena nalezena na živé stránce dodavatele; stálý plat z ceníku, který dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
-     "captured_at": "2026-11-13",
+     "confirmation": "cena nalezena na živé stránce dodavatele (kontrola přítomnosti); stálý plat z ceníku, který dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
      "price_list": {
       "url": null,
       "document": "cenik--variant--pro--na--3--roky--10_26-----distribucni--uzemi--pre.pdf",
       "effective_from": "2026-10-10",
-      "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
+      "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "eon-variantpro36",
@@ -1964,7 +2335,9 @@
       "eligible": true,
       "reason": null,
       "price": 2799.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -1977,15 +2350,17 @@
      "price_mwh_incl_vat": 3508.0,
      "monthly_fee_incl_vat": 168.19,
      "audience": "new",
+     "captured_at": "2026-11-13",
+     "document_status": null,
      "confirmed_live": false,
      "stale": false,
      "confirmation": "jen z přípravy: ceník dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
-     "captured_at": "2026-11-13",
      "price_list": {
       "url": null,
       "document": "cenik--variant--pro--na--2--roky--10_26-----distribucni--uzemi--pre.pdf",
       "effective_from": "2026-10-01",
-      "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
+      "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "eon-variantpro24",
@@ -1995,7 +2370,11 @@
       "eligible": true,
       "reason": null,
       "price": 2899.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": [
+       "Nabídka není živě potvrzena; srovnává se k období zachycení 2026-11."
+      ]
      }
     },
     {
@@ -2008,15 +2387,17 @@
      "price_mwh_incl_vat": 3919.0,
      "monthly_fee_incl_vat": 168.19,
      "audience": "existing",
+     "captured_at": "2026-11-13",
+     "document_status": null,
      "confirmed_live": false,
      "stale": false,
      "confirmation": "jen z přípravy: ceník dodal tým (PDF staženo z eon.cz 13. 11. 2026)",
-     "captured_at": "2026-11-13",
      "price_list": {
       "url": null,
       "document": "cenik--variant--na--3--roky--11_26-----distribucni--uzemi--pre.pdf",
       "effective_from": "2026-11-04",
-      "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)"
+      "provided_by": "tým (PDF staženo z eon.cz 13. 11. 2026)",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "eon-variant36",
@@ -2026,7 +2407,11 @@
       "eligible": true,
       "reason": null,
       "price": 3239.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": [
+       "Nabídka není živě potvrzena; srovnává se k období zachycení 2026-11."
+      ]
      }
     }
    ],
@@ -2051,7 +2436,7 @@
      "evidence": [
       {
        "label": "Variant PRO na 3 roky: 2 799 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3242.1611569371285,
@@ -2062,7 +2447,7 @@
       },
       {
        "label": "Variant na 3 roky: 3 239 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 242–3 430 Kč/MWh (bez DPH; D02d, fixace 36 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3242.1611569371285,
@@ -2095,40 +2480,21 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "částečně podloženo",
+     "verdict_label": "nelze ověřit",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "partially_supported",
-     "finding": "OTE eviduje 1 256 867 odběrných míst elektřiny a 279 912 plynu, dohromady 1 536 779. Tvrzených 1 500 000 zákazníků je s tím řádově v souladu (zákazníků s dodávkou energií nemůže být víc než odběrných míst).",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat i jiné služby než dodávku energií.",
-     "action": "Tvrzení o velikosti nenapadat.",
+     "verdict": "unverifiable",
+     "finding": "Tvrzení mluví o zákaznících, OTE eviduje odběrná místa. OTE eviduje 1 536 779 odběrných míst (E.ON Energie, a.s. – elektřina: 1 256 867; E.ON Energie, a.s. – plyn: 279 912) za 2026-09. Řádově to tvrzení neodporuje, počet zákazníků ale z odběrných míst určit nelze.",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat jiné služby, země nebo období. Tvrzení neuvádí datum; porovnává se s posledním zveřejněným měsícem OTE (2026-09).",
+     "action": "Bez akce. Údaj OTE použít jen jako kontext řádové velikosti.",
      "evidence": [
       {
-       "label": "Elektřina – E.ON Energie, a.s.: 1 256 867 OPM (2026-09)",
-       "value": "tvrzeno: 1 500 000",
-       "source": "ote"
-      },
-      {
-       "label": "Plyn – E.ON Energie, a.s.: 279 912 OPM (2026-09)",
-       "value": "druhá komodita téhož dodavatele",
-       "source": "ote_gas"
-      },
-      {
-       "label": "Součet elektřina + plyn: 1 536 779 OPM",
-       "value": "tvrzeno 1 500 000 zákazníků",
+       "label": "Odběrná místa podle OTE (2026-09)",
+       "value": "E.ON Energie, a.s. – elektřina: 1 256 867; E.ON Energie, a.s. – plyn: 279 912; tvrzeno 1 500 000",
        "source": "ote"
       }
      ],
-     "subclaims": [
-      {
-       "text": "Řádová velikost odpovídá počtu odběrných míst",
-       "status": "ověřeno"
-      },
-      {
-       "text": "Jde o počet zákazníků, ne odběrných míst",
-       "status": "neověřeno – OTE zákazníky neeviduje"
-      }
-     ],
+     "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
     },
@@ -2166,31 +2532,43 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
-    },
+    }
+   ],
+   "candidates": [
     {
      "id": "eon-n1",
      "supplier": "E.ON",
-     "quote": "Jsme stabilní dodavatel",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
+     "quote": "Ušetřete za elektřinu s jistotou na 3 roky",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
      "source_url": "https://www.eon.cz/domacnosti/elektrina/",
      "captured_at": "2026-11-13",
      "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
+     "discovered": true
+    },
+    {
+     "id": "eon-n2",
+     "supplier": "E.ON",
+     "quote": "Objevte náš tarif s klesající cenou na 36 měsíců. S každým dalším rokem odebíráte elektřinu výhodněji a navíc máte v ceně tarifu i příspěvek na pomoc elektrikáře nebo hodinového manžela.",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
+     "source_url": "https://www.eon.cz/domacnosti/elektrina/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    },
+    {
+     "id": "eon-n3",
+     "supplier": "E.ON",
+     "quote": "Stejně výhodně jako elektřinu vám můžeme dodávat i",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
+     "source_url": "https://www.eon.cz/domacnosti/elektrina/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
     }
    ],
-   "candidates": [],
    "decisions": [
     {
      "date": "06.10.2026",
@@ -2216,7 +2594,9 @@
      "url": "https://eru.gov.cz/rozhodnuti-ve-sporu-mezi-ote-eon-energie",
      "kind": "dispute"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "epet",
@@ -2224,16 +2604,16 @@
    "source_url": "https://epet.cz/elektrina-1",
    "page": {
     "source_url": "https://epet.cz/elektrina-1",
-    "fetched_at": "2026-11-13T14:37:58+00:00",
+    "fetched_at": "2026-11-16T18:24:18+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "3646d4f2ef48f424",
+    "sha256": "c8c7fb03f84be125",
     "name": "Web dodavatele epet",
-    "text_sha256": "16bf41e2c673b366"
+    "text_sha256": "e9b7e23c9c57930a"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [
     {
@@ -2245,14 +2625,19 @@
      "price_mwh_excl_vat": 3299.0,
      "price_mwh_incl_vat": 3991.79,
      "monthly_fee_incl_vat": 157.3,
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "new",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-14-59/EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
       "document": "EP-EE-FIX-36-GARANT-11_2026_DOM_PRE.pdf",
-      "effective_from": "2026-11-04"
+      "effective_from": "2026-11-04",
+      "reviewed_sha256": "8d6a5d6a4770cae4a346490a0caefb20dee6a121844ce8e5d46bd898da0bdbcb",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "epet-fix36",
@@ -2262,7 +2647,9 @@
       "eligible": true,
       "reason": null,
       "price": 3299.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -2274,14 +2661,19 @@
      "price_mwh_excl_vat": 3399.0,
      "price_mwh_incl_vat": 4112.79,
      "monthly_fee_incl_vat": 157.3,
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "new",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://1684053905.rsc.cdn77.org/files/2026/11/04/09-11-06/EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
       "document": "EP-EE-FIX-24-GARANT-11_2026_DOM_PRE.pdf",
-      "effective_from": "2026-11-04"
+      "effective_from": "2026-11-04",
+      "reviewed_sha256": "5b0865214b8e599bce076b2254325d0a87db883fbf9887e862c3e2d0188fd185",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "epet-fix24",
@@ -2291,7 +2683,9 @@
       "eligible": true,
       "reason": null,
       "price": 3399.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     }
    ],
@@ -2335,11 +2729,6 @@
        "source": "web:eon"
       },
       {
-       "label": "Fixace 36 měs.: epet – FIX 36 GARANT 3 299 Kč/MWh",
-       "value": "E.ON – Variant na 3 roky: 3 239 Kč/MWh (rozdíl +60 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 9 871 Kč vs. 9 856 Kč; 4 MWh/rok: 17 855 Kč vs. 17 694 Kč",
-       "source": "web:eon"
-      },
-      {
        "label": "Fixace 24 měs.: epet – FIX 24 GARANT 3 399 Kč/MWh",
        "value": "ČEZ Prodej – Elektřina Bez starostí na 2 roky: 3 223 Kč/MWh (rozdíl +176 Kč/MWh bez DPH); roční náklad obchodní části s DPH 2 MWh/rok: 10 113 Kč vs. 9 760 Kč; 4 MWh/rok: 18 339 Kč vs. 17 560 Kč",
        "source": "web:cez"
@@ -2378,7 +2767,7 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ u tohoto dodavatele neeviduje žádné pravomocné rozhodnutí o přestupku.",
+     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. V načtených výsledcích seznamu pravomocných rozhodnutí ERÚ (hledáno podle názvu účastníka řízení) jsme žádné rozhodnutí o přestupku tohoto dodavatele nenašli.",
      "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek). Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen název a datum zveřejnění, ne skutek ani sankci.",
      "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
      "evidence": [],
@@ -2407,28 +2796,19 @@
      "subclaims": [],
      "possible_regulatory_risk": true,
      "opportunity": true
-    },
+    }
+   ],
+   "candidates": [
     {
      "id": "epet-n1",
      "supplier": "epet",
-     "quote": "Elektřina od epet za skvělou cenu",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
+     "quote": "Elektřina od epet | Dodavatel elektřiny za férové ceny | epet.cz",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
      "source_url": "https://epet.cz/elektrina-1",
      "captured_at": "2026-11-13",
      "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
+     "discovered": true
     },
     {
      "id": "epet-n2",
@@ -2439,22 +2819,23 @@
      "source_url": "https://epet.cz/elektrina-1",
      "captured_at": "2026-11-13",
      "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ u tohoto dodavatele neeviduje žádné pravomocné rozhodnutí o přestupku.",
-     "limitation": "Neuvádí zdroj ani metodiku (průzkum, období, vzorek). Rozhodnutí o minulém přestupku nedokazuje, že slogan je dnes nepravdivý; z rozhodnutí známe jen název a datum zveřejnění, ne skutek ani sankci.",
-     "action": "Bez akce. Pokud podobné tvrzení používáme sami, uvádět zdroj průzkumu.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
+     "discovered": true
+    },
+    {
+     "id": "epet-n3",
+     "supplier": "epet",
+     "quote": "Jsem u epet pátým rokem a stále spokojen. Ceny si hlídají, jednají férově.",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
+     "source_url": "https://epet.cz/elektrina-1",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
     }
    ],
-   "candidates": [],
-   "decisions": []
+   "decisions": [],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "pre",
@@ -2462,16 +2843,16 @@
    "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
    "page": {
     "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
-    "fetched_at": "2026-11-13T14:37:58+00:00",
+    "fetched_at": "2026-11-16T18:24:19+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "f813e2a0e7485b45",
+    "sha256": "4ac9fea8b2728f06",
     "name": "Web dodavatele PRE",
     "text_sha256": "5cfbba540193fbdf"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [],
    "claims": [
@@ -2485,16 +2866,16 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "podloženo",
+     "verdict_label": "nelze ověřit",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "supported",
-     "finding": "Dodavatel k produktu výslovně uvádí, že spotřeba je kryta zárukami původu. Tvrzení je doložené podkladem vázaným na konkrétní produkt.",
-     "limitation": "Podklad je prohlášení dodavatele; samotné záruky původu v evidenci OTE jsme neověřovali. Krytí zárukami původu neznamená fyzickou dodávku zelené elektřiny.",
-     "action": "Bez akce. Dobrý příklad, jak zelené tvrzení formulovat doložitelně a bez přehánění.",
+     "verdict": "unverifiable",
+     "finding": "Nalezeno prohlášení dodavatele k produktu PRE PROUD EKO, že spotřeba je kryta zárukami původu. Jde o prohlášení samotného dodavatele; podkladové záruky původu jsme nezávisle neověřili.",
+     "limitation": "Prohlášení dodavatele není nezávislý důkaz. Krytí zárukami původu navíc neznamená fyzickou dodávku zelené elektřiny.",
+     "action": "Bez akce. Tvrzení je formulované konkrétně (produkt, záruky původu); tak formulovat i vlastní zelená tvrzení.",
      "evidence": [
       {
-       "label": "PRE PROUD EKO – prohlášení o krytí zárukami původu",
+       "label": "PRE PROUD EKO – prohlášení o krytí zárukami původu (prohlášení dodavatele)",
        "value": "„U produktu PRE PROUD EKO zákazník nezískává fyzicky elektřinu z obnovitelných zdrojů, jeho spotřeba je kryta odpovídajícím množstvím záruk původu.“ (nalezeno na živé stránce)",
        "source": "web:pre"
       }
@@ -2543,31 +2924,43 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": 2
-    },
+    }
+   ],
+   "candidates": [
     {
      "id": "pre-n1",
      "supplier": "PRE",
-     "quote": "Garance ceny elektřiny",
-     "rule_id": "price_guarantee",
-     "rule_label": "Garance (fixace) ceny",
+     "quote": "Podpora výroby elektřiny z obnovitelných zdrojů",
+     "rule_id": "green_generic",
+     "rule_label": "Obecné zelené tvrzení",
      "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
      "captured_at": "2026-11-13",
      "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "V připravených nabídkách dodavatele není produkt s fixací None měsíců.",
-     "limitation": "Smluvní podmínky a výluky nebyly posuzovány.",
-     "action": "Vyžádat si ceník a obchodní podmínky produktu.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
+     "discovered": true
+    },
+    {
+     "id": "pre-n2",
+     "supplier": "PRE",
+     "quote": "U produktu PRE PROUD EKO zákazník nezískává fyzicky elektřinu z obnovitelných zdrojů, jeho spotřeba je kryta odpovídajícím množstvím záruk původu.",
+     "rule_id": "green_generic",
+     "rule_label": "Obecné zelené tvrzení",
+     "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    },
+    {
+     "id": "pre-n3",
+     "supplier": "PRE",
+     "quote": "Výhodná cena elektřiny až na 2 roky",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
+     "source_url": "https://www.pre.cz/cs/domacnosti/elektrina/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
     }
    ],
-   "candidates": [],
    "decisions": [
     {
      "date": "15.07.2025",
@@ -2599,7 +2992,9 @@
      "url": "https://eru.gov.cz/prazska-energetika-rozhodnuti-o-vyuctovani-dodavky-elektriny",
      "kind": "offence"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "mnd",
@@ -2607,16 +3002,16 @@
    "source_url": "https://www.mnd.cz/elektrina",
    "page": {
     "source_url": "https://www.mnd.cz/elektrina",
-    "fetched_at": "2026-11-13T14:37:58+00:00",
+    "fetched_at": "2026-11-16T18:24:18+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "54805f3f0c18f2fa",
+    "sha256": "28a28a89eed87d2f",
     "name": "Web dodavatele MND",
     "text_sha256": "deb68768e29c55cd"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [],
    "claims": [
@@ -2630,40 +3025,21 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "částečně podloženo",
+     "verdict_label": "nelze ověřit",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "partially_supported",
-     "finding": "OTE eviduje 158 636 odběrných míst elektřiny a 114 942 plynu, dohromady 273 578. Tvrzených 250 000 zákazníků je s tím řádově v souladu (zákazníků s dodávkou energií nemůže být víc než odběrných míst).",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat i jiné služby než dodávku energií.",
-     "action": "Tvrzení o velikosti nenapadat.",
+     "verdict": "unverifiable",
+     "finding": "Tvrzení mluví o zákaznících, OTE eviduje odběrná místa. OTE eviduje 273 578 odběrných míst (MND Energie a.s. – elektřina: 158 636; MND Energie a.s. – plyn: 114 942) za 2026-09. Řádově to tvrzení neodporuje, počet zákazníků ale z odběrných míst určit nelze.",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat jiné služby, země nebo období. Tvrzení neuvádí datum; porovnává se s posledním zveřejněným měsícem OTE (2026-09).",
+     "action": "Bez akce. Údaj OTE použít jen jako kontext řádové velikosti.",
      "evidence": [
       {
-       "label": "Elektřina – MND Energie a.s.: 158 636 OPM (2026-09)",
-       "value": "tvrzeno: 250 000",
-       "source": "ote"
-      },
-      {
-       "label": "Plyn – MND Energie a.s.: 114 942 OPM (2026-09)",
-       "value": "druhá komodita téhož dodavatele",
-       "source": "ote_gas"
-      },
-      {
-       "label": "Součet elektřina + plyn: 273 578 OPM",
-       "value": "tvrzeno 250 000 zákazníků",
+       "label": "Odběrná místa podle OTE (2026-09)",
+       "value": "MND Energie a.s. – elektřina: 158 636; MND Energie a.s. – plyn: 114 942; tvrzeno 250 000",
        "source": "ote"
       }
      ],
-     "subclaims": [
-      {
-       "text": "Řádová velikost odpovídá počtu odběrných míst",
-       "status": "ověřeno"
-      },
-      {
-       "text": "Jde o počet zákazníků, ne odběrných míst",
-       "status": "neověřeno – OTE zákazníky neeviduje"
-      }
-     ],
+     "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
     }
@@ -2676,7 +3052,9 @@
      "url": "https://eru.gov.cz/mnd-energie-rozhodnuti-k-uziti-nekale-obchodni-praktiky",
      "kind": "practice"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "dobra",
@@ -2684,16 +3062,16 @@
    "source_url": "https://dobra-energie.eu/",
    "page": {
     "source_url": "https://dobra-energie.eu/",
-    "fetched_at": "2026-11-13T14:37:57+00:00",
+    "fetched_at": "2026-11-16T18:24:18+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "6142a70755662385",
+    "sha256": "d2c2dbf4e1dbd521",
     "name": "Web dodavatele Dobrá Energie",
-    "text_sha256": "75c7fefcdbb42083"
+    "text_sha256": "663f9fb84385b67f"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [],
    "claims": [
@@ -2707,13 +3085,13 @@
      "captured_at": "2026-11-13",
      "source_status": "live",
      "discovered": false,
-     "verdict_label": "v rozporu s daty",
+     "verdict_label": "nelze ověřit",
      "risk_reason": null,
      "review_required": false,
-     "verdict": "contradicted",
-     "finding": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají i dodavatelé mimo tradiční skupiny: CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578). Tvrzení neplatí při žádném z výkladů.",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Pojem „alternativní dodavatel“ tvrzení nedefinuje, proto se posuzuje podle výkladů stanovených týmem. Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json. Za tradiční se berou: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.. Velikost se měří součtem odběrných míst elektřiny a plynu; objem dodané energie ani vlastnictví firem v datech nejsou.",
-     "action": "Příležitost: tvrzení o prvenství lze zpochybnit čísly OTE, s výhradou, že dodavatel může myslet objem dodané energie.",
+     "verdict": "unverifiable",
+     "finding": "Tvrzení neuvádí, podle čeho se velikost měří (zákazníci, odběrná místa, objem dodávky, tržby). OTE zveřejňuje jen počty odběrných míst, proto je níže jen jako kontext, ne jako verdikt. Při výkladu týmu („alternativní“ = mimo tradiční skupiny: ČEZ Prodej, a.s., ČEZ ESCO, a.s., E.ON Energie, a.s., Pražská energetika, a.s., innogy Energie, s.r.o., Pražská plynárenská, a.s.) a měření odběrnými místy elektřiny a plynu by tvrzení neplatilo: víc jich má CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578).",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Výklad pojmu je rozhodnutí týmu, ne údaj z tvrzení; Tradiční jsou zde dodavatelé navazující na původní regionální dodavatele elektřiny a plynu; seznam stanovil tým a lze ho upravit v suppliers.json.",
+     "action": "Příležitost: podle odběrných míst tvrzení neplatí. Před použitím ověřit, jakou metriku dodavatel myslí.",
      "evidence": [
       {
        "label": "Elektřina – Dobrá Energie s.r.o.: 44 154 OPM (2026-09)",
@@ -2726,19 +3104,15 @@
        "source": "ote"
       },
       {
-       "label": "Součet odběrných míst elektřiny a plynu – Dobrá Energie s.r.o. + epet energie, a.s.: 187 462",
-       "value": "větší: ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)",
+       "label": "Součet odběrných míst elektřiny a plynu – Dobrá Energie s.r.o. + epet energie, a.s. (2026-09): 187 462",
+       "value": "víc mají mimo tradiční skupiny: CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578)",
        "source": "ote"
       }
      ],
      "subclaims": [
       {
-       "text": "Výklad „všichni dodavatelé“",
-       "status": "neplatí – víc odběrných míst má ČEZ Prodej, a.s. (3 310 670), innogy Energie, s.r.o. (1 684 220), E.ON Energie, a.s. (1 536 779)"
-      },
-      {
-       "text": "Výklad „dodavatelé mimo tradiční skupiny“",
-       "status": "neplatí – víc odběrných míst má CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578)"
+       "text": "Elektřina podle OPM",
+       "status": "13. místo; největší je ČEZ Prodej, a.s."
       }
      ],
      "possible_regulatory_risk": false,
@@ -2758,13 +3132,13 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "supported",
-     "finding": "OTE eviduje 187 462 odběrných míst (Dobrá Energie s.r.o.: 44 154 elektřina + 22 890 plyn; epet energie, a.s.: 91 653 elektřina + 28 765 plyn). Tvrzených 185 000 tedy platí.",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby.",
-     "action": "Tvrzení nenapadat; je formulované přesně a opírá se o ověřitelnou metriku.",
+     "finding": "OTE eviduje 187 462 odběrných míst (Dobrá Energie s.r.o. – elektřina: 44 154; Dobrá Energie s.r.o. – plyn: 22 890; epet energie, a.s. – elektřina: 91 653; epet energie, a.s. – plyn: 28 765) za 2026-09. Tvrzených 185 000 tomu odpovídá.",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Tvrzení neuvádí datum; porovnává se s posledním zveřejněným měsícem OTE (2026-09).",
+     "action": "Tvrzení nenapadat; opírá se o ověřitelnou metriku.",
      "evidence": [
       {
-       "label": "Součet odběrných míst podle OTE: 187 462",
-       "value": "Dobrá Energie s.r.o.: 44 154 elektřina + 22 890 plyn; epet energie, a.s.: 91 653 elektřina + 28 765 plyn; tvrzeno 185 000",
+       "label": "Odběrná místa podle OTE (2026-09)",
+       "value": "Dobrá Energie s.r.o. – elektřina: 44 154; Dobrá Energie s.r.o. – plyn: 22 890; epet energie, a.s. – elektřina: 91 653; epet energie, a.s. – plyn: 28 765; tvrzeno 185 000",
        "source": "ote"
       }
      ],
@@ -2773,7 +3147,30 @@
      "opportunity": false
     }
    ],
-   "candidates": [],
+   "candidates": [
+    {
+     "id": "dobra-n1",
+     "supplier": "Dobrá Energie",
+     "quote": "U předchozího dodavatele jsem neměla absolutně přehled o tom, za co vlastně platím, tady mám vše přehledně na jednom místě, konečně férové jednání.",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
+     "source_url": "https://dobra-energie.eu/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    },
+    {
+     "id": "dobra-n2",
+     "supplier": "Dobrá Energie",
+     "quote": "Spolehlivá dodávka elektřiny s férovými cenami a prvotřídní zákaznickou podporou.",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
+     "source_url": "https://dobra-energie.eu/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    }
+   ],
    "decisions": [
     {
      "date": "12.03.2026",
@@ -2799,7 +3196,9 @@
      "url": "https://eru.gov.cz/dobra-energie-sro-rozhodnuti-k-neposkytnuti-informaci",
      "kind": "offence"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "spp",
@@ -2807,16 +3206,16 @@
    "source_url": "https://www.spp.cz/",
    "page": {
     "source_url": "https://www.spp.cz/",
-    "fetched_at": "2026-11-13T14:37:57+00:00",
+    "fetched_at": "2026-11-16T18:24:18+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "5b9cbe69d4a1081f",
+    "sha256": "a669108c022b067d",
     "name": "Web dodavatele SPP CZ",
     "text_sha256": "0c763bfebf9af081"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [],
    "claims": [
@@ -2834,54 +3233,56 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "Tvrzení sčítá zákazníky ve více zemích (Česko a Slovensko). V Česku eviduje OTE 6 584 odběrných míst elektřiny a 9 177 plynu, dohromady 15 761, tedy nejvýše 1,1 % tvrzeného počtu.",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat i jiné služby než dodávku energií. OTE pokrývá jen český trh, zahraniční část ověřit nelze.",
-     "action": "Příležitost: číslo působí na českého zákazníka mnohem větší, než jaká je česká část. Pokud komunikujeme velikost, uvádět český údaj a zdroj.",
+     "finding": "Tvrzení sčítá zákazníky ve více zemích. V Česku oTE eviduje 15 761 odběrných míst (SPP CZ, a.s. – elektřina: 6 584; SPP CZ, a.s. – plyn: 9 177) za 2026-09. To je 1,1 % tvrzeného počtu.",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat jiné služby, země nebo období. Tvrzení neuvádí datum; porovnává se s posledním zveřejněným měsícem OTE (2026-09). OTE pokrývá jen český trh.",
+     "action": "Příležitost: číslo působí na českého zákazníka větší, než jaká je česká část. Vlastní tvrzení uvádět s českým údajem a zdrojem.",
      "evidence": [
       {
-       "label": "Elektřina – SPP CZ, a.s.: 6 584 OPM (2026-09)",
-       "value": "tvrzeno: 1 500 000",
-       "source": "ote"
-      },
-      {
-       "label": "Plyn – SPP CZ, a.s.: 9 177 OPM (2026-09)",
-       "value": "druhá komodita téhož dodavatele",
-       "source": "ote_gas"
-      },
-      {
-       "label": "Součet elektřina + plyn: 15 761 OPM",
-       "value": "tvrzeno 1 500 000 zákazníků",
+       "label": "Odběrná místa podle OTE (2026-09)",
+       "value": "SPP CZ, a.s. – elektřina: 6 584; SPP CZ, a.s. – plyn: 9 177; tvrzeno 1 500 000",
        "source": "ote"
       }
      ],
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": 2
-    },
+    }
+   ],
+   "candidates": [
     {
      "id": "spp-n1",
      "supplier": "SPP CZ",
-     "quote": "Garantujeme výhodnou cenu a hrajeme fér.",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
+     "quote": "Spolehlivý dodavatel energií pro domácnosti i firmy | SPP",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
      "source_url": "https://www.spp.cz/",
      "captured_at": "2026-11-13",
      "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
+     "discovered": true
+    },
+    {
+     "id": "spp-n2",
+     "supplier": "SPP CZ",
+     "quote": "SPOČÍTEJTE, KOLIK UŠETŘÍTE NA ENERGIÍCH S SPP",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
+     "source_url": "https://www.spp.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    },
+    {
+     "id": "spp-n3",
+     "supplier": "SPP CZ",
+     "quote": "Garantujeme výhodnou cenu a hrajeme fér. Žádné chytáky ve smlouvě ani skryté poplatky u nás nenajde.",
+     "rule_id": "price_favorable",
+     "rule_label": "Výhodná cena",
+     "source_url": "https://www.spp.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
     }
    ],
-   "candidates": [],
    "decisions": [
     {
      "date": "16.11.2023",
@@ -2895,7 +3296,9 @@
      "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-spp-cz",
      "kind": "dispute"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "lama",
@@ -2903,16 +3306,16 @@
    "source_url": "https://www.lamaenergy.cz/",
    "page": {
     "source_url": "https://www.lamaenergy.cz/",
-    "fetched_at": "2026-11-13T14:37:58+00:00",
+    "fetched_at": "2026-11-16T18:24:18+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "e8ee73d95216a6c4",
+    "sha256": "5f1b363a178f23e4",
     "name": "Web dodavatele LAMA energy",
     "text_sha256": "61c5aaefbf34b23f"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [],
    "claims": [
@@ -2937,31 +3340,43 @@
      "subclaims": [],
      "possible_regulatory_risk": false,
      "opportunity": false
-    },
+    }
+   ],
+   "candidates": [
     {
      "id": "lama-n1",
      "supplier": "LAMA energy",
-     "quote": "Dodáváme energie za mimořádné ceny!",
-     "rule_id": "other",
-     "rule_label": "Ostatní",
+     "quote": "Nízké ceny plynu a elektřiny od spolehlivého českého dodavatele s vlastní těžbou v Česku i zahraniční.",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
      "source_url": "https://www.lamaenergy.cz/",
      "captured_at": "2026-11-13",
      "source_status": "live",
-     "discovered": true,
-     "verdict_label": "nelze ověřit",
-     "risk_reason": null,
-     "review_required": false,
-     "verdict": "unverifiable",
-     "finding": "Pro tento typ tvrzení zatím neexistuje ověřovací pravidlo.",
-     "limitation": "Bez pravidla se verdikt nevydává.",
-     "action": "Zvážit doplnění pravidla, pokud se tvrzení opakuje.",
-     "evidence": [],
-     "subclaims": [],
-     "possible_regulatory_risk": false,
-     "opportunity": false
+     "discovered": true
+    },
+    {
+     "id": "lama-n2",
+     "supplier": "LAMA energy",
+     "quote": "fixace obchodní ceny do konce roku 2029",
+     "rule_id": "price_guarantee",
+     "rule_label": "Garance (fixace) ceny",
+     "source_url": "https://www.lamaenergy.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    },
+    {
+     "id": "lama-n3",
+     "supplier": "LAMA energy",
+     "quote": "fixace obchodní ceny do konce roku 2025",
+     "rule_id": "price_guarantee",
+     "rule_label": "Garance (fixace) ceny",
+     "source_url": "https://www.lamaenergy.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
     }
    ],
-   "candidates": [],
    "decisions": [
     {
      "date": "22.05.2024",
@@ -2987,7 +3402,9 @@
      "url": "https://eru.gov.cz/rozhodnuti-ve-spotrebitelskem-sporu-s-lama-energy",
      "kind": "dispute"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "armex",
@@ -2995,16 +3412,16 @@
    "source_url": "https://www.armexenergy.cz/",
    "page": {
     "source_url": "https://www.armexenergy.cz/",
-    "fetched_at": "2026-11-13T14:37:58+00:00",
+    "fetched_at": "2026-11-16T18:24:19+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "af61d8abc2cd171e",
+    "sha256": "e471ac4a962224a0",
     "name": "Web dodavatele ARMEX ENERGY",
-    "text_sha256": "462107407daea9fc"
+    "text_sha256": "71ed2830373e21a7"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [
     {
@@ -3016,14 +3433,19 @@
      "price_mwh_excl_vat": 2990.0,
      "price_mwh_incl_vat": 3617.9,
      "monthly_fee_incl_vat": 118.58,
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "new",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.armexenergy.cz/wp-content/uploads/2026/10/X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
       "document": "X2026_10_21_AE_Cenik_EL_OPTIMAL_606_FIX_DOM_platny-21.10.2026_PRE_do-100MWh.pdf",
-      "effective_from": "2026-10-21"
+      "effective_from": "2026-10-21",
+      "reviewed_sha256": "dfe0a9d0631e25225fec0b0931920ed6968931f1984297b3178d565059d7eda7",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "armex-optimal24",
@@ -3033,7 +3455,9 @@
       "eligible": true,
       "reason": null,
       "price": 2990.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     },
     {
@@ -3045,14 +3469,19 @@
      "price_mwh_excl_vat": 3250.0,
      "price_mwh_incl_vat": 3932.5,
      "monthly_fee_incl_vat": 156.09,
-     "confirmed_live": true,
-     "stale": false,
-     "confirmation": "ceník stažen živě a obsahuje cenu i stálý plat",
+     "audience": "new",
      "captured_at": "2026-11-13",
+     "document_status": "unchanged",
+     "stale": false,
+     "confirmed_live": true,
+     "confirmation": "ceník stažen živě a shoduje se se zkontrolovanou verzí",
      "price_list": {
       "url": "https://www.armexenergy.cz/wp-content/uploads/2026/08/XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
       "document": "XN2026_07_29_AE_Cenik_EL_KLASIK_602_FIX_DOM_platny_1.8.2026_PRE_do-100MWh.pdf",
-      "effective_from": "2026-08-01"
+      "effective_from": "2026-08-01",
+      "reviewed_sha256": "a9bcc2a99df30f84e53d8ce3976c07a94422d156c28e4d2ee2c652046d14d536",
+      "reviewed_at": "2026-11-13",
+      "row_locator": "Obchodní část ceny, řádek vysoký tarif a stálý (měsíční) plat, sloupec D02d"
      },
      "benchmark": {
       "offer_id": "armex-klasik12",
@@ -3062,7 +3491,9 @@
       "eligible": true,
       "reason": null,
       "price": 3250.0,
-      "basis": "bez DPH"
+      "basis": "bez DPH",
+      "period": "2026-11",
+      "notes": []
      }
     }
    ],
@@ -3081,23 +3512,13 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "unverifiable",
-     "finding": "OTE eviduje 49 764 odběrných míst elektřiny a 23 596 plynu, dohromady 73 360. Tvrzených 80 000 zákazníků je nad tímto součtem, rozdíl je ale v toleranci zaokrouhlení, takže to rozpor není. Tvrzený počet převyšuje součet odběrných míst v každém měsíci roku (nejvíc 76 196 v 2026-04) a počet od začátku roku klesá (-3,2 %).",
-     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat i jiné služby než dodávku energií.",
-     "action": "Příležitost: číslo je nejspíš zaokrouhlené nahoru nebo zastaralé. Lze na to upozornit daty OTE; u vlastních tvrzení uvádět aktuální počet a datum.",
+     "finding": "Tvrzení mluví o zákaznících, OTE eviduje odběrná místa. OTE eviduje 73 360 odběrných míst (ARMEX ENERGY a.s. – elektřina: 49 764; ARMEX ENERGY a.s. – plyn: 23 596) za 2026-09. Tvrzených 80 000 je víc než odběrných míst v kterémkoli měsíci roku (nejvíc 76 196). Pokud jde o zákazníky s dodávkou energie v Česku, číslo nesedí; jiný výklad tvrzení ale vyloučit nelze.",
+     "limitation": "OPM jsou odběrná místa, ne zákazníci, objem dodávky ani tržby. Jeden zákazník může mít více odběrných míst a tvrzení může zahrnovat jiné služby, země nebo období. Tvrzení neuvádí datum; porovnává se s posledním zveřejněným měsícem OTE (2026-09).",
+     "action": "Příležitost: číslo je nejspíš zaokrouhlené nahoru, zastaralé nebo počítá i jiné služby. Před použitím ověřit, co dodavatel počítá.",
      "evidence": [
       {
-       "label": "Elektřina – ARMEX ENERGY a.s.: 49 764 OPM (2026-09)",
-       "value": "tvrzeno: 80 000",
-       "source": "ote"
-      },
-      {
-       "label": "Plyn – ARMEX ENERGY a.s.: 23 596 OPM (2026-09)",
-       "value": "druhá komodita téhož dodavatele",
-       "source": "ote_gas"
-      },
-      {
-       "label": "Součet elektřina + plyn: 73 360 OPM",
-       "value": "tvrzeno 80 000 zákazníků",
+       "label": "Odběrná místa podle OTE (2026-09)",
+       "value": "ARMEX ENERGY a.s. – elektřina: 49 764; ARMEX ENERGY a.s. – plyn: 23 596; tvrzeno 80 000",
        "source": "ote"
       }
      ],
@@ -3119,13 +3540,13 @@
      "risk_reason": null,
      "review_required": false,
      "verdict": "supported",
-     "finding": "Všechny srovnatelné nabídky jsou pod pásmem ERÚ, tedy podle ERÚ mezi nejlevnější čtvrtinou fixovaných nabídek na trhu (OPTIMAL 606 FIX pod pásmem; KLASIK 602 FIX pod pásmem).",
-     "limitation": "Pásmo ERÚ odpovídá zhruba 25. až 50. percentilu fixovaných nabídek na trhu (dolní mez = hranice nejlevnější čtvrtiny, horní mez = přibližně medián). Je to cena komodity bez stálého měsíčního platu a bez regulovaných složek; neříká nic o celkovém účtu ani o tom, zda je nabídka nejlevnější na trhu. „Výhodná cena“ je zde vyložena jako cena nepřesahující pásmo ERÚ.",
-     "action": "Cenou komodity tohoto konkurenta nepodbízet; odlišit se stálým platem, podmínkami a službami.",
+     "finding": "Všechny srovnatelné nabídky jsou pod indikativním pásmem ERÚ pro svou sazbu, fixaci a měsíc (OPTIMAL 606 FIX pod pásmem; KLASIK 602 FIX pod pásmem).",
+     "limitation": "Indikativní pásmo ERÚ je odhad ceny komodity pro danou sazbu, délku fixace a měsíc, bez stálého platu a regulovaných složek. Podle metodiky ERÚ dolní mez navazuje na 25. percentil a horní mez přibližně na medián nabídek ze srovnávače, nabídky se ale od pásma krátkodobě odchylují. Pozice vůči pásmu proto není změřené pořadí na trhu ani celkový účet. „Výhodná cena“ je zde vyložena jako cena nepřesahující pásmo ERÚ.",
+     "action": "Cena komodity konkurenta je vůči pásmu ERÚ nízko; soutěžit spíš stálým platem, podmínkami a službami.",
      "evidence": [
       {
        "label": "OPTIMAL 606 FIX: 2 990 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 387–3 569 Kč/MWh (bez DPH; D02d, fixace 24 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 387–3 569 Kč/MWh (bez DPH; D02d, fixace 24 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3387.3525703324126,
@@ -3136,7 +3557,7 @@
       },
       {
        "label": "KLASIK 602 FIX: 3 250 Kč/MWh (bez DPH)",
-       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod pásmem (nejlevnější čtvrtina nabídek na trhu)",
+       "value": "pásmo ERÚ 3 834–3 957 Kč/MWh (bez DPH; D02d, fixace 12 měs., období 2026-11) → pod indikativním pásmem ERÚ",
        "source": "eru",
        "chart": {
         "low": 3834.1199946102115,
@@ -3151,7 +3572,19 @@
      "opportunity": false
     }
    ],
-   "candidates": [],
+   "candidates": [
+    {
+     "id": "armex-n1",
+     "supplier": "ARMEX ENERGY",
+     "quote": "ARMEX ENERGY je skvělý poskytovatel elektřiny a plynu. S jejich spolehlivým servisem a příjemným přístupem k zákazníkům jsem velmi spokojený. Doporučuji je všem, kteří hledají spolehlivého partnera na dodávku energii.",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
+     "source_url": "https://www.armexenergy.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    }
+   ],
    "decisions": [
     {
      "date": "01.04.2026",
@@ -3171,7 +3604,9 @@
      "url": "https://eru.gov.cz/armex-energy-rozhodnuti-k-poruseni-povinnosti-drzitele-licence-k-uziti-nekale-obchodni-praktiky",
      "kind": "practice"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   },
   {
    "id": "bezdodavatele",
@@ -3179,16 +3614,16 @@
    "source_url": "https://www.bezdodavatele.cz/",
    "page": {
     "source_url": "https://www.bezdodavatele.cz/",
-    "fetched_at": "2026-11-13T14:37:59+00:00",
+    "fetched_at": "2026-11-16T18:24:20+00:00",
     "origin": "live",
     "warning": null,
-    "sha256": "efb52587d8e235f7",
+    "sha256": "cb3c9fa8455917df",
     "name": "Web dodavatele bezDodavatele",
     "text_sha256": "430cceba96d5f324"
    },
    "extractor": {
-    "method": "model gemini-3.5-flash-lite",
-    "note": null
+    "method": "klíčová slova",
+    "note": "Model vrátil chybu 503. Použita klíčová slova."
    },
    "offers": [],
    "claims": [
@@ -3259,7 +3694,41 @@
      "opportunity": true
     }
    ],
-   "candidates": [],
+   "candidates": [
+    {
+     "id": "bezdodavatele-n1",
+     "supplier": "bezDodavatele",
+     "quote": "Zelená energie bez prostředníků a závazků – bezDodavatele",
+     "rule_id": "green_generic",
+     "rule_label": "Obecné zelené tvrzení",
+     "source_url": "https://www.bezdodavatele.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    },
+    {
+     "id": "bezdodavatele-n2",
+     "supplier": "bezDodavatele",
+     "quote": "Nejsme jen další dodavatel energií. Jsme váš parťák, který drží ceny férově podle trhu. Díky našim tarifům",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
+     "source_url": "https://www.bezdodavatele.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    },
+    {
+     "id": "bezdodavatele-n3",
+     "supplier": "bezDodavatele",
+     "quote": "Platíte podle reality, ne podle tabulek. SPOT je férový, transparentní a v dlouhodobém průměru vždy výhodnější než klasické tarify.",
+     "rule_id": "soft_trust",
+     "rule_label": "Důvěra a férovost",
+     "source_url": "https://www.bezdodavatele.cz/",
+     "captured_at": "2026-11-13",
+     "source_status": "live",
+     "discovered": true
+    }
+   ],
    "decisions": [
     {
      "date": "20.06.2022",
@@ -3267,17 +3736,19 @@
      "url": "https://eru.gov.cz/bezdodavatele-usneseni-o-zastaveni-rizeni",
      "kind": "discontinued"
     }
-   ]
+   ],
+   "decisions_truncated": false,
+   "decisions_missing": false
   }
  ],
  "briefing": {
-  "headline": "Konkurenční tvrzení na trhu s elektřinou vykazují řadu nepřesností, které lze obchodně využít.",
-  "summary": "Někteří dodavatelé používají marketingová tvrzení o nejnižších cenách či prvenství, jež veřejná data a ceníky nepotvrzují. U tvrzení o zeleném původu energií a uhlíkové neutralitě chybí na trhu doložitelné záruky a certifikáty. Řada konkurenčních sloganů navíc operuje s nejasně definovanou metrikou zákazníků namísto skutečných odběrných míst.",
+  "headline": "3 tvrzení konkurence si zaslouží pozornost.",
+  "summary": "Ověřeno 24 tvrzení: 4 podloženo, 1 částečně, 1 v rozporu s daty, 18 nelze ověřit dostupnými podklady. „Nelze ověřit“ neznamená, že je tvrzení nepravdivé.",
   "matrix": {
    "Velikost na trhu": {
-    "contradicted": 1,
-    "partially_supported": 3,
-    "unverifiable": 0,
+    "contradicted": 0,
+    "partially_supported": 0,
+    "unverifiable": 3,
     "supported": 0
    },
    "Výhodná cena": {
@@ -3289,7 +3760,7 @@
    "Důvěra a férovost": {
     "contradicted": 0,
     "partially_supported": 0,
-    "unverifiable": 5,
+    "unverifiable": 4,
     "supported": 0
    },
    "Nejnižší cena / cenové prvenství": {
@@ -3298,29 +3769,23 @@
     "unverifiable": 3,
     "supported": 0
    },
-   "Ostatní": {
-    "contradicted": 0,
-    "partially_supported": 0,
-    "unverifiable": 5,
-    "supported": 0
-   },
    "Garance (fixace) ceny": {
     "contradicted": 0,
     "partially_supported": 0,
-    "unverifiable": 1,
+    "unverifiable": 0,
     "supported": 1
    },
    "Počet zákazníků": {
     "contradicted": 0,
-    "partially_supported": 2,
-    "unverifiable": 2,
+    "partially_supported": 0,
+    "unverifiable": 4,
     "supported": 1
    },
    "Podíl zelené elektřiny": {
     "contradicted": 0,
     "partially_supported": 0,
-    "unverifiable": 2,
-    "supported": 1
+    "unverifiable": 3,
+    "supported": 0
    },
    "Uhlíková neutralita a kompenzace": {
     "contradicted": 0,
@@ -3338,21 +3803,21 @@
     "next_step": "Příležitost: tvrzení o nejlepší ceně lze doložitelně zpochybnit konkrétním protipříkladem z veřejných ceníků. Před komunikací znovu ověřit oba ceníky a datum platnosti."
    },
    {
-    "claim_id": "dobra-1",
-    "supplier": "Dobrá Energie",
-    "quote": "Po sloučení s epet jsme největší alternativní dodavatel energií v ČR",
-    "why": "Podle OTE má Dobrá Energie s.r.o. + epet energie, a.s. dohromady 187 462 odběrných míst elektřiny a plynu. Víc jich mají i dodavatelé mimo tradiční skupiny: CENTROPOL ENERGY, a.s. (292 503), MND Energie a.s. (273 578). Tvrzení neplatí při žádném z výkladů.",
-    "next_step": "Příležitost: tvrzení o prvenství lze zpochybnit čísly OTE, s výhradou, že dodavatel může myslet objem dodané energie."
+    "claim_id": "centropol-1",
+    "supplier": "Centropol",
+    "quote": "Ke stabilní dodávce energií dáváme Garanci nejnižší ceny.",
+    "why": "Jde o závazek dorovnat nižší cenu, ne o tvrzení, že ceník je nejnižší. Levnější srovnatelná nabídka veřejně existuje: ČEZ Prodej – Elektřina Online na 1 rok proti Fixně online pro začátek na 1 rok. Roční náklad obchodní části (s DPH) 2 MWh/rok: 10 692 Kč vs. 8 640 Kč; 4 MWh/rok: 19 423 Kč vs. 15 320 Kč.",
+    "next_step": "Příležitost: slogan „Garance nejnižší ceny“ nezaručuje nejnižší ceník; zákazník musí o dorovnání sám požádat a nižší cenu doložit. V komunikaci lze ukázat konkrétní levnější ceníkovou nabídku."
    },
    {
-    "claim_id": "cez-3",
-    "supplier": "ČEZ Prodej",
-    "quote": "Jsme nejdůvěryhodnější dodavatel energií",
-    "why": "Tvrzení o důvěře nebo férovosti nemá měřitelnou definici, kterou by šlo ověřit veřejnými daty. ERÚ přitom eviduje 1 pravomocné rozhodnutí o přestupcích tohoto dodavatele, z toho se obchodních praktik nebo nepravdivých informací týká 1 (poslední zveřejněno 01.04.2026).",
-    "next_step": "Příležitost: slogan o důvěryhodnosti stojí vedle pravomocného rozhodnutí regulátora. Před použitím si rozhodnutí přečíst (skutek, období, sankce)."
+    "claim_id": "spp-1",
+    "supplier": "SPP CZ",
+    "quote": "Jsme dodavatel energie pro téměř 1,5 milionu zákazníků v Česku a na Slovensku.",
+    "why": "Tvrzení sčítá zákazníky ve více zemích. V Česku oTE eviduje 15 761 odběrných míst (SPP CZ, a.s. – elektřina: 6 584; SPP CZ, a.s. – plyn: 9 177) za 2026-09. To je 1,1 % tvrzeného počtu.",
+    "next_step": "Příležitost: číslo působí na českého zákazníka větší, než jaká je česká část. Vlastní tvrzení uvádět s českým údajem a zdrojem."
    }
   ],
-  "method": "model gemini-3.5-flash-lite vybral priority a napsal shrnutí; nálezy, čísla a verdikty jsou z pravidel v kódu"
+  "method": "model gemini-3.5-flash-lite jen seřadil priority mezi kandidáty z pravidel; text, čísla a verdikty jsou z kódu"
  },
  "warnings": [],
  "llm_used": true,

@@ -1,3 +1,5 @@
+HISTORICKÝ DOKUMENT: návod k instalaci frontendového ZIP balíčku z 14. 11. 2026. Změny už jsou ve větvi main; aktuální postup je v README.md.
+
 FACT OR WATT — FRONTEND REDESIGN PRO VĚTEV CONTENT-IMPROVEMENTS
 ============================================================
 Zdroj: competitive-intelligence-content-improvements.zip (poskytnuto uživatelem)

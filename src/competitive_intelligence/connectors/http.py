@@ -1,12 +1,19 @@
-"""Bezpečné stahování: jen schválené hostitele, omezený čas a velikost, záloha ze snapshotu."""
+"""Bezpečné stahování: jen schválené hostitele, omezený čas a velikost, záloha ze snapshotu.
+
+Přesměrování se neprovádí automaticky: každý krok se zkontroluje (HTTPS, hostitel, port)
+dřív, než se na něj odešle požadavek. Celý audit má jeden časový limit (`deadline`), který
+platí pro všechna stahování v daném běhu, včetně vláken.
+"""
 from __future__ import annotations
 
+import contextvars
 import hashlib
 import json
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import httpx
 
@@ -27,12 +34,24 @@ ALLOWED_HOSTS = {
     "www.lamaenergy.cz",
     "www.armexenergy.cz",
 }
+ALLOWED_PORTS = {None, 443}
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130 Safari/537.36"
 TIMEOUT_S = 20.0
 MAX_BYTES = 3_000_000
+MAX_REDIRECTS = 3
+MIN_REMAINING_S = 1.0  # s menším zbytkem času se nový požadavek už nezačíná
+
+# Okamžik (time.monotonic), do kdy musí doběhnout všechna stahování aktuálního auditu.
+DEADLINE: contextvars.ContextVar[float | None] = contextvars.ContextVar("audit_deadline", default=None)
+# Testy mohou podstrčit httpx transport (např. httpx.MockTransport).
+TRANSPORT: httpx.BaseTransport | None = None
 
 
 class FetchError(Exception):
+    pass
+
+
+class DeadlineExceeded(FetchError):
     pass
 
 
@@ -58,29 +77,64 @@ class Fetched:
         }
 
 
+def remaining() -> float | None:
+    """Kolik sekund zbývá do konce auditu; None, když limit není nastaven."""
+    deadline = DEADLINE.get()
+    return None if deadline is None else deadline - time.monotonic()
+
+
 def _check_host(url: str) -> None:
     parsed = urlparse(url)
-    if parsed.scheme != "https" or parsed.hostname not in ALLOWED_HOSTS:
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise FetchError(f"Neplatná adresa: {url}") from exc
+    if parsed.scheme != "https" or parsed.hostname not in ALLOWED_HOSTS or port not in ALLOWED_PORTS:
         raise FetchError(f"URL není na seznamu schválených zdrojů: {url}")
+
+
+def _budget() -> float:
+    left = remaining()
+    if left is None:
+        return TIMEOUT_S
+    if left < MIN_REMAINING_S:
+        raise DeadlineExceeded("Vyčerpán časový limit auditu; další zdroj se už nestahuje.")
+    return min(TIMEOUT_S, left)
 
 
 def fetch_live(url: str) -> Fetched:
     _check_host(url)
     try:
         with httpx.Client(
-            follow_redirects=True,
-            timeout=TIMEOUT_S,
+            follow_redirects=False,
+            timeout=_budget(),
             headers={"User-Agent": USER_AGENT, "Accept-Language": "cs"},
+            transport=TRANSPORT,
         ) as client:
-            with client.stream("GET", url) as resp:
-                _check_host(str(resp.url))  # i cíl přesměrování musí být schválený
-                resp.raise_for_status()
-                chunks, size = [], 0
-                for chunk in resp.iter_bytes():
-                    size += len(chunk)
-                    if size > MAX_BYTES:
-                        raise FetchError(f"Odpověď je větší než {MAX_BYTES} bajtů: {url}")
-                    chunks.append(chunk)
+            current = url
+            for _ in range(MAX_REDIRECTS + 1):
+                _check_host(current)  # kontrola před každým odesláním, i po přesměrování
+                timeout = _budget()
+                with client.stream("GET", current, timeout=timeout) as resp:
+                    if resp.is_redirect:
+                        location = resp.headers.get("location")
+                        if not location:
+                            raise FetchError(f"Přesměrování bez cíle: {current}")
+                        current = urljoin(current, location)
+                        continue
+                    resp.raise_for_status()
+                    chunks, size = [], 0
+                    for chunk in resp.iter_bytes():
+                        size += len(chunk)
+                        if size > MAX_BYTES:
+                            raise FetchError(f"Odpověď je větší než {MAX_BYTES} bajtů: {url}")
+                        left = remaining()
+                        if left is not None and left <= 0:
+                            raise DeadlineExceeded(f"Vyčerpán časový limit auditu během stahování: {url}")
+                        chunks.append(chunk)
+                    break
+            else:
+                raise FetchError(f"Příliš mnoho přesměrování: {url}")
     except httpx.HTTPError as exc:
         raise FetchError(f"Stažení selhalo ({type(exc).__name__}): {url}") from exc
     return Fetched(

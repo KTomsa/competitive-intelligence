@@ -18,8 +18,8 @@
   };
   const ORIGIN_TEXT = { live: "živě", snapshot: "snapshot" };
   const MODE_TEXT = {
-    live: "Živý běh: všechny zdroje byly staženy teď.",
-    mixed: "Smíšený běh: část zdrojů pochází z uloženého snapshotu.",
+    live: "Živý běh: všechny očekávané zdroje byly staženy teď.",
+    mixed: "Smíšený běh: část očekávaných zdrojů pochází ze snapshotu nebo chybí.",
     snapshot: "Běh z uložených dat: nejde o živé stažení.",
   };
 
@@ -152,7 +152,8 @@
     sec.append(el("h2", null, "Srovnání fixovaných nabídek"));
     sec.append(el("p", "meta", "Sazba " + r.profile.tariff + (r.profile.area ? ", distribuční území " + r.profile.area : "") +
       ". Roční náklad je obchodní část ceny s DPH (12 × stálý plat + spotřeba × cena), bez regulovaných složek. " +
-      "Seřazeno od nejnižšího nákladu. Pásmo ERÚ: pod pásmem = nejlevnější čtvrtina nabídek na trhu."));
+      "Seřazeno od nejnižšího nákladu; pořadí platí jen pro tento vzorek. Pásmo ERÚ je odhad ceny komodity " +
+      "pro sazbu, fixaci a měsíc, ne změřené pořadí na trhu."));
     r.comparison.forEach((g) => {
       sec.append(el("h3", null, "Fixace " + g.fixation_months + " měsíců"));
       const wrap = el("div", "matrix-wrap");
@@ -170,6 +171,7 @@
           first.append(" ");
           first.append(link(row.price_list_url, "ceník"));
         }
+        if (row.row_locator) first.append(el("div", "sub", row.row_locator));
         tr.append(first);
         tr.append(el("td", null, row.price_mwh_excl_vat == null ? "–" : czNumber.format(row.price_mwh_excl_vat)));
         tr.append(el("td", null, row.monthly_fee_incl_vat == null ? "–" : czMoney.format(row.monthly_fee_incl_vat)));
@@ -188,8 +190,17 @@
       wrap.append(table);
       sec.append(wrap);
     });
-    sec.append(el("p", "meta", "Ověření „živě“ znamená, že při tomto běhu byl stažen ceník nebo stránka dodavatele " +
-      "a cena v nich stále je. „Z přípravy“ jsou údaje z ceníku, který nelze stáhnout automaticky."));
+    sec.append(el("p", "meta", "„Živě“ znamená, že při tomto běhu byl stažen ceník, shoduje se s ručně " +
+      "zkontrolovanou verzí a dnes platí; u stránky dodavatele jde jen o kontrolu přítomnosti ceny v textu. " +
+      "„Z přípravy“ jsou ručně zkontrolované údaje, které se nepodařilo živě potvrdit."));
+    if (r.comparison_excluded && r.comparison_excluded.length) {
+      const det = el("details", "candidates");
+      det.append(el("summary", null, "Nabídky vyřazené ze srovnání (" + r.comparison_excluded.length + ")"));
+      const list = el("ul");
+      r.comparison_excluded.forEach((x) => list.append(el("li", null, x.supplier + " – " + x.product + ": " + x.reason)));
+      det.append(list);
+      sec.append(det);
+    }
     return sec;
   }
 
@@ -433,6 +444,13 @@
       : MODE_TEXT[r.mode];
     const mode = el("p", "mode mode-" + (r.is_saved_example ? "snapshot" : r.mode), modeText);
     reportEl.append(mode);
+    if (r.coverage) {
+      const c = r.coverage;
+      const parts = ["živě " + c.live, "ze snapshotu " + c.snapshot, "chybí " + c.missing];
+      const cov = el("p", "meta coverage", "Očekávané zdroje: " + c.expected + " (" + parts.join(", ") + ")" +
+        (r.duration_s != null ? " · běh trval " + r.duration_s + " s z limitu " + r.deadline_s + " s" : "") + ".");
+      reportEl.append(cov);
+    }
     if (r.warnings && r.warnings.length) {
       const warn = el("ul", "warnings");
       r.warnings.forEach((w) => warn.append(el("li", null, w)));
@@ -476,6 +494,27 @@
 
     const srcPanel = el("section", "panel");
     srcPanel.append(el("h2", null, "Zdroje použité v tomto běhu"));
+    if (r.manifest && r.manifest.length) {
+      const STATE = { live: "živě", snapshot: "snapshot", missing: "chybí", not_required: "ruční podklad" };
+      const det = el("details", "pricelists");
+      det.append(el("summary", null, "Všechny očekávané zdroje a jejich stav (" + r.manifest.length + ")"));
+      const list = el("ul", "sources");
+      r.manifest.forEach((m) => {
+        const li = el("li", "source");
+        const head = el("div", "source-head");
+        head.append(el("strong", null, m.label),
+          el("span", "badge origin-" + (m.state === "live" ? "live" : "snapshot"), STATE[m.state] || m.state));
+        li.append(head);
+        const meta = el("div", "meta");
+        if (m.fetched_at) meta.append("Získáno " + fmtTime(m.fetched_at));
+        if (m.note) meta.append((m.fetched_at ? " · " : "") + m.note);
+        li.append(meta);
+        if (m.url) li.append(link(m.url, m.url));
+        list.append(li);
+      });
+      det.append(list);
+      srcPanel.append(det);
+    }
     const ul = el("ul", "sources");
     ul.append(sourceRow(r.sources.eru), sourceRow(r.sources.ote));
     if (r.sources.ote_gas) ul.append(sourceRow(r.sources.ote_gas));
