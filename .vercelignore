@@ -1,0 +1,12 @@
+# Nikdy nenahrávat tajemství ani lokální prostředí
+.env
+.env.*
+!.env.example
+.venv/
+**/__pycache__/
+.pytest_cache/
+# Na běh aplikace nejsou potřeba
+tests/
+docs/
+.github/
+.vscode/
