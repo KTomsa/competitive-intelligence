@@ -217,7 +217,8 @@ def price_favorable(claim, supplier, ctx):
 # ---------- cenové prvenství ----------
 
 def _comparable(offer: dict, ctx: dict) -> bool:
-    return ev.offer_eligibility(offer, ctx, audience="new").ok  # nabídky pro zákazníka, který mění dodavatele
+    """Nabídka pro zákazníka, který mění dodavatele, platná k jednomu datu srovnání (QUAL-004)."""
+    return ev.offer_eligibility(offer, ctx, audience="new", current=True).ok
 
 
 def _same_area(a: dict, b: dict) -> bool:
@@ -249,11 +250,23 @@ def price_rank(claim, supplier, ctx):
         s["name"] for s in ctx["suppliers"]
         if s["id"] != supplier["id"] and any(_comparable(o, ctx) for o in s["offers"])
     })
+    as_of = ev.comparison_date(ctx).isoformat()
     sample_note = (
         f"Srovnání pokrývá jen vzorek ({', '.join(sample) or 'žádný další dodavatel'}): sazba {profile['tariff']}"
         + (f", distribuční území {profile['area']}" if profile.get("area") else "")
-        + ", stejná délka fixace, jen produkty s jednou pevnou cenou."
+        + f", stejná délka fixace, jen produkty s jednou pevnou cenou, obě nabídky platné k {as_of}."
     )
+    if not own and any(ev.offer_eligibility(o, ctx, audience="new").ok for o in supplier["offers"]):
+        reason = next(
+            ev.offer_current(o, ctx).reason for o in supplier["offers"]
+            if ev.offer_eligibility(o, ctx, audience="new").ok
+        )
+        return result(
+            UNVERIFIABLE,
+            f"Ceník dodavatele nelze postavit vedle ostatních k datu srovnání {as_of}: {reason}",
+            sample_note,
+            "Znovu zachytit aktuální ceník dodavatele; do té doby tvrzení nehodnotit.",
+        )
     if not own:
         return result(
             UNVERIFIABLE,
@@ -553,12 +566,24 @@ def market_size(claim, supplier, ctx):
         scope = ev.ClaimScope(**{**scope.__dict__, "commodities": (ev.ELECTRICITY, ev.GAS)})
     evidence, rows, info = _size_context(supplier, ctx, scope)
 
+    gate = ev.ote_scope_gate(scope, ctx)  # trh, komodita a období tvrzení musí sedět na data OTE
+    if not gate.ok:
+        summary = "; ".join(f"{r['text']}: {r['status']}" for r in rows)
+        return result(
+            UNVERIFIABLE,
+            f"{gate.reason} Data OTE proto slouží jen jako kontext: {summary}.",
+            OTE_LIMIT, "Bez akce; pro verdikt by bylo potřeba údaj za stejný trh, komoditu a období.",
+            evidence, rows,
+        )
+
     if scope.qualifier:
         return _qualified_size(claim, supplier, ctx, scope, evidence, rows, info)
 
     if scope.metric != "opm":
         summary = "; ".join(f"{r['text']}: {r['status']}" for r in rows)
-        bigger = info["position"] != 1 or (ev.GAS in scope.commodities and info.get("gas_position") not in (None, 1))
+        bigger = (ev.ELECTRICITY in scope.commodities and info["position"] != 1) or (
+            ev.GAS in scope.commodities and info.get("gas_position") not in (None, 1)
+        )
         return result(
             UNVERIFIABLE,
             f"{NO_METRIC} Podle odběrných míst (OTE, {info['period']}): {summary}.",
@@ -569,8 +594,8 @@ def market_size(claim, supplier, ctx):
             evidence, rows, opportunity=2 if bigger else False,
         )
 
-    # tvrzení výslovně o odběrných místech: lze vydat verdikt
-    statuses = [info["position"] == 1]
+    # tvrzení výslovně o odběrných místech: lze vydat verdikt, jen z komodit, o kterých tvrzení mluví
+    statuses = [info["position"] == 1] if ev.ELECTRICITY in scope.commodities else []
     if ev.GAS in scope.commodities:
         if info.get("gas_position") is None:
             return result(
@@ -775,32 +800,40 @@ def customer_growth(claim, supplier, ctx):
             UNVERIFIABLE, "Superlativ růstu („nejrychleji“) vyžaduje definici metriky a období.",
             OTE_LIMIT, "Vyžádat si metodiku; případně porovnat růst OPM všech dodavatelů.",
         )
-    change = ev.opm_change(ctx["ote"], supplier.get("ote_name") or "")
+    gate = ev.ote_scope_gate(scope, ctx)  # QUAL-001: trh, komodita a období podle tvrzení, ne vždy elektřina
+    if not gate.ok:
+        return result(UNVERIFIABLE, f"Růst nelze posoudit daty OTE. {gate.reason}", OTE_LIMIT,
+                      "Bez akce; pro verdikt by byl potřeba údaj za stejný trh, komoditu a období.")
+    what = " a ".join(scope.commodities)
+    change = ev.opm_change_scope(ctx, scope.entities, scope.commodities)
     if change.abs is None:
-        return result(UNVERIFIABLE, f"Změnu počtu odběrných míst nelze určit. {change.reason}", OTE_LIMIT,
+        return result(UNVERIFIABLE, f"Změnu počtu odběrných míst ({what}) nelze určit. {change.reason}", OTE_LIMIT,
                       "Ověřit název právnické osoby a období v tabulce OTE.")
     window = change.window
+    pct = ev.pct_label(change.pct)
     evidence = [{
-        "label": f"{supplier['ote_name']}: {num(change.first)} → {num(change.last)} OPM elektřiny ({window.label})",
-        "value": f"změna {'+' if change.abs >= 0 else ''}{num(change.abs)} OPM ({change.pct:+.1f} %)",
-        "source": "ote",
+        "label": f"{' + '.join(scope.entities)}: {num(change.first)} → {num(change.last)} OPM ({what}, {window.label})",
+        "value": f"změna {'+' if change.abs >= 0 else ''}{num(change.abs)} OPM ({pct})",
+        "source": "ote" if ev.ELECTRICITY in scope.commodities else "ote_gas",
     }]
     limitation = OTE_LIMIT + f" Měří se jen společné období tabulky OTE ({window.label})."
+    if change.pct is None:
+        limitation += " Výchozí stav je nula, procentní změnu proto nelze určit; uvádí se jen absolutní změna."
     if scope.metric != "opm":
         return result(
             UNVERIFIABLE,
-            "Tvrzení neuvádí, co roste (zákazníci, odběrná místa, objem). Počet odběrných míst elektřiny se "
-            f"za {window.label} změnil o {num(change.abs)} ({change.pct:+.1f} %).",
+            f"Tvrzení neuvádí, co roste (zákazníci, odběrná místa, objem). Počet odběrných míst ({what}) se "
+            f"za {window.label} změnil o {num(change.abs)} ({pct}).",
             limitation,
             "Bez akce, pokud odběrná místa rostou; jinak se zeptat, jakou metriku dodavatel myslí."
             if change.abs > 0 else "Příležitost: odběrná místa za období nerostla.",
             evidence, opportunity=False if change.abs > 0 else 2,
         )
     if change.abs > 0:
-        return result(SUPPORTED, f"Počet odběrných míst elektřiny za {window.label} vzrostl.",
+        return result(SUPPORTED, f"Počet odběrných míst ({what}) za {window.label} vzrostl.",
                       limitation, "Tvrzení o růstu nenapadat.", evidence)
     return result(
-        CONTRADICTED, f"Počet odběrných míst elektřiny za {window.label} nevzrostl.", limitation,
+        CONTRADICTED, f"Počet odběrných míst ({what}) za {window.label} nevzrostl.", limitation,
         "Příležitost: tvrzení o růstu lze zpochybnit veřejnými daty OTE.", evidence, opportunity=3,
     )
 

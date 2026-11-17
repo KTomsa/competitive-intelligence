@@ -19,8 +19,18 @@ PRICE_CAVEAT = (
 )
 
 
-def pct_text(value: float) -> str:
-    return f"{value:+.1f}".replace(".", ",") + " %"
+def pct_text(value: float | None) -> str:
+    return ev.pct_label(value)  # nulový výchozí stav: procento není definováno (QUAL-005)
+
+
+def _growth_key(row: dict) -> tuple:
+    """Řazení podle růstu: nejdřív známé procento, pak růst z nuly (jen absolutně), nakonec bez údaje."""
+    change = row["electricity"]
+    if change is None:
+        return (2, 0)
+    if change["pct"] is None:
+        return (1, -change["abs"])
+    return (0, -change["pct"])
 
 
 def _series(table_data: dict | None, legal_name: str) -> dict | None:
@@ -73,7 +83,7 @@ def market_overview(suppliers: list[dict], ctx: dict, comparison: list[dict]) ->
             "price": price,
             "decisions": _decision_counts(supplier, ctx),
         })
-    rows.sort(key=lambda r: (r["electricity"] is None, -(r["electricity"] or {"pct": 0})["pct"]))
+    rows.sort(key=_growth_key)
     window = ev.common_window(ctx["ote"])
     market = ev.market_change(ctx["ote"])
 
@@ -143,7 +153,8 @@ def loyalty_gaps(suppliers: list[dict], ctx: dict) -> list[dict]:
         source = supplier.get("audience_source") or {}
         by_months: dict[int, dict[str, dict]] = {}
         for offer in supplier["offers"]:
-            if not ev.offer_eligibility(offer, ctx).ok:  # stejné pravidlo jako verdikty a srovnání
+            # stejné pravidlo jako verdikty a srovnání, obě nabídky platné k jednomu datu srovnání
+            if not ev.offer_eligibility(offer, ctx, current=True).ok:
                 continue
             group = {"new": "new", "existing": "existing", "all": "existing"}.get(offer.get("audience"))
             if group is None:
@@ -246,7 +257,8 @@ def build_perspective(own: dict, ctx: dict, comparison: list[dict], evaluated: d
                 f"Rosteme: počet našich odběrných míst {label} vzrostl {span} o {rules.num(change['abs'])} "
                 f"({pct_text(change['pct'])})."
             )
-            if label == "elektřiny" and market_pct is not None and change["pct"] > market_pct:
+            if (label == "elektřiny" and market_pct is not None and change["pct"] is not None
+                    and change["pct"] > market_pct):
                 text += (f" Trh za stejné období (dodavatelé s údajem na začátku i na konci) se změnil o "
                          f"{pct_text(market_pct)}.")
             provable.append({"text": text, "source": source, "caveat": OPM_CAVEAT})
@@ -356,12 +368,12 @@ def build_perspective(own: dict, ctx: dict, comparison: list[dict], evaluated: d
                         + " Lze je oslovit nabídkou, která je pro ně výhodnější." + note,
             })
     mine_row = next((r for r in market["rows"] if r["id"] == own["id"]), None)
-    if mine_row and mine_row["electricity"]:
+    if mine_row and mine_row["electricity"] and mine_row["electricity"]["pct"] is not None:
         own_pct = mine_row["electricity"]["pct"]
-        faster = [
+        faster = [  # růst z nuly nemá procento, proto se do „rychleji“ nepočítá
             r for r in market["rows"]
             if r["id"] != own["id"] and r["electricity"] and r["electricity"]["abs"] > 0
-            and r["electricity"]["pct"] > own_pct
+            and r["electricity"]["pct"] is not None and r["electricity"]["pct"] > own_pct
         ]
         faster.sort(key=lambda r: -r["electricity"]["abs"])
         if faster:

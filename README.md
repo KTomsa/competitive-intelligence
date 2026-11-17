@@ -102,20 +102,28 @@ Verdikty se předem nepřipravují.
 ## Spolehlivost běhu
 
 - **Manifest zdrojů**: zpráva vypisuje každý očekávaný zdroj a jeho stav (živě, snapshot, chybí, ruční podklad). Běh je „živý“ jen tehdy, když jsou živě všechny očekávané zdroje.
-- **Jeden časový limit**: celý audit má limit `AUDIT_DEADLINE_S` (výchozí 45 s, pod limitem hostingu 60 s). Každé stažení dostane jen zbývající čas, po vypršení se nové stažení nezačne a použije se datovaný snapshot.
+- **Jeden časový limit**: celý audit má limit `AUDIT_DEADLINE_S` (výchozí 45 s, pod limitem hostingu 60 s). Síť a model musí skončit o rezervu dřív (5 s, u krátkých limitů pětina), aby zbyl čas na pravidla a odeslání odpovědi. Každé stažení má tvrdý strop: běží ve vlákně a čeká se na něj nejvýš zbývající čas, takže spojení, hlavičky a data nemohou limit překročit součtem. Po vypršení se nové stažení nezačne a použije se datovaný snapshot.
+- **Jedno datum srovnání**: kde stojí dvě nabídky vedle sebe (verdikt o ceně, tabulka srovnání, rozdíl pro nové a stávající zákazníky), musí obě platit k datu auditu. Nepotvrzená nabídka zachycená před víc než 62 dny se nepoužije.
 - **Přesměrování**: každý krok přesměrování se kontroluje (HTTPS, schválený hostitel a port) dřív, než se na něj odešle požadavek.
 
 ## Nasazení a veřejné demo
 
-`vercel.json` a `src/index.py` jsou připravené pro Vercel, ale **nasazení zatím nikdo nevyzkoušel**, stejně jako dostupnost Pythonu 3.14 na hostingu. Postup pro veřejné demo:
+Aplikace běží na https://fact-or-watt.vercel.app (`vercel.json`, `src/index.py`). Nasazuje se ručně z `main` a s číslem commitu, které se pak ukáže v patičce stránky a na `/api/v1/version`:
+
+```bash
+npx --yes vercel@latest deploy --prod --yes --env APP_BUILD=$(git rev-parse HEAD)
+```
+
+Postup pro veřejné demo:
 
 1. Nastavte `DEMO_CODE` (sdílený přístupový kód). Na Vercelu (`VERCEL`) nebo s `PUBLIC_DEMO=1` je bez něj živý audit vypnutý; analýza ze zálohy a uložená ukázka fungují dál.
-2. Model nechte vypnutý, dokud nemáte nastavenou kvótu a rozpočet u poskytovatele.
+2. Model zapněte (`CI_USE_LLM=1`, `GEMINI_API_KEY`) jen s vědomím, že bezplatná vrstva občas vrátí chybu 503; aplikace pak hledá tvrzení podle klíčových slov.
 3. Aplikace omezuje velikost požadavku (8 kB), souběžné audity (`MAX_CONCURRENT_AUDITS`, výchozí 2) a živé audity z jedné adresy (`LIVE_AUDITS_PER_WINDOW` za 10 minut, výchozí 6). **Tyto limity platí pro jednu instanci**; na serverless hostingu doplňte ochranu hostingu (např. heslo nasazení) a ověřte je na cílové adrese.
 4. Před prezentací ověřte, že nasazená aplikace dosáhne na `eru.gov.cz`, `www.ote-cr.cz` a weby dodavatelů.
 
 ## Postup na den prezentace
 
+1. Den předem ručně obnovit připravené příklady (ceníky a citáty) a ověřit, že verze v patičce odpovídá commitu v `main`.
 1. Spustit živou analýzu a ukázat panel zdrojů: období dat ERÚ a OTE a čas stažení.
 2. Projít příklad epet (v rozporu s daty) a ČEZ (nelze ověřit) a ukázat, proč se liší.
 3. Přepnout na „Analýza ze zálohy“ a ukázat, že aplikace použití snapshotu výslovně označí.
@@ -169,6 +177,18 @@ docs/ARCHITECTURE.md, RULE_CATALOG.md, DATA_SOURCES.md, historical/
 | TEST-001 | Ručně posouzené případy, testy limitu, přesměrování, manifestu a vstupů, CI úloha, volitelná kontrola živých zdrojů. |
 | DOC-001 | Tento README, aktualizované `docs/`, staré návody přesunuté do `docs/historical/`. |
 
+### Opakovaná revize (17. 11. 2026)
+
+Revize potvrdila 10 ze 14 nálezů jako vyřešené. Zbylé čtyři jsou dokončené takto (testy v `tests/test_rereview.py`):
+
+| Nález | Co se změnilo |
+|---|---|
+| QUAL-004 | Dvojice nabídek se srovnává k jednomu datu (`evidence.comparison_date`, `offer_current`): ve verdiktu o ceně, v tabulce srovnání i v rozdílu pro nové a stávající zákazníky. Nabídka, která k datu srovnání neplatí, se vyřadí s důvodem. |
+| QUAL-001 | Velikost a růst respektují rozsah tvrzení (`evidence.ote_scope_gate`): jiný trh nebo období než data OTE → „nelze ověřit“; růst plynu se počítá z tabulky plynu, tvrzení jen o plynu se nehodnotí pořadím v elektřině. |
+| OPS-002 | Rezerva na zpracování odpovědi a tvrdý strop každého stažení přes všechny fáze (spojení, hlavičky, data). |
+| QUAL-005 | Růst z nulového výchozího stavu: absolutní změna zůstane, procento je „nelze určit“, řazení i text s tím počítají. |
+| Původ nasazení | Patička stránky a `/api/v1/version` ukazují commit, ze kterého nasazení běží. |
+
 ## Známá omezení
 
 - Ceny jsou z ceníků pro distribuční území PRE a sazbu D02d; jinde se mohou lišit.
@@ -179,4 +199,5 @@ docs/ARCHITECTURE.md, RULE_CATALOG.md, DATA_SOURCES.md, historical/
 - Z rozhodnutí ERÚ se čte jen název, datum zveřejnění a štítky, a hledá se podle názvu; skutek ani výši sankce aplikace nezná.
 - Souběh ceny a růstu není důkaz příčiny.
 - Odkaz na směrnici (EU) 2024/825 u zelených tvrzení nebyl právně ověřen.
-- Nevyzkoušeno: nasazení na hosting, chování pod zátěží, skutečné výstupy a náklady modelu.
+- Nasazení je vyzkoušené jednotlivými běhy (revize 17. 11. 2026: 34 z 37 zdrojů živě, 26,8 s). Nevyzkoušeno: chování pod zátěží, dlouhodobá dostupnost, náklady a kvóty modelu.
+- Limity četnosti a souběhu platí jen v rámci jedné instance hostingu.

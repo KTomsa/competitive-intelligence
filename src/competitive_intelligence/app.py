@@ -59,6 +59,12 @@ def is_public_deployment() -> bool:
     return bool(os.environ.get("VERCEL")) or os.environ.get("PUBLIC_DEMO") == "1"
 
 
+def build_id() -> str | None:
+    """Commit, ze kterého běží nasazení (nastaví se při nasazení), aby šlo ověřit, co běží."""
+    value = os.environ.get("APP_BUILD") or os.environ.get("VERCEL_GIT_COMMIT_SHA")
+    return value[:12] if value else None
+
+
 def _code_matches(given: str | None, expected: str) -> bool:
     return hmac.compare_digest((given or "").encode("utf-8"), expected.encode("utf-8"))
 
@@ -90,7 +96,12 @@ def create_app() -> Flask:
             profile=config["profile"],
             llm=agents.llm_available(),
             needs_code=bool(os.environ.get("DEMO_CODE")),
+            build=build_id(),
         )
+
+    @app.get("/api/v1/version")
+    def version():
+        return jsonify(build=build_id())
 
     @app.post("/api/v1/analyze")
     def analyze():
@@ -125,6 +136,7 @@ def create_app() -> Flask:
             return jsonify(error="Došlo k chybě při provádění auditu."), 502
         finally:
             slots.release()
+        report["build"] = build_id()
         return jsonify(report)
 
     @app.get("/api/v1/example")

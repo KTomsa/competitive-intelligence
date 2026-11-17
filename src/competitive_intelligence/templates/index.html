@@ -147,6 +147,7 @@
   <footer class="site-footer shell">
     <span>© 2026 Fact or Watt</span>
     <span>Analytická podpora, nikoliv právní posouzení. „Nelze ověřit“ neznamená „nepravdivé“.</span>
+    {% if build %}<span>Verze {{ build }}</span>{% endif %}
   </footer>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>

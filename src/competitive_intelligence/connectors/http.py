@@ -3,12 +3,16 @@
 Přesměrování se neprovádí automaticky: každý krok se zkontroluje (HTTPS, hostitel, port)
 dřív, než se na něj odešle požadavek. Celý audit má jeden časový limit (`deadline`), který
 platí pro všechna stahování v daném běhu, včetně vláken.
+
+Limit jednoho stažení je tvrdý: stahování běží ve vlákně a čeká se na něj nejvýš zbývající
+čas. Jednotlivé fáze (spojení, hlavičky, data) tak nemohou limit překročit součtem.
 """
 from __future__ import annotations
 
 import contextvars
 import hashlib
 import json
+import threading
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -103,18 +107,49 @@ def _budget() -> float:
 
 
 def fetch_live(url: str) -> Fetched:
+    """Stáhne URL nejvýš za zbývající čas auditu (tvrdý strop, ne součet časových limitů fází)."""
     _check_host(url)
+    limit = _budget()
+    stop_at = time.monotonic() + limit
+    box: dict = {}
+    context = contextvars.copy_context()
+
+    def work():
+        try:
+            box["result"] = context.run(_fetch_live, url, stop_at)
+        except BaseException as exc:  # předá se volajícímu
+            box["error"] = exc
+
+    worker = threading.Thread(target=work, name="fetch", daemon=True)
+    worker.start()
+    worker.join(limit)
+    if worker.is_alive():
+        # vlákno doběhne samo díky časovým limitům fází; výsledek se už nepoužije
+        raise DeadlineExceeded(f"Zdroj neodpověděl v časovém limitu auditu ({limit:.1f} s): {url}")
+    if "error" in box:
+        raise box["error"]
+    return box["result"]
+
+
+def _phase_timeout(stop_at: float) -> float:
+    left = stop_at - time.monotonic()
+    if left <= 0:
+        raise DeadlineExceeded("Vyčerpán časový limit stažení.")
+    return min(TIMEOUT_S, left)
+
+
+def _fetch_live(url: str, stop_at: float) -> Fetched:
     try:
         with httpx.Client(
             follow_redirects=False,
-            timeout=_budget(),
+            timeout=_phase_timeout(stop_at),
             headers={"User-Agent": USER_AGENT, "Accept-Language": "cs"},
             transport=TRANSPORT,
         ) as client:
             current = url
             for _ in range(MAX_REDIRECTS + 1):
                 _check_host(current)  # kontrola před každým odesláním, i po přesměrování
-                timeout = _budget()
+                timeout = _phase_timeout(stop_at)
                 with client.stream("GET", current, timeout=timeout) as resp:
                     if resp.is_redirect:
                         location = resp.headers.get("location")
@@ -128,8 +163,7 @@ def fetch_live(url: str) -> Fetched:
                         size += len(chunk)
                         if size > MAX_BYTES:
                             raise FetchError(f"Odpověď je větší než {MAX_BYTES} bajtů: {url}")
-                        left = remaining()
-                        if left is not None and left <= 0:
+                        if time.monotonic() >= stop_at:
                             raise DeadlineExceeded(f"Vyčerpán časový limit auditu během stahování: {url}")
                         chunks.append(chunk)
                     break

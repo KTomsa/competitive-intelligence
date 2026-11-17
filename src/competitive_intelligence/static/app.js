@@ -153,7 +153,8 @@
     sec.append(el("p", "meta", "Sazba " + r.profile.tariff + (r.profile.area ? ", distribuční území " + r.profile.area : "") +
       ". Roční náklad je obchodní část ceny s DPH (12 × stálý plat + spotřeba × cena), bez regulovaných složek. " +
       "Seřazeno od nejnižšího nákladu; pořadí platí jen pro tento vzorek. Pásmo ERÚ je odhad ceny komodity " +
-      "pro sazbu, fixaci a měsíc, ne změřené pořadí na trhu."));
+      "pro sazbu, fixaci a měsíc, ne změřené pořadí na trhu." +
+      (r.comparison_date ? " Všechny nabídky platí k datu srovnání " + r.comparison_date + "." : "")));
     r.comparison.forEach((g) => {
       sec.append(el("h3", null, "Fixace " + g.fixation_months + " měsíců"));
       const wrap = el("div", "matrix-wrap");
@@ -205,6 +206,7 @@
   }
 
   function pctText(v) {
+    if (v == null) return "procento nelze určit"; // růst z nuly: jen absolutní změna
     return (v > 0 ? "+" : "") + String(v.toFixed(1)).replace(".", ",") + " %";
   }
 

@@ -50,7 +50,8 @@ Role jsou funkce, ne samostatné služby. Samostatný Judge není; jeho úlohu p
 ## Co hlídá kód
 
 - Stahuje se jen ze schválených hostitelů přes HTTPS a port 443, s limitem velikosti. Přesměrování se provádí ručně a každý krok se kontroluje dřív, než se na něj pošle požadavek.
-- Celý audit má jeden časový limit (`AUDIT_DEADLINE_S`, výchozí 45 s). Limit se předává do vláken (`contextvars`), každé stažení dostane jen zbývající čas a po vypršení se nic nového nezačíná.
+- Celý audit má jeden časový limit (`AUDIT_DEADLINE_S`, výchozí 45 s). Síť a model musí skončit o rezervu dřív (`RESPONSE_RESERVE_S`), aby zbyl čas na pravidla a odpověď. Limit se předává do vláken (`contextvars`), každé stažení má tvrdý strop zbývajícího času přes všechny fáze a po vypršení se nic nového nezačíná.
+- Dvojice nabídek se srovnává k jednomu datu (`evidence.comparison_date`); tvrzení o velikosti a růstu se hodnotí jen daty OTE za stejný trh, komoditu a období (`evidence.ote_scope_gate`).
 - Jedno pravidlo oprávněnosti nabídek (`evidence.offer_eligibility`) pro verdikty, srovnání, rozdíl cen pro nové a stávající zákazníky i pohled firmy.
 - Rozhraní přijímá jen identifikátory dodavatelů, žádné uživatelské URL.
 - CSV ERÚ musí mít očekávané sloupce a konečné kladné hodnoty; duplicitní řádek je chyba.

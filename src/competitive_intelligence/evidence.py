@@ -16,6 +16,9 @@ from .connectors import ote as ote_connector
 METRICS = ("opm", "customers", "unspecified")
 COMPARATORS = ("at_least", "at_most", "approx", "exactly")
 ELECTRICITY, GAS = "elektřina", "plyn"
+COMMODITIES = (ELECTRICITY, GAS)
+# Nepotvrzená nabídka starší než tohle se k datu srovnání nepovažuje za platnou.
+MAX_UNCONFIRMED_AGE_DAYS = 62
 
 
 @dataclass(frozen=True)
@@ -68,6 +71,27 @@ def claim_scope(claim: dict, supplier: dict) -> ClaimScope:
         market=market,
         qualifier=scope.get("qualifier") or params.get("qualifier"),
     )
+
+
+def ote_scope_gate(scope: ClaimScope, ctx: dict) -> Check:
+    """Smí se tvrzení o velikosti nebo růstu posoudit daty OTE? Nepodporovaný rozsah = zdržet se.
+
+    OTE pokrývá jen český trh, elektřinu a plyn a jedno zveřejněné období. Tvrzení o jiném trhu,
+    jiné komoditě nebo jiném období se daty OTE nehodnotí, i kdyby čísla vypadala podobně.
+    """
+    if scope.market != "CZ":
+        return Check(False, "Tvrzení se týká i jiných trhů než Česka; OTE pokrývá jen český trh.")
+    unknown = [c for c in scope.commodities if c not in COMMODITIES]
+    if unknown or not scope.commodities:
+        return Check(False, f"Komoditu „{', '.join(unknown) or 'neuvedena'}“ data OTE nepokrývají.")
+    for commodity in scope.commodities:
+        data = ctx.get("ote") if commodity == ELECTRICITY else ctx.get("ote_gas")
+        if not data:
+            return Check(False, f"Tabulka OTE pro komoditu „{commodity}“ není k dispozici.")
+        period = table_period(data)
+        if scope.period and period != scope.period:
+            return Check(False, f"Tvrzení se týká období {scope.period}, data OTE ({commodity}) jsou za {period}.")
+    return OK
 
 
 # ---------- OTE: období a součty ----------
@@ -188,9 +212,43 @@ class Change:
 
     @property
     def pct(self) -> float | None:
+        """Procentní změna; None, když chybí údaj nebo je výchozí stav nula (procento není definováno)."""
         if self.abs is None or not self.first:
             return None
         return round(self.abs / self.first * 100, 1)
+
+
+def pct_label(pct: float | None) -> str:
+    """Procento pro text; u nulového výchozího stavu napíše, že ho nelze určit."""
+    if pct is None:
+        return "procento nelze určit"
+    return f"{pct:+.1f}".replace(".", ",") + " %"
+
+
+def opm_change_scope(ctx: dict, entities: tuple[str, ...], commodities: tuple[str, ...]) -> Change:
+    """Změna OPM pro subjekty a komodity z rozsahu tvrzení.
+
+    Každá komodita se čte ze své tabulky; tabulky musí mít stejné společné období, jinak se
+    změny nesčítají. Chybějící údaj u kteréhokoli subjektu nebo komodity změnu zastaví.
+    """
+    tables = {ELECTRICITY: ctx.get("ote"), GAS: ctx.get("ote_gas")}
+    windows, first, last = set(), 0, 0
+    window = None
+    for commodity in commodities:
+        data = tables.get(commodity)
+        if not data:
+            return Change(None, None, None, f"Tabulka OTE pro komoditu „{commodity}“ není k dispozici.")
+        for entity in entities:
+            change = opm_change(data, entity)
+            if change.abs is None:
+                return Change(None, None, change.window, f"{commodity}: {change.reason}")
+            windows.add(change.window.label)
+            window = change.window
+            first += change.first
+            last += change.last
+    if len(windows) != 1:
+        return Change(None, None, None, "Tabulky OTE pro elektřinu a plyn mají jiné období; změny se nesčítají.")
+    return Change(first, last, window)
 
 
 def opm_change(table_data: dict | None, entity: str) -> Change:
@@ -253,6 +311,33 @@ def offer_valid_on(offer: dict, day: date) -> Check:
     return OK
 
 
+def comparison_date(ctx: dict) -> date:
+    """Jedno datum, ke kterému se srovnávají nabídky ve verdiktu, tabulce i doporučení."""
+    return ctx.get("comparison_date") or ctx["audit_date"]
+
+
+def offer_current(offer: dict, ctx: dict) -> Check:
+    """Platí nabídka k datu srovnání? Bez toho nelze dvě nabídky postavit vedle sebe."""
+    as_of = comparison_date(ctx)
+    valid = offer_valid_on(offer, as_of)
+    if not valid.ok:
+        return Check(False, f"K datu srovnání {as_of.isoformat()} nabídka neplatí. {valid.reason}")
+    if offer.get("confirmed_live"):
+        return OK
+    captured = _parse_date(offer.get("captured_at"))
+    if captured is None:
+        return Check(False, "Nepotvrzená nabídka nemá datum zachycení; k datu srovnání ji nelze použít.")
+    if captured > as_of:
+        return Check(False, f"Nabídka byla zachycena až po datu srovnání {as_of.isoformat()}.")
+    if (as_of - captured).days > MAX_UNCONFIRMED_AGE_DAYS:
+        return Check(
+            False,
+            f"Nabídka není živě potvrzena a byla zachycena {captured.isoformat()}, víc než "
+            f"{MAX_UNCONFIRMED_AGE_DAYS} dní před datem srovnání {as_of.isoformat()}.",
+        )
+    return OK
+
+
 @dataclass(frozen=True)
 class OfferCheck:
     ok: bool
@@ -262,9 +347,13 @@ class OfferCheck:
 
 
 def offer_eligibility(
-    offer: dict, ctx: dict, *, need_fees: bool = False, audience: str | None = None
+    offer: dict, ctx: dict, *, need_fees: bool = False, audience: str | None = None, current: bool = False
 ) -> OfferCheck:
-    """Jediné pravidlo, zda nabídka smí vstoupit do verdiktu, žebříčku nebo doporučení."""
+    """Jediné pravidlo, zda nabídka smí vstoupit do verdiktu, žebříčku nebo doporučení.
+
+    `current=True` se používá všude, kde stojí dvě nabídky vedle sebe (srovnání, žebříček,
+    rozdíl pro nové a stávající zákazníky): obě musí platit k jednomu datu srovnání.
+    """
     profile = ctx["profile"]
     if offer.get("stale"):
         return OfferCheck(False, "Živý zdroj už cenu z přípravy neobsahuje; nabídku je potřeba znovu zachytit.")
@@ -282,6 +371,10 @@ def offer_eligibility(
         return OfferCheck(False, "Nabídka nemá stálý měsíční plat, roční náklad nelze spočítat.")
     if audience and offer.get("audience", "new") not in (audience, "all"):
         return OfferCheck(False, "Nabídka je určena jiné skupině zákazníků.")
+    if current:
+        now = offer_current(offer, ctx)
+        if not now.ok:
+            return OfferCheck(False, now.reason)
     today = ctx["audit_date"]
     captured = _parse_date(offer.get("captured_at")) or today
     notes = []

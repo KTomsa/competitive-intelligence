@@ -2,7 +2,8 @@
 
 Celý běh má jeden časový limit (AUDIT_DEADLINE_S). Všechna stahování z něj čerpají, a když
 čas dojde, další zdroj se už nezačíná: použije se datovaný snapshot nebo se zdroj označí jako
-chybějící. Seznam očekávaných zdrojů (manifest) určuje, zda je běh opravdu živý.
+chybějící. Z limitu se předem odečte rezerva na vyhodnocení a odeslání odpovědi, takže síť
+nesmí spotřebovat celý čas. Seznam očekávaných zdrojů (manifest) určuje, zda je běh opravdu živý.
 """
 from __future__ import annotations
 
@@ -23,7 +24,13 @@ from .connectors.http import FetchError
 DATA = Path(__file__).resolve().parent / "data"
 EXAMPLE_REPORT = DATA / "example_report.json"
 DEFAULT_DEADLINE_S = 45.0  # pod limitem hostingu (vercel.json: 60 s)
+RESPONSE_RESERVE_S = 5.0  # čas na pravidla, briefing a odeslání odpovědi; síť ho nesmí spotřebovat
 MIN_LLM_S = 12.0  # s menším zbytkem času se model nevolá
+
+
+def network_reserve(budget: float) -> float:
+    """Rezerva na zpracování odpovědi: 5 s, u krátkých limitů nejvýš pětina limitu."""
+    return min(RESPONSE_RESERVE_S, budget * 0.2)
 
 
 class AuditError(Exception):
@@ -120,7 +127,7 @@ def _comparison(suppliers: list[dict], ctx: dict) -> tuple[list[dict], list[dict
     excluded = []
     for supplier in suppliers:
         for offer in supplier["offers"]:
-            check = evidence.offer_eligibility(offer, ctx, need_fees=True, audience="new")
+            check = evidence.offer_eligibility(offer, ctx, need_fees=True, audience="new", current=True)
             if not check.ok:
                 excluded.append({"supplier": supplier["name"], "product": offer["product"], "reason": check.reason})
                 continue
@@ -183,7 +190,7 @@ def run(
         use_llm = live and agents.llm_available()
     started = time.monotonic()
     budget = deadline_seconds()
-    token = http.DEADLINE.set(started + budget)
+    token = http.DEADLINE.set(started + budget - network_reserve(budget))  # síť a model končí dřív
     try:
         return _run(config, suppliers, selected, live, use_llm, perspective, started, budget)
     finally:
@@ -431,6 +438,7 @@ def _run(config, suppliers, selected, live, use_llm, perspective, started, budge
         "sources": sources,
         "price_lists": price_list_sources,
         "comparison": comparison,
+        "comparison_date": evidence.comparison_date(ctx).isoformat(),
         "comparison_excluded": excluded,
         "market": market,
         "perspective": view,
